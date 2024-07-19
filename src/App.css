@@ -13,5 +13,9 @@
   }
   .rcb-bot-message a {
     color: #ffffff;
+    text-decoration: underline;
+  }
+  .rcb-chat-footer-container {
+    font-size: 10px;
   }
 }
