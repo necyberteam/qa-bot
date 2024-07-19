@@ -11,4 +11,7 @@
     align-items: center;
     font-weight: 700;
   }
+  .rcb-bot-message a {
+    color: #ffffff;
+  }
 }

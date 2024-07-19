@@ -18,29 +18,14 @@ const handleQuery = async (params) => {
       body: JSON.stringify({ query: params.userInput })
     };
     const response = await fetch(queryEndpoint, requestOptions)
-    let text = "";
     let offset = 0;
-    for await (const chunk of response.stream) {
-      const chunkText = chunk.text();
-      text += chunkText;
-      // inner for-loop used to visually stream messages character-by-character
-      // feel free to remove this loop if you are alright with visually chunky streams
-      for (let i = offset; i < chunkText.length; i++) {
-        // while this example shows params.streamMessage taking in text input,
-        // you may also feed it custom JSX.Element if you wish
-        await params.streamMessage(text.slice(0, i + 1));
-        await new Promise(resolve => setTimeout(resolve, 30));
-      }
-      offset += chunkText.length;
-    }
+    const body = await response.json();
+    const text = body.response;
 
-    // in case any remaining chunks are missed (e.g. timeout)
-    // you may do your own nicer logic handling for large chunks
     for (let i = offset; i < text.length; i++) {
       await params.streamMessage(text.slice(0, i + 1));
-      await new Promise(resolve => setTimeout(resolve, 30));
+      await new Promise(resolve => setTimeout(resolve, 2));
     }
-    await params.streamMessage(text);
   } catch (error) {
     await params.injectMessage("Unable to contact the Q&A Bot. Please try again later.");
     hasError = true;
@@ -83,7 +68,10 @@ const MyChatBot = () => {
           enabledPlaceholderText: 'Ask me anything about ACCESS!',
         },
         chatHistory: { storageKey: "qa_bot" },
-        botBubble: { simStream: true },
+        botBubble: { 
+          simStream: true,
+          dangerouslySetInnerHtml: true
+         },
         isOpen: false,
         chatButton: {
           icon: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
