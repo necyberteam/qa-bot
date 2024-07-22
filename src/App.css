@@ -1,4 +1,7 @@
 .rcb-chat-window {
+  width: 550px;
+  max-width: calc(100% - 2.5rem);
+  
   .rcb-bot-avatar {
     background-size: contain;
     border-radius: 0;
