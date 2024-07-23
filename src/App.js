@@ -13,16 +13,14 @@ const handleQuery = async (params) => {
       headers: { 
         'Content-Type': 'application/json',
         'X-API-KEY': apiKey
-
       },
       body: JSON.stringify({ query: params.userInput })
     };
     const response = await fetch(queryEndpoint, requestOptions)
-    let offset = 0;
     const body = await response.json();
     const text = body.response;
 
-    for (let i = offset; i < text.length; i++) {
+    for (let i = 0; i < text.length; i++) {
       await params.streamMessage(text.slice(0, i + 1));
       await new Promise(resolve => setTimeout(resolve, 2));
     }
@@ -32,10 +30,13 @@ const handleQuery = async (params) => {
   }
 }
 
-const MyChatBot = () => {
+const MyChatBot = (props) => {
+  let welcome = 'Ask me anything about ACCESS!'
+  if (props.welcome !== undefined) {
+    welcome = props.welcome;
+  }
   const flow = {
     start: {
-      message: 'Hello! How can I help you today?',
       path: 'loop'
     },
     loop: {
@@ -58,14 +59,14 @@ const MyChatBot = () => {
           primaryColor: '#1a5b6e',
           secondaryColor: '#107180',
           fontFamily: 'Arial, sans-serif',
-          embedded: false 
+          embedded: props.embedded, 
         },
         header: {
           title: 'ACCESS Q&A Bot',
           avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
         },
         chatInput: {
-          enabledPlaceholderText: 'Ask me anything about ACCESS!',
+          enabledPlaceholderText: welcome,
         },
         chatHistory: { storageKey: "qa_bot" },
         botBubble: { 
@@ -99,10 +100,10 @@ const MyChatBot = () => {
     />
   );
 }
-function App() {
+function App(props) {
   return (
     <div className="access-qa-bot">
-      <MyChatBot />
+      <MyChatBot embedded={props.embedded} welcome={props.welcome}/>
     </div>
   );
 }
