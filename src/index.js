@@ -17,13 +17,14 @@ document.body.appendChild(domNode);
 // Look for optional elements for an embedded chat widget
 const embeddedQABots = document.querySelectorAll('.embedded-qa-bot');
 embeddedQABots.forEach(embeddedQABot => {
-  // get data-welcome value
+  // welcome message and prompt are data- attributes
   const welcome = embeddedQABot.dataset.welcome;
+  const prompt = embeddedQABot.dataset.prompt;
   const embeddedDomNode = document.createElement('div');
   const embeddedRoot = ReactDOM.createRoot(embeddedDomNode); 
   embeddedRoot.render(
     <React.StrictMode>
-      <App embedded welcome={welcome}/>
+      <App embedded welcome={welcome} prompt={prompt}/>
     </React.StrictMode>
   );
   embeddedQABot.appendChild(embeddedDomNode);

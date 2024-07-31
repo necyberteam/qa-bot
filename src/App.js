@@ -31,12 +31,17 @@ const handleQuery = async (params) => {
 }
 
 const MyChatBot = (props) => {
-  let welcome = 'Ask me anything about ACCESS!'
+  let welcome = 'Hello! What can I help you with?'
   if (props.welcome !== undefined) {
     welcome = props.welcome;
   }
+  let prompt = 'What would you like to know about ACCESS?'
+  if (props.prompt !== undefined) {
+    prompt = props.prompt;
+  }
   const flow = {
     start: {
+      message: welcome,
       path: 'loop'
     },
     loop: {
@@ -66,7 +71,7 @@ const MyChatBot = (props) => {
           avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
         },
         chatInput: {
-          enabledPlaceholderText: welcome,
+          enabledPlaceholderText: prompt,
         },
         chatHistory: { storageKey: "qa_bot" },
         botBubble: { 
@@ -103,7 +108,7 @@ const MyChatBot = (props) => {
 function App(props) {
   return (
     <div className="access-qa-bot">
-      <MyChatBot embedded={props.embedded} welcome={props.welcome}/>
+      <MyChatBot embedded={props.embedded} welcome={props.welcome} prompt={props.prompt}/>
     </div>
   );
 }
