@@ -1,7 +1,7 @@
 import './App.css';
 import ChatBot from "react-chatbotify";
 
-const queryEndpoint = 'https://access-qa.ccs.uky.edu:6060/api/query';
+const queryEndpoint = 'https://access-ai.ccs.uky.edu:6060/api/query';
 const apiKey = process.env.REACT_APP_API_KEY;
 let hasError = false;
 
