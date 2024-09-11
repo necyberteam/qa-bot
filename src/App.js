@@ -35,7 +35,7 @@ const MyChatBot = (props) => {
   if (props.welcome !== undefined) {
     welcome = props.welcome;
   }
-  let prompt = 'What would you like to know about ACCESS?'
+  let prompt = 'Questions should stand alone and not refer to previous ones.'
   if (props.prompt !== undefined) {
     prompt = props.prompt;
   }
