@@ -6,10 +6,16 @@ import reportWebVitals from './reportWebVitals';
 
 // Popup Chat widget
 const domNode = document.createElement('div');
-const root = ReactDOM.createRoot(domNode); 
+const root = ReactDOM.createRoot(domNode);
+
+function isAnonymous() {
+  return !document.querySelector('body').classList.contains('user-logged-in');
+}
+const disabled = isAnonymous();
+
 root.render(
   <React.StrictMode>
-    <App />
+    <App disabled={disabled} />
   </React.StrictMode>
 );
 document.body.appendChild(domNode); 
@@ -17,6 +23,7 @@ document.body.appendChild(domNode);
 // Look for optional elements for an embedded chat widget
 const embeddedQABots = document.querySelectorAll('.embedded-qa-bot');
 embeddedQABots.forEach(embeddedQABot => {
+  const disabled = isAnonymous();
   // welcome message and prompt are data- attributes
   const welcome = embeddedQABot.dataset.welcome;
   const prompt = embeddedQABot.dataset.prompt;
@@ -24,7 +31,7 @@ embeddedQABots.forEach(embeddedQABot => {
   const embeddedRoot = ReactDOM.createRoot(embeddedDomNode); 
   embeddedRoot.render(
     <React.StrictMode>
-      <App embedded welcome={welcome} prompt={prompt}/>
+      <App embedded welcome={welcome} prompt={prompt} disabled={disabled}/>
     </React.StrictMode>
   );
   embeddedQABot.appendChild(embeddedDomNode);

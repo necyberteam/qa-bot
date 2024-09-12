@@ -72,6 +72,8 @@ const MyChatBot = (props) => {
         },
         chatInput: {
           enabledPlaceholderText: prompt,
+          disabledPlaceholderText: 'Please log in to ask questions.',
+          disabled: props.disabled
         },
         chatHistory: { storageKey: "qa_bot" },
         botBubble: { 
@@ -108,7 +110,7 @@ const MyChatBot = (props) => {
 function App(props) {
   return (
     <div className="access-qa-bot">
-      <MyChatBot embedded={props.embedded} welcome={props.welcome} prompt={props.prompt}/>
+      <MyChatBot embedded={props.embedded} welcome={props.welcome} prompt={props.prompt} disabled={props.disabled}/>
     </div>
   );
 }
