@@ -100,7 +100,7 @@ const MyChatBot = (props) => {
           disabled: true,
         },
         footer: {
-          text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a>.</div>),
+          text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
         },
       }}
       flow={flow}
