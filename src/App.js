@@ -74,7 +74,7 @@ const MyChatBot = (props) => {
           disabledPlaceholderText: 'Please log in to ask questions.',
           disabled: props.disabled
         },
-        chatHistory: { storageKey: "qa_bot" },
+        chatHistory: { disabled: true },
         botBubble: {
           simStream: true,
           dangerouslySetInnerHtml: true
