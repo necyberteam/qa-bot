@@ -1,6 +1,12 @@
+.rcb-toggle-button.rcb-button-show {
+  background-size: 72%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: rgb(26, 91, 110);
+}
 .rcb-chat-window {
   width: 550px !important;
-  max-width: calc(100% - 2.5rem);
+  max-width: calc(100%);
 
   .rcb-bot-avatar {
     background-size: contain;

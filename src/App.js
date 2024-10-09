@@ -10,7 +10,7 @@ const handleQuery = async (params) => {
   try {
     const requestOptions = {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-API-KEY': apiKey
       },
@@ -55,16 +55,15 @@ const MyChatBot = (props) => {
         return 'loop'
       }
     }
-  
   }
   return (
-    <ChatBot 
+    <ChatBot
       options={{
-        theme: { 
+        theme: {
           primaryColor: '#1a5b6e',
           secondaryColor: '#107180',
           fontFamily: 'Arial, sans-serif',
-          embedded: props.embedded, 
+          embedded: props.embedded,
         },
         header: {
           title: 'ACCESS Q&A Bot',
@@ -75,11 +74,11 @@ const MyChatBot = (props) => {
           disabledPlaceholderText: 'Please log in to ask questions.',
           disabled: props.disabled
         },
-        chatHistory: { storageKey: "qa_bot" },
-        botBubble: { 
+        chatHistory: { disabled: true },
+        botBubble: {
           simStream: true,
           dangerouslySetInnerHtml: true
-         },
+        },
         isOpen: false,
         chatButton: {
           icon: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
@@ -110,7 +109,7 @@ const MyChatBot = (props) => {
 function App(props) {
   return (
     <div className="access-qa-bot">
-      <MyChatBot embedded={props.embedded} welcome={props.welcome} prompt={props.prompt} disabled={props.disabled}/>
+      <MyChatBot embedded={props.embedded} welcome={props.welcome} prompt={props.prompt} disabled={props.disabled} />
     </div>
   );
 }

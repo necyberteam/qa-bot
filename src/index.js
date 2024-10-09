@@ -37,6 +37,31 @@ embeddedQABots.forEach(embeddedQABot => {
   embeddedQABot.appendChild(embeddedDomNode);
 });
 
+// attach login event to the disabled chatbot input
+const loginHandler = () => {
+  if (disabled) {
+    const loginUrl = '/login?destination=' + window.location.pathname;
+    window.location = loginUrl;
+  }
+}
+const addCustomEventListener = (selector, event, handler) => {
+  let rootElement = document.querySelector('body');
+  rootElement.addEventListener(event, function (evt) {
+          var targetElement = evt.target;
+          while (targetElement != null) {
+              if (targetElement.matches(selector)) {
+                  handler(evt);
+                  return;
+              }
+              targetElement = targetElement.parentElement;
+          }
+      },
+      true
+  );
+}
+//adding the Event Listeners to all the chatbot instances
+addCustomEventListener('.rcb-chat-input','click',loginHandler);
+
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
