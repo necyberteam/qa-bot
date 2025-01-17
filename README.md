@@ -12,6 +12,17 @@ Some messages in the app can be customized if desired:
 
 See the index.html file for examples of how to add the default widget floating in the bottom right of the page and as an "embedded" widget with the tool open on the page by default.
 
+## Deployment
+You can install the app in a website:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.0/build/static/main.css">
+<div style="display:none;" id="qa-bot">
+    &nbsp;
+</div>
+<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.1/build/static/js/main.js"></script><script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.1/build/static/js/453.chunk.js"></script>
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
