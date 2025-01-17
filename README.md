@@ -16,7 +16,7 @@ See the index.html file for examples of how to add the default widget floating i
 You can install the app in a website:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.0/build/static/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.1/build/static/css/main.css">
 <div style="display:none;" id="qa-bot">
     &nbsp;
 </div>
