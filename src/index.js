@@ -8,10 +8,7 @@ import reportWebVitals from './reportWebVitals';
 const domNode = document.createElement('div');
 const root = ReactDOM.createRoot(domNode);
 
-function isAnonymous() {
-  return !document.querySelector('body').classList.contains('user-logged-in');
-}
-const disabled = isAnonymous();
+const disabled = window.isAnonymous;
 
 root.render(
   <React.StrictMode>
@@ -23,7 +20,6 @@ document.body.appendChild(domNode);
 // Look for optional elements for an embedded chat widget
 const embeddedQABots = document.querySelectorAll('.embedded-qa-bot');
 embeddedQABots.forEach(embeddedQABot => {
-  const disabled = isAnonymous();
   // welcome message and prompt are data- attributes
   const welcome = embeddedQABot.dataset.welcome;
   const prompt = embeddedQABot.dataset.prompt;
