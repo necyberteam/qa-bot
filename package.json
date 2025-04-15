@@ -1,22 +1,67 @@
 {
-  "name": "qa_bot",
-  "version": "0.1.1",
-  "private": true,
+  "name": "access-qa-bot",
+  "version": "0.2.0",
+  "private": false,
   "homepage": ".",
+  "description": "ACCESS Q&A Bot React Component and Web Component",
+  "main": "./dist/access-qa-bot.umd.cjs",
+  "module": "./dist/access-qa-bot.js",
+  "exports": {
+    ".": {
+      "import": "./dist/access-qa-bot.js",
+      "require": "./dist/access-qa-bot.umd.cjs"
+    },
+    "./standalone": "./dist/access-qa-bot.standalone.js"
+  },
+  "unpkg": "./dist/access-qa-bot.standalone.js",
+  "types": "index.d.ts",
+  "files": [
+    "dist",
+    "build",
+    "index.d.ts"
+  ],
   "dependencies": {
+    "react-chatbotify": "^1.7.0"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0",
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "preact": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "@babel/preset-react": "^7.23.9",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-terser": "^0.4.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "customize-cra": "^1.0.0",
     "react": "^18.3.1",
-    "react-chatbotify": "^1.7.0",
+    "react-app-rewired": "^2.2.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
+    "rollup": "^4.9.6",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test"
+    "test": "react-app-rewired test",
+    "build:lib": "rollup -c",
+    "prepare": "npm run build:lib"
   },
   "eslintConfig": {
     "extends": [
@@ -35,9 +80,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "customize-cra": "^1.0.0",
-    "react-app-rewired": "^2.2.1"
   }
 }

@@ -1,51 +1,124 @@
-# ACCESS Q&A Tool Widget
+# ACCESS Q&A Bot
 
-This REACT app provides an interface to the ACCESS Q&A Tool API. More information about this tool is available at https://support.access-ci.org/tools/access-qa-tool.
+A React component and Web Component for integrating the ACCESS Q&A Bot into your application.
 
-Interacting with the Q&A Tool requires authentication with an ACCESS ID. Currently, the app checks for the class "user-logged-in" on the <body> HTML element to determine if a visitor is authenticated. 
+## Installation
 
-The Q&A Tool API requires an API Key to be sent in the HTTP Headers. This should be set with the `REACT_APP_API_KEY` environment variable. Please contact ACCESS Support if you need an API Key.
-
-Some messages in the app can be customized if desired:
-- welcome message
-- prompt
-
-See the index.html file for examples of how to add the default widget floating in the bottom right of the page and as an "embedded" widget with the tool open on the page by default.
-
-## Deployment
-You can install the app in a website:
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.1/build/static/css/main.css">
-<div style="display:none;" id="qa-bot">
-    &nbsp;
-</div>
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.1/build/static/js/main.js"></script><script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.1.1/build/static/js/453.chunk.js"></script>
+```bash
+npm install access-qa-bot
 ```
 
-## Available Scripts
+## Usage
 
-In the project directory, you can run:
+### As a React Component
 
-### `npm start`
+```jsx
+import React, { useState } from 'react';
+import { QABot } from 'access-qa-bot';
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+function MyApp() {
+  const [isOpen, setIsOpen] = useState(false);
+  const isLoggedIn = true; // Determine based on your auth logic
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  return (
+    <div className="app">
+      <h1>My React Application</h1>
 
-### `npm test`
+      <button onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? 'Close' : 'Open'} Q&A Bot
+      </button>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+      <QABot
+        isLoggedIn={isLoggedIn}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        welcome="Welcome to the ACCESS Q&A Bot!"
+        prompt="How can I help you today?"
+        apiKey={process.env.REACT_APP_API_KEY}
+      />
+    </div>
+  );
+}
+```
 
-### `npm run build`
+### As a Web Component
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Method 1: Using HTML directly
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```html
+<script src="https://unpkg.com/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<access-qa-bot
+  welcome="Welcome to the Q&A Bot!"
+  prompt="Ask me anything about ACCESS..."
+  is-logged-in
+  is-open>
+</access-qa-bot>
+```
+
+#### Method 2: Creating programmatically
+
+```html
+<script src="https://unpkg.com/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
+
+<div id="qa-container"></div>
+
+<script>
+  const container = document.getElementById('qa-container');
+  const qaBot = document.createElement('access-qa-bot');
+  qaBot.setAttribute('welcome', 'Hello!');
+  qaBot.setAttribute('prompt', 'Ask something...');
+  qaBot.setAttribute('is-logged-in', '');
+  container.appendChild(qaBot);
+</script>
+```
+
+#### Method 3: Using the JavaScript API
+
+```html
+<script src="https://unpkg.com/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
+
+<div id="js-api-container"></div>
+
+<script>
+  window.addEventListener('load', function() {
+    if (window.accessQABot && window.accessQABot.qAndATool) {
+      window.accessQABot.qAndATool({
+        target: document.getElementById('js-api-container'),
+        welcome: "This is created using the JavaScript API!",
+        prompt: "Ask a question about ACCESS...",
+        isLoggedIn: true,
+        embedded: true,
+        isOpen: true
+      });
+    }
+  });
+</script>
+```
+
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| welcome | string | Welcome message shown to the user |
+| prompt | string | Text shown in the input field |
+| embedded | boolean | Display in embedded mode |
+| isLoggedIn / is-logged-in | boolean | Whether the user is logged in |
+| disabled | boolean | Disable the chat input |
+| isOpen / is-open | boolean | Whether the chat is open |
+| apiKey / api-key | string | API key for authentication |
+| onClose | function | Callback when the chat is closed (React only) |
+
+## Events
+
+When using as a Web Component, you can listen for the following events:
+
+```javascript
+document.querySelector('access-qa-bot').addEventListener('qabot-close', () => {
+  console.log('Chat was closed');
+});
+```
+
+## Browser Support
+
+The Web Component implementation uses modern browser features. For older browsers, consider using a polyfill.

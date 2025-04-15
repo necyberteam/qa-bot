@@ -3,22 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>ACCESS Q&A Bot Demo</title>
+    <title>ACCESS Q&A Bot Standalone Demo</title>
     <link rel="stylesheet" href="./build/static/css/main.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .explanation {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-left: 4px solid #6c757d;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body class="user-logged-in">
-    <div class="embedded-qa-bot" data-welcome="Hello! What can I help you with?" data-prompt="Ask me about ACCESS!"></div>
+    <h1>ACCESS Q&A Bot Standalone Demo</h1>
+
+    <!-- This empty div matches the original index.html structure -->
     <div id="qa-bot"></div>
 
+    <div class="explanation">
+        <p>This page demonstrates how to integrate the ACCESS Q&A Bot in different ways using the pre-built files.
+        No React framework setup is needed - just include the CSS and JS files from the build directory, or from the CDN.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>Method 1: Mount React Component to <code>div#qa-bot</code></h2>
+        <p>The floating widget that appears in the bottom-right corner.</p>
+        <p>This is created when you include an empty <code>&lt;div id="qa-bot"&gt;&lt;/div&gt;</code> element and the JavaScript files.
+        The library automatically detects this element and initializes the widget.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>Method 2: Mount React Component to <code>div.embedded-qa-bot</code></h2>
+        <p>Add the <code>embedded-qa-bot</code> class and data attributes to a <code>&lt;div&gt;</code> element:</p>
+        <pre>&lt;div class="embedded-qa-bot" data-welcome="Hello!" data-prompt="Ask me..."&gt;&lt;/div&gt;</pre>
+        <div class="embedded-qa-bot" data-welcome="Hello from the embedded widget!" data-prompt="Ask me anything about ACCESS..."></div>
+    </div>
+
+    <div class="demo-section">
+        <h2>Method 3: Explicitly Call JavaScript Function</h2>
+        <p>Use the global <code>qAndATool()</code> function for complete configuration:</p>
+        <div id="custom-qa-bot"></div>
+    </div>
+
     <script>
+        // Determine if user is logged in by checking for a class on the body
         function isAnonymous() {
             return !document.querySelector('body').classList.contains('user-logged-in');
         }
         window.isAnonymous = isAnonymous();
     </script>
+
+    <!--
+        Load the main JavaScript bundle which includes:
+        1. The React components that power the Q&A tool
+        2. The globally exposed qAndATool function (from src/index.js)
+
+        Note: All three integration methods depend on window.qAndATool
+        being exposed by the JavaScript bundle
+    -->
     <script src="./build/static/js/main.js"></script>
     <script src="./build/static/js/453.chunk.js"></script>
 
+    <script>
+        // Wait for window.qAndATool to be available
+        window.addEventListener('load', function() {
+            if (window.qAndATool) {
+                // JavaScript function example
+                window.qAndATool({
+                    target: document.getElementById('custom-qa-bot'),
+                    embedded: true,
+                    welcome: "This is configured using JavaScript!",
+                    prompt: "Try asking a question about ACCESS...",
+                    isLoggedIn: !window.isAnonymous,
+                    disabled: window.isAnonymous,
+                    isOpen: true
+                });
+
+                // Note: Method 1 uses the div with id="qa-bot"
+                // and Method 2 is handled by the class-based selector
+            } else {
+                console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
+            }
+        });
+    </script>
 </body>
 </html>

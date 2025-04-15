@@ -2,61 +2,44 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { qAndATool } from './lib';
 import reportWebVitals from './reportWebVitals';
 
-// Popup Chat widget
-const domNode = document.createElement('div');
-const root = ReactDOM.createRoot(domNode);
+// Expose qAndATool globally so it can be called directly from HTML files like index.html
+// This enables the non-React integration methods demonstrated in the top-level index.html
+window.qAndATool = qAndATool;
 
-const disabled = window.isAnonymous;
+// Set up default state based on authentication
+const isLoggedIn = !window.isAnonymous;
+const disabled = window.isAnonymous === true;
 
+// Standard CRA rendering
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App disabled={disabled} />
+    <App disabled={disabled} isLoggedIn={isLoggedIn} />
   </React.StrictMode>
 );
-document.body.appendChild(domNode); 
 
-// Look for optional elements for an embedded chat widget
-const embeddedQABots = document.querySelectorAll('.embedded-qa-bot');
-embeddedQABots.forEach(embeddedQABot => {
-  // welcome message and prompt are data- attributes
-  const welcome = embeddedQABot.dataset.welcome;
-  const prompt = embeddedQABot.dataset.prompt;
-  const embeddedDomNode = document.createElement('div');
-  const embeddedRoot = ReactDOM.createRoot(embeddedDomNode); 
-  embeddedRoot.render(
-    <React.StrictMode>
-      <App embedded welcome={welcome} prompt={prompt} disabled={disabled}/>
-    </React.StrictMode>
-  );
-  embeddedQABot.appendChild(embeddedDomNode);
-});
-
-// attach login event to the disabled chatbot input
+// Simple login handler for demo purposes
 const loginHandler = () => {
   if (disabled) {
     const loginUrl = '/login?destination=' + window.location.pathname;
     window.location = loginUrl;
   }
 }
-const addCustomEventListener = (selector, event, handler) => {
-  let rootElement = document.querySelector('body');
-  rootElement.addEventListener(event, function (evt) {
-          var targetElement = evt.target;
-          while (targetElement != null) {
-              if (targetElement.matches(selector)) {
-                  handler(evt);
-                  return;
-              }
-              targetElement = targetElement.parentElement;
-          }
-      },
-      true
-  );
-}
-//adding the Event Listeners to all the chatbot instances
-addCustomEventListener('.rcb-chat-input','click',loginHandler);
+
+// Add listener to chat input for login redirection
+document.querySelector('body').addEventListener('click', (evt) => {
+  let targetElement = evt.target;
+  while (targetElement != null) {
+    if (targetElement.matches('.rcb-chat-input')) {
+      loginHandler(evt);
+      return;
+    }
+    targetElement = targetElement.parentElement;
+  }
+}, true);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
