@@ -12,7 +12,8 @@ export { QABot };
 // Re-export the web component functionality for those accessing via the main entry point
 export { WebComponentQABot };
 
-// Function-based API for non-React environments
+// Function-based API that prioritizes web component usage
+// and then attempts a react render (since some people may use the function within a react context)
 export function qAndATool(config) {
   const { target, version, isLoggedIn, isOpen, ...otherProps } = config;
 
@@ -31,7 +32,7 @@ export function qAndATool(config) {
       ...otherProps
     });
   } else {
-    // Fall back to React rendering
+    // Use direct react rendering
     const root = ReactDOM.createRoot(target);
     root.render(
       <React.StrictMode>

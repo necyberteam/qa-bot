@@ -4,6 +4,8 @@ A React component and Web Component for integrating the ACCESS Q&A Bot into your
 
 ## Installation
 
+*npm package may not be available yet*
+
 ```bash
 npm install access-qa-bot
 ```
@@ -118,6 +120,48 @@ document.querySelector('access-qa-bot').addEventListener('qabot-close', () => {
   console.log('Chat was closed');
 });
 ```
+
+## Disambiguating all the different html files here
+
+- **index.html**: The main demo file showcasing React-based integration methods with three different approaches to integrate the QA Bot: auto-mounting to a specific div ID, using class-based selectors, and explicitly calling the JavaScript function.
+
+- **public/index.html**: The standard React application template file created by Create React App. This serves as the base HTML template that gets processed during the React build process.
+
+- **build/index.html**: The minified production version of the public/index.html file after the build process has completed. This contains all the necessary script and link tags to load the compiled React application.
+
+- **demo.html**: A standalone demo specifically showcasing the Web Component implementation (using the custom `<access-qa-bot>` element). This demonstrates three integration methods: standard floating button, embedded mode, and using the JavaScript API with the Web Component.
+
+The **index.html** file is focused on the React component usage, while **demo.html** focuses on the Web Component usage, providing complete examples for both integration approaches.
+
+## Development and Testing
+
+### Development Server
+When running the default development script (`npm start` or `yarn start`), the application serves the content from the `public` directory using React's development server. This shows the default React implementation with hot reloading enabled.
+
+```bash
+# Start the development server (React implementation)
+npm start
+```
+
+### Testing Standalone Demo Files
+To test the standalone demo files (`index.html` and `demo.html`) at the root level, you need to:
+
+1. Stop the development server (if running)
+2. Build the project (`npm run build`)
+3. Serve the root directory using a static file server:
+
+```bash
+# After building, serve the files from root
+npx serve
+```
+
+Then you can access:
+- The React demo at `/index.html` (or just `/`)
+- The Web Component demo at `/demo.html`
+
+This allows testing both integration approaches (React components and Web Components) in their respective demo environments.
+
+Note: The standalone demos rely on the built files in the `dist` and `build` directories, so make sure to build the project before testing.
 
 ## Browser Support
 
