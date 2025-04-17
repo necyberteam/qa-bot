@@ -7,7 +7,7 @@ A React component and Web Component for integrating the ACCESS Q&A Bot into your
 *npm package may not be available yet*
 
 ```bash
-npm install access-qa-bot
+npm install @snf/access-qa-bot
 ```
 
 ## Usage
@@ -48,7 +48,7 @@ function MyApp() {
 #### Method 1: Using HTML directly
 
 ```html
-<script src="https://unpkg.com/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
+<script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
 
 <access-qa-bot
   welcome="Welcome to the Q&A Bot!"
@@ -61,7 +61,7 @@ function MyApp() {
 #### Method 2: Creating programmatically
 
 ```html
-<script src="https://unpkg.com/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
+<script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
 
 <div id="qa-container"></div>
 
@@ -78,7 +78,7 @@ function MyApp() {
 #### Method 3: Using the JavaScript API
 
 ```html
-<script src="https://unpkg.com/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
+<script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
 
 <div id="js-api-container"></div>
 

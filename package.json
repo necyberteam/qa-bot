@@ -1,5 +1,5 @@
 {
-  "name": "access-qa-bot",
+  "name": "@snf/access-qa-bot",
   "version": "0.2.0",
   "private": false,
   "homepage": ".",
