@@ -66,6 +66,33 @@
             return !document.querySelector('body').classList.contains('user-logged-in');
         }
         window.isAnonymous = isAnonymous();
+
+        // Function to initialize QABot instances for Method 1 and Method 2
+        function initializeQABot() {
+            // Method 1: Auto-detect div#qa-bot
+            const qaBot = document.getElementById('qa-bot');
+            if (qaBot && window.qAndATool) {
+                window.qAndATool({
+                    target: qaBot,
+                    isLoggedIn: !window.isAnonymous,
+                    disabled: window.isAnonymous
+                });
+            }
+
+            // Method 2: Auto-detect embedded-qa-bot divs
+            document.querySelectorAll('.embedded-qa-bot').forEach(container => {
+                if (window.qAndATool) {
+                    window.qAndATool({
+                        target: container,
+                        embedded: true,
+                        welcome: container.dataset.welcome || "Hello!",
+                        prompt: container.dataset.prompt || "Ask me a question...",
+                        isLoggedIn: !window.isAnonymous,
+                        disabled: window.isAnonymous
+                    });
+                }
+            });
+        }
     </script>
 
     <!--
@@ -82,8 +109,11 @@
     <script>
         // Wait for window.qAndATool to be available
         window.addEventListener('load', function() {
+            // Initialize Method 1 and Method 2
+            initializeQABot();
+
+            // Method 3 (explicit JS function call)
             if (window.qAndATool) {
-                // JavaScript function example
                 window.qAndATool({
                     target: document.getElementById('custom-qa-bot'),
                     embedded: true,
@@ -93,9 +123,6 @@
                     disabled: window.isAnonymous,
                     isOpen: true
                 });
-
-                // Note: Method 1 uses the div with id="qa-bot"
-                // and Method 2 is handled by the class-based selector
             } else {
                 console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
             }
