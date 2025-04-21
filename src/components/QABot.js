@@ -11,8 +11,9 @@ const QABot = (props) => {
   const containerRef = useRef(null);
 
   const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
+  const isAnonymous = props.isAnonymous !== undefined ? props.isAnonymous : !isLoggedIn;
   // Derive disabled state, respecting explicit disabled prop if provided
-  const disabled = props.disabled !== undefined ? props.disabled : !isLoggedIn;
+  const disabled = props.disabled !== undefined ? props.disabled : isAnonymous;
 
   // Use isOpen prop with default to false if not provided
   const isOpen = props.isOpen !== undefined ? props.isOpen : false;

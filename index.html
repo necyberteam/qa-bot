@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ACCESS Q&A Bot Standalone Demo</title>
     <link rel="stylesheet" href="./build/static/css/main.css">
+    <!-- Load scripts in head for earlier initialization -->
+    <script>
+        // Determine if user is logged in by checking for a class on the body
+        document.addEventListener('DOMContentLoaded', function() {
+            window.isAnonymous = !document.querySelector('body').classList.contains('user-logged-in');
+        });
+    </script>
+    <!-- Preload JavaScript bundles -->
+    <script src="./build/static/js/main.js"></script>
+    <script src="./build/static/js/453.chunk.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -61,43 +71,62 @@
     </div>
 
     <script>
-        // Determine if user is logged in by checking for a class on the body
-        function isAnonymous() {
-            return !document.querySelector('body').classList.contains('user-logged-in');
-        }
-        window.isAnonymous = isAnonymous();
-    </script>
+        // Initialize all methods once DOM is fully loaded and scripts are available
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure window.qAndATool is available before proceeding
+            function initializeQABots() {
+                if (window.qAndATool) {
+                    // Method 1: Initialize the root element if not already done
+                    const qaBot = document.getElementById('qa-bot');
+                    if (qaBot && !qaBot.hasChildNodes()) {
+                        console.log("Initializing Method 1 - Root QA Bot");
+                        window.qAndATool({
+                            target: qaBot,
+                            isLoggedIn: !window.isAnonymous,
+                            isAnonymous: window.isAnonymous
+                        });
+                    }
 
-    <!--
-        Load the main JavaScript bundle which includes:
-        1. The React components that power the Q&A tool
-        2. The globally exposed qAndATool function (from src/index.js)
+                    // Method 2: Initialize embedded-qa-bot elements
+                    const embeddedBots = document.querySelectorAll('.embedded-qa-bot');
+                    embeddedBots.forEach(function(bot) {
+                        if (!bot.hasChildNodes()) {
+                            console.log("Initializing Method 2 - Embedded QA Bot");
+                            window.qAndATool({
+                                target: bot,
+                                embedded: true,
+                                isOpen: true,
+                                welcome: bot.getAttribute('data-welcome') || "Hello!",
+                                prompt: bot.getAttribute('data-prompt') || "Ask me a question...",
+                                isLoggedIn: !window.isAnonymous,
+                                isAnonymous: window.isAnonymous
+                            });
+                        }
+                    });
 
-        Note: All three integration methods depend on window.qAndATool
-        being exposed by the JavaScript bundle
-    -->
-    <script src="./build/static/js/main.js"></script>
-    <script src="./build/static/js/453.chunk.js"></script>
+                    // Method 3: Initialize the custom-qa-bot element
+                    console.log("Initializing Method 3 - Custom QA Bot");
+                    window.qAndATool({
+                        target: document.getElementById('custom-qa-bot'),
+                        embedded: true,
+                        welcome: "This is configured using JavaScript!",
+                        prompt: "Try asking a question about ACCESS...",
+                        isLoggedIn: !window.isAnonymous,
+                        isAnonymous: window.isAnonymous,
+                        disabled: window.isAnonymous,
+                        isOpen: true
+                    });
+                } else {
+                    console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
+                }
+            }
 
-    <script>
-        // Wait for window.qAndATool to be available
-        window.addEventListener('load', function() {
+            // Try to initialize immediately
             if (window.qAndATool) {
-                // JavaScript function example
-                window.qAndATool({
-                    target: document.getElementById('custom-qa-bot'),
-                    embedded: true,
-                    welcome: "This is configured using JavaScript!",
-                    prompt: "Try asking a question about ACCESS...",
-                    isLoggedIn: !window.isAnonymous,
-                    disabled: window.isAnonymous,
-                    isOpen: true
-                });
-
-                // Note: Method 1 uses the div with id="qa-bot"
-                // and Method 2 is handled by the class-based selector
+                initializeQABots();
             } else {
-                console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
+                // Or wait a bit for scripts to load if needed
+                setTimeout(initializeQABots, 500);
             }
         });
     </script>
