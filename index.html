@@ -48,6 +48,18 @@
     <div class="explanation">
         <p>This page demonstrates how to integrate the ACCESS Q&A Bot in different ways using the pre-built files.
         No React framework setup is needed - just include the CSS and JS files from the build directory, or from the CDN.</p>
+        <p>You can use either the <strong>jsDelivr CDN</strong> (direct from GitHub repository) or <strong>unpkg CDN</strong> (from npm package):</p>
+        <pre>
+<!-- jsDelivr CDN (direct from GitHub) -->
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/css/main.css"&gt;
+&lt;div id="qa-bot"&gt;&lt;/div&gt;
+&lt;script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/453.chunk.js"&gt;&lt;/script&gt;
+
+<!-- OR unpkg CDN (from npm package) -->
+&lt;script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"&gt;&lt;/script&gt;
+&lt;access-qa-bot welcome="Hello!" prompt="Ask me anything..."&gt;&lt;/access-qa-bot&gt;
+        </pre>
     </div>
 
     <div class="demo-section">

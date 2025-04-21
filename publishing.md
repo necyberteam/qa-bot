@@ -142,6 +142,19 @@ https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js
 
 The version number in these URLs must match git tags in our repository. Never reuse a version number that already has a tag to avoid breaking existing CDN links.
 
+A complete jsDelivr implementation typically requires three files:
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/css/main.css">
+<div id="qa-bot"></div>
+<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/453.chunk.js"></script>
+```
+
+**Important:** When updating the package:
+1. Make sure these file paths remain consistent
+2. Test all jsDelivr URLs after updating
+3. Remember that the chunk filename (like 453.chunk.js) may change in future builds
+
 ### 2. unpkg CDN (npm-based, Secondary)
 
 After publishing to npm, the package will also be available via unpkg:

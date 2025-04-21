@@ -98,6 +98,21 @@ function MyApp() {
 </script>
 ```
 
+### Direct Deployment via jsDelivr CDN
+
+For websites that don't use npm packages, you can directly include the ACCESS Q&A Bot using jsDelivr CDN:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/css/main.css">
+<div style="display:none;" id="qa-bot">
+    &nbsp;
+</div>
+<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/453.chunk.js"></script>
+```
+
+Replace `v0.2.0` with the specific version you want to use. This method provides the React version of the bot and automatically initializes it when the page loads.
+
 ## Properties
 
 | Property | Type | Description |
