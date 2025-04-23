@@ -21,3 +21,10 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+
+# local diffs
+*.diff
+*.patch
+
+# Library build output
+/dist
