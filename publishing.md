@@ -168,14 +168,7 @@ After publishing to npm, the package will also be available via unpkg:
 https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js
 ```
 
-## CI Integration
-
-**TODO**: Add information about the CI process:
-- Where the CI configuration is located
-- How the CI process works with the npm-release branch
-- How versioning is managed in CI
-
-## Using the Published Package
+### 3. Using the Published Package
 
 After the package is published to npm, users can install and use it in their projects.
 
