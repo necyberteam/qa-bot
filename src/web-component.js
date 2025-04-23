@@ -234,6 +234,7 @@ export function webComponentQAndATool(config) {
   if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
   if (props.embedded) qaBot.setAttribute('embedded', '');
   if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
+  if (props.isAnonymous) qaBot.setAttribute('is-anonymous', '');
   if (props.disabled) qaBot.setAttribute('disabled', '');
   if (props.isOpen) qaBot.setAttribute('is-open', '');
   if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
