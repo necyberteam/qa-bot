@@ -143,9 +143,9 @@ document.querySelector('access-qa-bot').addEventListener('qabot-close', () => {
 
 - **build/index.html**: The minified production version of the public/index.html file after the build process has completed. This contains all the necessary script and link tags to load the compiled React application.
 
-- **demo.html**: A standalone demo specifically showcasing the Web Component implementation (using the custom `<access-qa-bot>` element). This demonstrates three integration methods: standard floating button, embedded mode, and using the JavaScript API with the Web Component.
+- **web-component-demo.html**: A standalone demo specifically showcasing the Web Component implementation (using the custom `<access-qa-bot>` element). This demonstrates three integration methods: standard floating button, embedded mode, and using the JavaScript API with the Web Component.
 
-The **index.html** file is focused on the React component usage, while **demo.html** focuses on the Web Component usage, providing complete examples for both integration approaches.
+The **index.html** file is focused on the React component usage, while **web-component-demo.html** focuses on the Web Component usage, providing complete examples for both integration approaches.
 
 ## Development and Testing
 
@@ -158,7 +158,7 @@ npm start
 ```
 
 ### Testing Standalone Demo Files
-To test the standalone demo files (`index.html` and `demo.html`) at the root level, you need to:
+To test the standalone demo files (`index.html` and `web-component-demo.html`) at the root level, you need to:
 
 1. Stop the development server (if running)
 2. Build the project (`npm run build`)
@@ -171,7 +171,7 @@ npx serve
 
 Then you can access:
 - The React demo at `/index.html` (or just `/`)
-- The Web Component demo at `/demo.html`
+- The Web Component demo at `/web-component-demo.html`
 
 This allows testing both integration approaches (React components and Web Components) in their respective demo environments.
 
