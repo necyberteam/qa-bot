@@ -4,8 +4,6 @@ A React component and Web Component for integrating the ACCESS Q&A Bot into your
 
 ## Installation
 
-*npm package may not be available yet*
-
 ```bash
 npm install @snf/access-qa-bot
 ```
@@ -151,7 +149,7 @@ The **index.html** file is focused on the React component usage, while **demo.ht
 ## Development and Testing
 
 ### Development Server
-When running the default development script (`npm start` or `yarn start`), the application serves the content from the `public` directory using React's development server. This shows the default React implementation with hot reloading enabled.
+When running the default development script (`npm start` or `yarn start`), the application serves the content from the `public` directory using React's development server. This shows the default React implementation with hot reloading enabled. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ```bash
 # Start the development server (React implementation)

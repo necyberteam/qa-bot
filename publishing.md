@@ -71,7 +71,7 @@ Create a PR. Once approved, merge your feature branch to main, including the ver
 
 ### 3. Create Tag
 
-After merging to main, create a tag matching your version:
+After merging to main, create a tag matching your version and a make a GitHub release:
 
 ```bash
 git checkout main
@@ -79,6 +79,11 @@ git pull
 git tag -a v0.2.0 -m "Release version 0.2.0"  # Match your actual version
 git push origin v0.2.0
 ```
+- Click on the "Releases" tab in the GitHub repository
+- Click "Draft a new release"
+- Select the tag you just created
+- Add a title and description
+- Click "Publish release"
 
 This tag will be used by the jsdelivr CDN.
 
