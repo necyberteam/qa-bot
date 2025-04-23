@@ -4,6 +4,8 @@ A React component and Web Component for integrating the ACCESS Q&A Bot into your
 
 ## Installation
 
+*npm package may not be available yet*
+
 ```bash
 npm install @snf/access-qa-bot
 ```
@@ -96,21 +98,6 @@ function MyApp() {
 </script>
 ```
 
-### Direct Deployment via jsDelivr CDN
-
-For websites that don't use npm packages, you can directly include the ACCESS Q&A Bot using jsDelivr CDN:
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/css/main.css">
-<div style="display:none;" id="qa-bot">
-    &nbsp;
-</div>
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/453.chunk.js"></script>
-```
-
-Replace `v0.2.0` with the specific version you want to use. This method provides the React version of the bot and automatically initializes it when the page loads.
-
 ## Properties
 
 | Property | Type | Description |
@@ -149,7 +136,7 @@ The **index.html** file is focused on the React component usage, while **demo.ht
 ## Development and Testing
 
 ### Development Server
-When running the default development script (`npm start` or `yarn start`), the application serves the content from the `public` directory using React's development server. This shows the default React implementation with hot reloading enabled. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+When running the default development script (`npm start` or `yarn start`), the application serves the content from the `public` directory using React's development server. This shows the default React implementation with hot reloading enabled.
 
 ```bash
 # Start the development server (React implementation)

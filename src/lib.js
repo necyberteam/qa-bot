@@ -15,7 +15,7 @@ export { WebComponentQABot };
 // Function-based API that prioritizes web component usage
 // and then attempts a react render (since some people may use the function within a react context)
 export function qAndATool(config) {
-  const { target, version, isLoggedIn, isAnonymous, isOpen, ...otherProps } = config;
+  const { target, version, isLoggedIn, isOpen, ...otherProps } = config;
 
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
@@ -28,7 +28,6 @@ export function qAndATool(config) {
     return webComponentQAndATool({
       target,
       isLoggedIn,
-      isAnonymous,
       isOpen,
       ...otherProps
     });
@@ -39,7 +38,6 @@ export function qAndATool(config) {
       <React.StrictMode>
         <App
           isLoggedIn={isLoggedIn}
-          isAnonymous={isAnonymous}
           isOpen={isOpen}
           {...otherProps}
         />

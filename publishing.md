@@ -71,7 +71,7 @@ Create a PR. Once approved, merge your feature branch to main, including the ver
 
 ### 3. Create Tag
 
-After merging to main, create a tag matching your version and a make a GitHub release:
+After merging to main, create a tag matching your version:
 
 ```bash
 git checkout main
@@ -79,11 +79,6 @@ git pull
 git tag -a v0.2.0 -m "Release version 0.2.0"  # Match your actual version
 git push origin v0.2.0
 ```
-- Click on the "Releases" tab in the GitHub repository
-- Click "Draft a new release"
-- Select the tag you just created
-- Add a title and description
-- Click "Publish release"
 
 This tag will be used by the jsdelivr CDN.
 
@@ -147,19 +142,6 @@ https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js
 
 The version number in these URLs must match git tags in our repository. Never reuse a version number that already has a tag to avoid breaking existing CDN links.
 
-A complete jsDelivr implementation typically requires three files:
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/css/main.css">
-<div id="qa-bot"></div>
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/453.chunk.js"></script>
-```
-
-**Important:** When updating the package:
-1. Make sure these file paths remain consistent
-2. Test all jsDelivr URLs after updating
-3. Remember that the chunk filename (like 453.chunk.js) may change in future builds
-
 ### 2. unpkg CDN (npm-based, Secondary)
 
 After publishing to npm, the package will also be available via unpkg:
@@ -168,7 +150,14 @@ After publishing to npm, the package will also be available via unpkg:
 https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js
 ```
 
-### 3. Using the Published Package
+## CI Integration
+
+**TODO**: Add information about the CI process:
+- Where the CI configuration is located
+- How the CI process works with the npm-release branch
+- How versioning is managed in CI
+
+## Using the Published Package
 
 After the package is published to npm, users can install and use it in their projects.
 
