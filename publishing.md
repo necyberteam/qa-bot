@@ -25,7 +25,7 @@ Before updating a version, always check existing tags to avoid conflicts:
 git tag -l "v*"
 
 # Or check a specific version
-git tag -l "v0.2.0"
+git tag -l "v0.3.0"
 ```
 
 ## Setup
@@ -71,13 +71,13 @@ Create a PR. Once approved, merge your feature branch to main, including the ver
 
 ### 3. Create Tag
 
-After merging to main, create a tag matching your version and a make a GitHub release:
+After merging to main, create a tag matching your version, and make a GitHub release:
 
 ```bash
 git checkout main
 git pull
-git tag -a v0.2.0 -m "Release version 0.2.0"  # Match your actual version
-git push origin v0.2.0
+git tag -a v0.3.0 -m "Release version 0.3.0"  # Match your actual version
+git push upstream v0.3.0  # would typically be `origin` but my local dev environment uses a fork as `origin`
 ```
 - Click on the "Releases" tab in the GitHub repository
 - Click "Draft a new release"
@@ -119,7 +119,7 @@ npm publish --access public
 Push the commit to the npm-release branch:
 
 ```bash
-git push origin npm-release
+git push upstream npm-release
 ```
 
 ## Maintaining the Release Branch
@@ -130,7 +130,7 @@ The `npm-release` branch should be periodically synced with main:
 git checkout npm-release
 git merge main
 # Resolve any conflicts
-git push origin npm-release
+git push upstream npm-release
 ```
 
 ## CDN Usage
@@ -142,17 +142,17 @@ Our project uses two CDN systems:
 This CDN pulls directly from our GitHub repository based on git tags:
 
 ```
-https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js
+https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.3.0/build/static/js/main.js
 ```
 
 The version number in these URLs must match git tags in our repository. Never reuse a version number that already has a tag to avoid breaking existing CDN links.
 
 A complete jsDelivr implementation typically requires three files:
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.3.0/build/static/css/main.css">
 <div id="qa-bot"></div>
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/main.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/js/453.chunk.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.3.0/build/static/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.3.0/build/static/js/453.chunk.js"></script>
 ```
 
 **Important:** When updating the package:
@@ -165,7 +165,7 @@ A complete jsDelivr implementation typically requires three files:
 After publishing to npm, the package will also be available via unpkg:
 
 ```
-https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js
+https://unpkg.com/@snf/access-qa-bot@0.3.0/dist/access-qa-bot.standalone.js
 ```
 
 ### 3. Using the Published Package

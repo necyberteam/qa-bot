@@ -12,6 +12,7 @@ const QABot = (props) => {
 
   const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
   const isAnonymous = props.isAnonymous !== undefined ? props.isAnonymous : !isLoggedIn;
+
   // Derive disabled state, respecting explicit disabled prop if provided
   const disabled = props.disabled !== undefined ? props.disabled : isAnonymous;
 
@@ -109,8 +110,8 @@ const QABot = (props) => {
   return (
     <div className="access-qa-bot" ref={containerRef}>
       <ChatBot
-        options={{
-          theme: getThemeColors(),
+        settings={{
+          general: getThemeColors(),
           header: {
             title: 'ACCESS Q&A Bot',
             avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
@@ -125,8 +126,6 @@ const QABot = (props) => {
             simStream: true,
             dangerouslySetInnerHtml: true
           },
-          isOpen: isOpen,
-          onClose: onClose,
           chatButton: {
             icon: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
           },
@@ -149,6 +148,8 @@ const QABot = (props) => {
             text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
           },
         }}
+        isOpen={isOpen}
+        onClose={onClose}
         flow={flow}
       />
     </div>
