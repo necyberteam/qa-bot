@@ -120,6 +120,7 @@ Replace `v0.2.0` with the specific version you want to use. This method provides
 | prompt | string | Text shown in the input field |
 | embedded | boolean | Display in embedded mode |
 | isLoggedIn / is-logged-in | boolean | Whether the user is logged in |
+| isAnonymous / is-anonymous | boolean | Whether the user is anonymous |
 | disabled | boolean | Disable the chat input |
 | isOpen / is-open | boolean | Whether the chat is open |
 | apiKey / api-key | string | API key for authentication |

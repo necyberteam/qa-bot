@@ -122,6 +122,7 @@ class AccessQABot extends HTMLElement {
       'prompt',
       'embedded',
       'is-logged-in',
+      'is-anonymous',
       'disabled',
       'is-open',
       'api-key'
@@ -142,6 +143,7 @@ class AccessQABot extends HTMLElement {
       prompt: this.getAttribute('prompt'),
       embedded: this.hasAttribute('embedded'),
       isLoggedIn: this.hasAttribute('is-logged-in'),
+      isAnonymous: this.hasAttribute('is-anonymous'),
       disabled: this.hasAttribute('disabled'),
       isOpen: this.hasAttribute('is-open'),
       // Always provide an apiKey to prevent process.env reference errors

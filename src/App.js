@@ -10,6 +10,7 @@ import QABot from './components/QABot';
  * - welcome: string
  * - prompt: string
  * - isLoggedIn: boolean
+ * - isAnonymous: boolean
  * - disabled: boolean
  * - isOpen: boolean
  * - onClose: function
@@ -21,6 +22,7 @@ function App(props) {
       welcome={props.welcome}
       prompt={props.prompt}
       isLoggedIn={props.isLoggedIn}
+      isAnonymous={props.isAnonymous}
       disabled={props.disabled}
       isOpen={props.isOpen}
       onClose={props.onClose}
