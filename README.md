@@ -111,7 +111,6 @@ For websites that don't use npm packages, you can directly include the ACCESS Q&
 
 Replace `v0.2.0` with the specific version you want to use. This method provides the React version of the bot and automatically initializes it when the page loads.
 
-
 ## Properties
 
 | Property | Type | Description |
