@@ -49,10 +49,6 @@ class AccessQABot extends HTMLElement {
         margin-right: 8px !important;
       }
 
-      .rcb-chat-header {
-        background-color: var(--primary-color) !important;
-      }
-
       .rcb-chat-button {
         background-color: var(--primary-color) !important;
       }
