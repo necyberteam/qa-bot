@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import useScreenshotCapture from '../hooks/useScreenshotCapture';
 
 /**
  * Component for handling file uploads in the feedback flow
@@ -11,6 +12,7 @@ const FileUploadComponent = ({ onFileUpload }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
+  const { captureScreenshot, isCapturing } = useScreenshotCapture();
 
   const handleFiles = (files) => {
     const newFileArray = Array.from(files);
@@ -69,8 +71,57 @@ const FileUploadComponent = ({ onFileUpload }) => {
     }
   };
 
+  const handleScreenshotCapture = async () => {
+    try {
+      const file = await captureScreenshot();
+      handleFiles([file]);
+    } catch (error) {
+      // Error is already logged in the hook
+    }
+  };
+
   return (
     <div className="file-upload-container">
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            handleScreenshotCapture();
+          }}
+          disabled={isCapturing}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            backgroundColor: '#107180',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            padding: '8px 12px',
+            cursor: isCapturing ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
+            fontWeight: '500',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          {isCapturing ? 'Taking screenshot...' : 'Take screenshot...'}
+        </button>
+      </div>
+
       <div
         className={`file-upload-dropzone ${dragActive ? "active" : ""}`}
         onDragEnter={handleDrag}
