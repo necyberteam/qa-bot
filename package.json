@@ -21,7 +21,7 @@
     "index.d.ts"
   ],
   "dependencies": {
-    "react-chatbotify": "^2.0.0-beta.32"
+    "react-chatbotify": "^2.0.0-beta.35"
   },
   "peerDependencies": {
     "preact": "^10.0.0",
