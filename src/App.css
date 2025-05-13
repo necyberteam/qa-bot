@@ -102,3 +102,10 @@
   font-size: 14px;
   padding: 2px 0;
 }
+
+.header-home-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid red;
+}

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import useScreenshotCapture from '../hooks/useScreenshotCapture';
+import UploadIcon from './icons/UploadIcon';
 
 /**
  * Component for handling file uploads in the feedback flow
@@ -11,6 +12,7 @@ import useScreenshotCapture from '../hooks/useScreenshotCapture';
 const FileUploadComponent = ({ onFileUpload }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewFile, setPreviewFile] = useState(null);
   const fileInputRef = useRef(null);
   const { captureScreenshot, isCapturing } = useScreenshotCapture();
 
@@ -80,6 +82,107 @@ const FileUploadComponent = ({ onFileUpload }) => {
     }
   };
 
+  const handleFilePreview = (file) => {
+    setPreviewFile(file);
+  };
+
+  const closePreview = () => {
+    setPreviewFile(null);
+  };
+
+  const renderFilePreview = () => {
+    if (!previewFile) return null;
+
+    const isImage = previewFile.type.startsWith('image/');
+    const isText = previewFile.type.startsWith('text/');
+    const isPDF = previewFile.type === 'application/pdf';
+
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000,
+        }}
+        onClick={closePreview}
+      >
+        <div
+          style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            maxWidth: '90%',
+            maxHeight: '90%',
+            overflow: 'auto',
+            position: 'relative',
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <button
+            onClick={closePreview}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              background: 'none',
+              border: 'none',
+              fontSize: '24px',
+              cursor: 'pointer',
+              color: '#666',
+            }}
+          >
+            ×
+          </button>
+
+          <h3 style={{ marginTop: 0, marginBottom: '16px' }}>{previewFile.name}</h3>
+
+          {isImage && (
+            <img
+              src={URL.createObjectURL(previewFile)}
+              alt={previewFile.name}
+              style={{ maxWidth: '100%', maxHeight: '70vh' }}
+            />
+          )}
+
+          {isText && (
+            <pre style={{
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word',
+              maxHeight: '70vh',
+              overflow: 'auto',
+              padding: '16px',
+              backgroundColor: '#f5f5f5',
+              borderRadius: '4px',
+            }}>
+              {URL.createObjectURL(previewFile)}
+            </pre>
+          )}
+
+          {isPDF && (
+            <iframe
+              src={URL.createObjectURL(previewFile)}
+              style={{ width: '100%', height: '70vh', border: 'none' }}
+              title={previewFile.name}
+            />
+          )}
+
+          {!isImage && !isText && !isPDF && (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              Preview not available for this file type
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="file-upload-container">
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
@@ -139,23 +242,7 @@ const FileUploadComponent = ({ onFileUpload }) => {
         />
         <div className="upload-content" onClick={handleButtonClick} style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#107180"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
+            <UploadIcon />
             <p style={{ margin: 0 }}>Drag and drop files here or click to select files</p>
           </div>
           {selectedFiles.length > 0 && (
@@ -177,6 +264,11 @@ const FileUploadComponent = ({ onFileUpload }) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
+                    cursor: 'pointer',
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFilePreview(file);
                   }}
                 >
                   <span
@@ -202,6 +294,7 @@ const FileUploadComponent = ({ onFileUpload }) => {
           )}
         </div>
       </div>
+      {renderFilePreview()}
     </div>
   );
 };

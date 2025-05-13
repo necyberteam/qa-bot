@@ -1,3 +1,6 @@
+import React from 'react';
+import HomeIcon from '../components/icons/HomeIcon';
+
 // Constants for the QA Bot
 export const CONSTANTS = {
   // URLs
@@ -138,6 +141,36 @@ export const createFooterContent = () => {
 };
 
 /**
+ * Creates header configuration for ChatBot component
+ * @returns {Object} Header configuration object
+ */
+export const createHeaderSettings = () => {
+  return {
+    title: CONSTANTS.headerTitleText,
+    avatar: CONSTANTS.avatarUrl,
+    buttons: [
+      <div className="header-home-button">
+        <button
+          onClick={() => alert("You clicked the home button!")}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'white',
+            cursor: 'pointer',
+            padding: '5px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <HomeIcon />
+        </button>
+      </div>
+    ]
+  };
+};
+
+/**
  * Creates settings configuration for ChatBot component
  * @param {Object} config - Configuration options
  * @param {Function} config.getThemeColors - Function to get theme colors
@@ -148,10 +181,7 @@ export const createFooterContent = () => {
 export const createChatBotSettings = ({ getThemeColors, prompt, disabled }) => {
   return {
     general: getThemeColors(),
-    header: {
-      title: CONSTANTS.headerTitleText,
-      avatar: CONSTANTS.avatarUrl,
-    },
+    header: createHeaderSettings(),
     chatInput: {
       enabledPlaceholderText: prompt,
       disabledPlaceholderText: CONSTANTS.disabledPlaceholderText,

@@ -10,6 +10,12 @@ import React from 'react';
 import FileUploadComponent from '../../components/FileUploadComponent';
 import { prepareApiSubmission, sendPreparedDataToProxy } from '../bot-utils';
 
+// Email validation function
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 export const createDevTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
   const fileUploadElement = (
     <FileUploadComponent
@@ -48,7 +54,13 @@ export const createDevTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} 
     dev_ticket_email: {
       message: "What is your email?",
       function: (chatState) => setTicketForm({...ticketForm, email: chatState.userInput}),
-      path: "dev_ticket_accessid"
+      path: async (chatState) => {
+        if (!isValidEmail(chatState.userInput)) {
+          await chatState.injectMessage("Please enter a valid email address.");
+          return;
+        }
+        return "dev_ticket_accessid";
+      }
     },
     dev_ticket_accessid: {
       message: "What is your ACCESS ID?",
