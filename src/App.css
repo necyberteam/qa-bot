@@ -42,9 +42,7 @@
     font-size: 10px;
   }
 }
-.embedded-qa-bot {
-  .rcb-chat-window {
-    width: 100% !important;
-    max-width: 100%;
-  } 
+.embedded-qa-bot .rcb-chat-window {
+  width: 100% !important;
+  max-width: 100%;
 }

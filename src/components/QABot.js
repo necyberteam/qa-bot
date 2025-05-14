@@ -5,7 +5,9 @@ import '../App.css';
 const QABot = (props) => {
   const welcome = props.welcome || 'Hello! What can I help you with?';
   const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
+
   const embedded = props.embedded || false;
+  console.log("| about to pass ChatBot embedded:", embedded);
 
   // Ref for the container element
   const containerRef = useRef(null);
@@ -18,6 +20,7 @@ const QABot = (props) => {
 
   // Use isOpen prop with default to false if not provided
   const isOpen = props.isOpen !== undefined ? props.isOpen : false;
+  console.log("| about to pass ChatBot isOpen:", isOpen);
   const onClose = props.onClose;
 
   const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
@@ -102,16 +105,20 @@ const QABot = (props) => {
     return {
       primaryColor: getCSSVariable('--primary-color', '#1a5b6e'),
       secondaryColor: getCSSVariable('--secondary-color', '#107180'),
-      fontFamily: getCSSVariable('--font-family', 'Arial, sans-serif'),
-      embedded: embedded
+      fontFamily: getCSSVariable('--font-family', 'Arial, sans-serif')
     };
   };
 
+  const containerClassName = `access-qa-bot ${embedded ? "embedded-qa-bot" : ""}`;
+
   return (
-    <div className="access-qa-bot" ref={containerRef}>
+    <div className={containerClassName} ref={containerRef}>
       <ChatBot
         settings={{
-          general: getThemeColors(),
+          general: {
+            ...getThemeColors(),
+            embedded: embedded
+          },
           header: {
             title: 'ACCESS Q&A Bot',
             avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
@@ -148,7 +155,6 @@ const QABot = (props) => {
             text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
           },
         }}
-        isOpen={isOpen}
         onClose={onClose}
         flow={flow}
       />

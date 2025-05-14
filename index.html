@@ -103,7 +103,8 @@
                         welcome: container.dataset.welcome || "Hello!",
                         prompt: container.dataset.prompt || "Ask me a question...",
                         isLoggedIn: !window.isAnonymous,
-                        isAnonymous: window.isAnonymous
+                        isAnonymous: window.isAnonymous,
+                        isOpen: false
                     });
                 }
             });
@@ -137,7 +138,7 @@
                     prompt: "Try asking a question about ACCESS...",
                     isLoggedIn: !window.isAnonymous,
                     isAnonymous: window.isAnonymous,
-                    isOpen: true
+                    isOpen: false
                 });
             } else if (!window.qAndATool) {
                 console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
