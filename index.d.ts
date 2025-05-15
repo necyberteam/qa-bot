@@ -1,6 +1,7 @@
 interface QABotProps {
   isLoggedIn?: boolean;
-  isOpen?: boolean;
+  isAnonymous?: boolean;
+  initiallyOpen?: boolean;
   apiKey?: string;
   embedded?: boolean;
   welcome?: string;

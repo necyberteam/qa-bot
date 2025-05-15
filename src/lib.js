@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import QABot from './components/QABot';
 import App from './App';
@@ -15,7 +15,7 @@ export { WebComponentQABot };
 // Function-based API that prioritizes web component usage
 // and then attempts a react render (since some people may use the function within a react context)
 export function qAndATool(config) {
-  const { target, version, isLoggedIn, isOpen, isAnonymous, ...otherProps } = config;
+  const { target, version, isLoggedIn, isAnonymous, defaultOpen, returnRef, ...otherProps } = config;
 
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
@@ -29,24 +29,44 @@ export function qAndATool(config) {
       target,
       isLoggedIn,
       isAnonymous,
-      isOpen,
+      defaultOpen,
+      returnRef,
       ...otherProps
     });
   } else {
-    // Use direct react rendering
+    // Use direct react rendering with ref support
     const root = ReactDOM.createRoot(target);
+    const qaRef = React.createRef();
+
     root.render(
       <React.StrictMode>
-        <App
+        <QABot
+          ref={qaRef}
+          embedded={otherProps.embedded}
+          defaultOpen={defaultOpen}
+          welcome={otherProps.welcome}
+          prompt={otherProps.prompt}
           isLoggedIn={isLoggedIn}
           isAnonymous={isAnonymous}
-          isOpen={isOpen}
-          {...otherProps}
+          disabled={otherProps.disabled}
+          onClose={otherProps.onClose}
+          apiKey={otherProps.apiKey}
         />
       </React.StrictMode>
     );
 
-    // Return a cleanup function
+    // If returnRef is true, return ref methods for programmatic control
+    if (returnRef) {
+      // Return an object with the control methods that match the QABot component's API
+      return {
+        toggle: () => qaRef.current && qaRef.current.toggle(),
+        open: () => qaRef.current && qaRef.current.open(),
+        close: () => qaRef.current && qaRef.current.close(),
+        isOpen: () => qaRef.current && qaRef.current.isOpen()
+      };
+    }
+
+    // Otherwise return a cleanup function
     return () => {
       root.unmount();
     };

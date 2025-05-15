@@ -1,30 +1,123 @@
-import React, { useEffect, useRef } from 'react';
-import ChatBot from "react-chatbotify";
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import ChatBot, { ChatBotProvider, useChatWindow } from "react-chatbotify";
 import '../App.css';
 
-const QABot = (props) => {
-  const welcome = props.welcome || 'Hello! What can I help you with?';
-  const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
+/**
+ * Container component for embedded chat that handles open/close functionality
+ */
+const EmbeddedChatContainer = forwardRef(({ children, embeddedDefaultOpen = false }, ref) => {
+  const { isChatWindowOpen, toggleChatWindow } = useChatWindow();
+  const [isOpen, setIsOpen] = useState(embeddedDefaultOpen);
 
-  const embedded = props.embedded || false;
-  console.log("| about to pass ChatBot embedded:", embedded);
+  useEffect(() => {
+    toggleChatWindow(embeddedDefaultOpen);
+    setIsOpen(embeddedDefaultOpen);
+  }, [embeddedDefaultOpen, toggleChatWindow]);
 
-  // Ref for the container element
+  useImperativeHandle(ref, () => ({
+    toggle: () => {
+      const newState = !isOpen;
+      setIsOpen(newState);
+      toggleChatWindow(newState);
+      return newState;
+    },
+    open: () => {
+      setIsOpen(true);
+      toggleChatWindow(true);
+    },
+    close: () => {
+      setIsOpen(false);
+      toggleChatWindow(false);
+    },
+    isOpen: () => isOpen
+  }));
+
+  const handleToggle = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    toggleChatWindow(newState);
+  };
+
+  return (
+    <div className={`embedded-chat-container ${isOpen ? 'open' : 'closed'}`}>
+      {/* Always render the chat content but toggle visibility with CSS */}
+      <div className="embedded-chat-open" style={{ display: isOpen ? 'block' : 'none' }}>
+        <div className="embedded-chat-content">
+          {children}
+        </div>
+      </div>
+
+      {/* Only show the closed bar when chat is closed */}
+      {!isOpen && (
+        <div className="embedded-chat-closed" onClick={handleToggle}>
+          <span>ACCESS Q&A Bot</span>
+          <button className="embedded-chat-open-btn">Open</button>
+        </div>
+      )}
+    </div>
+  );
+});
+
+/**
+ * ACCESS Q&A Bot Component
+ *
+ * @param {Object} props
+ * @param {string} [props.apiKey] - API key for the Q&A endpoint
+ * @param {string} [props.welcome='Hello! What can I help you with?'] - Welcome message
+ * @param {string} [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
+ * @param {boolean} [props.embedded=false] - Whether the bot is embedded in the page
+ * @param {boolean} [props.isLoggedIn=false] - Whether the user is logged in
+ * @param {boolean} [props.isAnonymous] - Whether the user is anonymous (defaults to !isLoggedIn)
+ * @param {boolean} [props.disabled] - Whether the chat input is disabled (defaults to isAnonymous)
+ * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default
+ * @param {boolean} [props.visible=true] - Whether the bot is visible
+ * @param {Function} [props.onClose] - Callback when the chat window is closed
+ * @returns {JSX.Element}
+ */
+const QABot = forwardRef((props, ref) => {
   const containerRef = useRef(null);
-
-  const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
-  const isAnonymous = props.isAnonymous !== undefined ? props.isAnonymous : !isLoggedIn;
-
-  // Derive disabled state, respecting explicit disabled prop if provided
-  const disabled = props.disabled !== undefined ? props.disabled : isAnonymous;
-
-  // Use isOpen prop with default to false if not provided
-  const isOpen = props.isOpen !== undefined ? props.isOpen : false;
-  console.log("| about to pass ChatBot isOpen:", isOpen);
-  const onClose = props.onClose;
-
+  const embeddedContainerRef = useRef(null);
   const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
   const queryEndpoint = 'https://access-ai.ccs.uky.edu/api/query';
+
+  const welcome = props.welcome || 'Hello! What can I help you with?';
+  const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
+  const embedded = props.embedded || false;
+  const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
+  const isAnonymous = props.isAnonymous !== undefined ? props.isAnonymous : !isLoggedIn;
+  const disabled = props.disabled !== undefined ? props.disabled : isAnonymous;
+  const defaultOpen = props.defaultOpen !== undefined ? props.defaultOpen : false;
+  const visible = props.visible !== undefined ? props.visible : true;
+  const onClose = props.onClose;
+
+  console.log("| QABot instantiated with props:", { ...props, defaultOpen });
+
+  // Expose methods for controlling the bot
+  useImperativeHandle(ref, () => ({
+    toggle: () => {
+      if (embedded && embeddedContainerRef.current) {
+        return embeddedContainerRef.current.toggle();
+      }
+      return false;
+    },
+    open: () => {
+      if (embedded && embeddedContainerRef.current) {
+        embeddedContainerRef.current.open();
+      }
+    },
+    close: () => {
+      if (embedded && embeddedContainerRef.current) {
+        embeddedContainerRef.current.close();
+      }
+    },
+    isOpen: () => {
+      if (embedded && embeddedContainerRef.current) {
+        return embeddedContainerRef.current.isOpen();
+      }
+      return false;
+    }
+  }));
+
   let hasError = false;
 
   // Get theme colors from CSS variables if available
@@ -109,57 +202,93 @@ const QABot = (props) => {
     };
   };
 
-  const containerClassName = `access-qa-bot ${embedded ? "embedded-qa-bot" : ""}`;
+  const containerClassName = `access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`;
+
+  // Create a close button for embedded mode
+  const createCloseButton = (embeddedRef) => {
+    return (
+      <button
+        className="embedded-close-button"
+        onClick={() => embeddedRef.current && embeddedRef.current.close()}
+      >
+        ×
+      </button>
+    );
+  };
+
+  const chatBot = (
+    <ChatBot
+      settings={{
+        general: {
+          ...getThemeColors(),
+          embedded: embedded
+        },
+        header: {
+          title: 'ACCESS Q&A Bot',
+          avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
+          // Only override buttons in embedded mode, otherwise keep default
+          ...(embedded ? { buttons: [createCloseButton(embeddedContainerRef)] } : {})
+        },
+        chatWindow: {
+          defaultOpen: defaultOpen, // Will be ignored if embedded=true
+        },
+        chatInput: {
+          enabledPlaceholderText: prompt,
+          disabledPlaceholderText: 'Please log in to ask questions.',
+          disabled: disabled
+        },
+        chatHistory: { disabled: true },
+        botBubble: {
+          simulateStream: true,
+          dangerouslySetInnerHtml: true
+        },
+        chatButton: {
+          icon: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
+        },
+        tooltip: {
+          text: 'Ask me about ACCESS! 😊',
+        },
+        audio: {
+          disabled: true,
+        },
+        emoji: {
+          disabled: true,
+        },
+        fileAttachment: {
+          disabled: true,
+        },
+        notification: {
+          disabled: true,
+        },
+        footer: {
+          text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
+        },
+      }}
+      onClose={onClose}
+      flow={flow}
+    />
+  );
+
+  if (!visible) {
+    return null;
+  }
 
   return (
     <div className={containerClassName} ref={containerRef}>
-      <ChatBot
-        settings={{
-          general: {
-            ...getThemeColors(),
-            embedded: embedded
-          },
-          header: {
-            title: 'ACCESS Q&A Bot',
-            avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
-          },
-          chatInput: {
-            enabledPlaceholderText: prompt,
-            disabledPlaceholderText: 'Please log in to ask questions.',
-            disabled: disabled
-          },
-          chatHistory: { disabled: true },
-          botBubble: {
-            simStream: true,
-            dangerouslySetInnerHtml: true
-          },
-          chatButton: {
-            icon: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
-          },
-          tooltip: {
-            text: 'Ask me about ACCESS! 😊',
-          },
-          audio: {
-            disabled: true,
-          },
-          emoji: {
-            disabled: true,
-          },
-          fileAttachment: {
-            disabled: true,
-          },
-          notification: {
-            disabled: true,
-          },
-          footer: {
-            text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
-          },
-        }}
-        onClose={onClose}
-        flow={flow}
-      />
+      <ChatBotProvider>
+        {embedded ? (
+          <EmbeddedChatContainer
+            ref={embeddedContainerRef}
+            embeddedDefaultOpen={defaultOpen}
+          >
+            {chatBot}
+          </EmbeddedChatContainer>
+        ) : (
+          chatBot
+        )}
+      </ChatBotProvider>
     </div>
   );
-}
+});
 
 export default QABot;

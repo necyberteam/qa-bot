@@ -27,6 +27,27 @@
             border-left: 4px solid #6c757d;
             margin-bottom: 20px;
         }
+        .control-buttons {
+            margin: 20px 0;
+        }
+        .control-buttons button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            background-color: #1a5b6e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .control-buttons button:hover {
+            background-color: #107180;
+        }
+        #programmatic-embedded-bot {
+            height: 500px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body class="user-logged-in">
@@ -75,6 +96,18 @@
         <div id="custom-qa-bot"></div>
     </div>
 
+    <div class="demo-section">
+        <h2>Method 4: Programmatically Control Embedded Bot</h2>
+        <p>Control the embedded bot programmatically using the exposed ref methods:</p>
+        <div class="control-buttons">
+            <button onclick="openBot()">Open Bot</button>
+            <button onclick="closeBot()">Close Bot</button>
+            <button onclick="toggleBot()">Toggle Bot</button>
+            <button onclick="checkBotState()">Check State</button>
+        </div>
+        <div id="programmatic-embedded-bot"></div>
+    </div>
+
     <script>
         // Determine if user is logged in by checking for a class on the body
         function isAnonymous() {
@@ -86,11 +119,13 @@
         function initializeQABot() {
             // Method 1: Auto-detect div#qa-bot
             const qaBot = document.getElementById('qa-bot');
+            console.log("| initializeQABot qaBot:", qaBot);
             if (qaBot && window.qAndATool && !qaBot.hasChildNodes()) {
                 window.qAndATool({
                     target: qaBot,
                     isLoggedIn: !window.isAnonymous,
-                    isAnonymous: window.isAnonymous
+                    isAnonymous: window.isAnonymous,
+                    defaultOpen: true
                 });
             }
 
@@ -104,10 +139,40 @@
                         prompt: container.dataset.prompt || "Ask me a question...",
                         isLoggedIn: !window.isAnonymous,
                         isAnonymous: window.isAnonymous,
-                        isOpen: false
+                        defaultOpen: false
                     });
                 }
             });
+        }
+
+        // Store reference to programmatic bot
+        let programmaticBotRef = null;
+
+        // Functions to control the bot programmatically
+        function openBot() {
+            if (programmaticBotRef && programmaticBotRef.open) {
+                programmaticBotRef.open();
+            }
+        }
+
+        function closeBot() {
+            if (programmaticBotRef && programmaticBotRef.close) {
+                programmaticBotRef.close();
+            }
+        }
+
+        function toggleBot() {
+            if (programmaticBotRef && programmaticBotRef.toggle) {
+                const isOpen = programmaticBotRef.toggle();
+                console.log('Bot is now', isOpen ? 'open' : 'closed');
+            }
+        }
+
+        function checkBotState() {
+            if (programmaticBotRef && programmaticBotRef.isOpen) {
+                const isOpen = programmaticBotRef.isOpen();
+                alert(`Bot is currently ${isOpen ? 'open' : 'closed'}`);
+            }
         }
     </script>
 
@@ -138,10 +203,25 @@
                     prompt: "Try asking a question about ACCESS...",
                     isLoggedIn: !window.isAnonymous,
                     isAnonymous: window.isAnonymous,
-                    isOpen: false
+                    defaultOpen: false
                 });
             } else if (!window.qAndATool) {
                 console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
+            }
+
+            // Method 4 (programmatic control)
+            const programmaticBot = document.getElementById('programmatic-embedded-bot');
+            if (window.qAndATool && programmaticBot && !programmaticBot.hasChildNodes()) {
+                programmaticBotRef = window.qAndATool({
+                    target: programmaticBot,
+                    embedded: true,
+                    welcome: "I can be controlled programmatically!",
+                    prompt: "Ask me a question about ACCESS...",
+                    isLoggedIn: !window.isAnonymous,
+                    isAnonymous: window.isAnonymous,
+                    defaultOpen: false,
+                    returnRef: true // Important: this makes qAndATool return the ref
+                });
             }
         });
     </script>
