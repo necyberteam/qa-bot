@@ -1,0 +1,22 @@
+/* Responsive styles */
+@media (max-width: 768px) {
+  .embedded-chat-container.open {
+    height: 400px;
+  }
+
+  .embedded-chat-closed {
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .embedded-chat-open-btn {
+    padding: 3px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .embedded-chat-container.open {
+    height: 350px;
+  }
+}

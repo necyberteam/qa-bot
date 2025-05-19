@@ -2,6 +2,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import QABot from './components/QABot';
+import './styles/index.css'; // Import all styles
 
 // Create a Web Component wrapper for the React component
 class AccessQABot extends HTMLElement {
@@ -118,10 +119,12 @@ class AccessQABot extends HTMLElement {
             if (!rules) continue;
 
             for (let j = 0; j < rules.length; j++) {
-              // Only include rules targeting rcb- prefixed classes (react-chatbotify)
+              // Include rules for chatbot, embedded chat, and related classes
               if (rules[j].selectorText &&
                   (rules[j].selectorText.includes('.rcb-') ||
-                   rules[j].selectorText.includes('.access-qa-bot'))) {
+                   rules[j].selectorText.includes('.access-qa-bot') ||
+                   rules[j].selectorText.includes('.embedded-chat') ||
+                   rules[j].selectorText.includes('.qa-bot-container'))) {
                 cssText += rules[j].cssText + '\n';
               }
             }

@@ -1,62 +1,8 @@
-import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import ChatBot, { ChatBotProvider, useChatWindow } from "react-chatbotify";
-import '../App.css';
-
-/**
- * Container component for embedded chat that handles open/close functionality
- */
-const EmbeddedChatContainer = forwardRef(({ children, embeddedDefaultOpen = false }, ref) => {
-  const { isChatWindowOpen, toggleChatWindow } = useChatWindow();
-  const [isOpen, setIsOpen] = useState(embeddedDefaultOpen);
-
-  useEffect(() => {
-    toggleChatWindow(embeddedDefaultOpen);
-    setIsOpen(embeddedDefaultOpen);
-  }, [embeddedDefaultOpen, toggleChatWindow]);
-
-  useImperativeHandle(ref, () => ({
-    toggle: () => {
-      const newState = !isOpen;
-      setIsOpen(newState);
-      toggleChatWindow(newState);
-      return newState;
-    },
-    open: () => {
-      setIsOpen(true);
-      toggleChatWindow(true);
-    },
-    close: () => {
-      setIsOpen(false);
-      toggleChatWindow(false);
-    },
-    isOpen: () => isOpen
-  }));
-
-  const handleToggle = () => {
-    const newState = !isOpen;
-    setIsOpen(newState);
-    toggleChatWindow(newState);
-  };
-
-  return (
-    <div className={`embedded-chat-container ${isOpen ? 'open' : 'closed'}`}>
-      {/* Always render the chat content but toggle visibility with CSS */}
-      <div className="embedded-chat-open" style={{ display: isOpen ? 'block' : 'none' }}>
-        <div className="embedded-chat-content">
-          {children}
-        </div>
-      </div>
-
-      {/* Only show the closed bar when chat is closed */}
-      {!isOpen && (
-        <div className="embedded-chat-closed" onClick={handleToggle}>
-          <span>ACCESS Q&A Bot</span>
-          <button className="embedded-chat-open-btn">Open</button>
-        </div>
-      )}
-    </div>
-  );
-});
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import ChatBot, { ChatBotProvider } from "react-chatbotify";
+import EmbeddedChatContainer from './EmbeddedChatContainer';
+import { getThemeColors } from '../utils/ThemeUtils';
+import '../styles/rcb-base.css';
 
 /**
  * ACCESS Q&A Bot Component
@@ -171,37 +117,6 @@ const QABot = forwardRef((props, ref) => {
     }
   }
 
-  // Get theme colors, with fallbacks and CSS variable support
-  const getThemeColors = () => {
-    // Get colors from CSS variables if available, fall back to defaults
-    const getCSSVariable = (name, fallback) => {
-      if (containerRef.current) {
-        // First check the container itself
-        const containerStyle = getComputedStyle(containerRef.current);
-        const containerValue = containerStyle.getPropertyValue(name);
-        if (containerValue && containerValue.trim() !== '') {
-          return containerValue.trim();
-        }
-
-        // Then check parent (useful for web component shadow DOM)
-        if (containerRef.current.parentElement) {
-          const parentStyle = getComputedStyle(containerRef.current.parentElement);
-          const parentValue = parentStyle.getPropertyValue(name);
-          if (parentValue && parentValue.trim() !== '') {
-            return parentValue.trim();
-          }
-        }
-      }
-      return fallback;
-    };
-
-    return {
-      primaryColor: getCSSVariable('--primary-color', '#1a5b6e'),
-      secondaryColor: getCSSVariable('--secondary-color', '#107180'),
-      fontFamily: getCSSVariable('--font-family', 'Arial, sans-serif')
-    };
-  };
-
   const containerClassName = `access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`;
 
   // Create a close button for embedded mode
@@ -220,7 +135,7 @@ const QABot = forwardRef((props, ref) => {
     <ChatBot
       settings={{
         general: {
-          ...getThemeColors(),
+          ...getThemeColors(containerRef),
           embedded: embedded
         },
         header: {

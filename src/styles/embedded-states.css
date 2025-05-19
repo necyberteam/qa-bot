@@ -1,0 +1,81 @@
+/* Embedded Chat Closed State */
+.embedded-chat-closed {
+  background-color: #107180;
+  color: white;
+  height: 60px; /* Match header height */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  border-radius: 8px 8px 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.embedded-chat-closed .title-with-icon {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+}
+
+.embedded-chat-closed .bot-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  background-image: url('https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.embedded-chat-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  width: 40px;
+  height: 40px;
+  margin-left: 8px;
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+/* Embedded Chat Open State */
+.embedded-chat-open {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.embedded-chat-content {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border-radius: 0 0 8px 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.embedded-close-button {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  margin-left: 10px;
+  line-height: 1;
+  padding: 0 5px;
+}
+
+.embedded-close-button:hover {
+  color: #333;
+}

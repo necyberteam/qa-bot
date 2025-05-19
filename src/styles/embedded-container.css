@@ -1,0 +1,53 @@
+.embedded-qa-bot .rcb-chat-window {
+  width: 100% !important;
+}
+
+.embedded-qa-bot .rcb-footer {
+  display: none;
+}
+
+.embedded-chat-container {
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.embedded-chat-container.closed {
+  height: 60px;
+  overflow: hidden;
+}
+
+.access-qa-bot.hidden {
+  display: none;
+}
+
+.embedded-bot-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.embedded-qa-bot .rcb-bot-message,
+.embedded-qa-bot .rcb-user-message {
+  max-width: 90% !important;
+  word-break: break-word;
+}
+
+.embedded-qa-bot .rcb-chat-input-textarea {
+  width: 100% !important;
+}
+
+.embedded-qa-bot .rcb-input-container {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
+  background-color: #fff;
+}
+
+.qa-bot-container {
+  width: 100%;
+  max-width: 100%;
+}
