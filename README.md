@@ -30,7 +30,7 @@ function MyApp() {
 
       <QABot
         isLoggedIn={isLoggedIn}
-        isOpen={isOpen}
+        defaultOpen={isOpen}
         onClose={() => setIsOpen(false)}
         welcome="Welcome to the ACCESS Q&A Bot!"
         prompt="How can I help you today?"
@@ -52,7 +52,7 @@ function MyApp() {
   welcome="Welcome to the Q&A Bot!"
   prompt="Ask me anything about ACCESS..."
   is-logged-in
-  is-open>
+  default-open>
 </access-qa-bot>
 ```
 
@@ -89,7 +89,7 @@ function MyApp() {
         prompt: "Ask a question about ACCESS...",
         isLoggedIn: true,
         embedded: true,
-        isOpen: true
+        defaultOpen: true
       });
     }
   });
@@ -121,7 +121,7 @@ Replace `v0.2.0` with the specific version you want to use. This method provides
 | isLoggedIn / is-logged-in | boolean | Whether the user is logged in |
 | isAnonymous / is-anonymous | boolean | Whether the user is anonymous |
 | disabled | boolean | Disable the chat input |
-| isOpen / is-open | boolean | Whether the chat is open |
+| defaultOpen / default-open | boolean | Whether the chat is initially open |
 | apiKey / api-key | string | API key for authentication |
 | onClose | function | Callback when the chat is closed (React only) |
 

@@ -1,50 +1,9 @@
-.rcb-toggle-button.rcb-button-show {
-  background-size: 72%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: rgb(26, 91, 110);
-}
-.rcb-chat-window {
-  width: 550px !important;
-  max-width: calc(100%);
+/**
+ * ACCESS QA Bot Styles
+ *
+ * This file now imports modular CSS files from the styles directory
+ * while maintaining backward compatibility with existing builds.
+ */
 
-  .rcb-bot-avatar {
-    background-size: contain;
-    border-radius: 0;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  .rcb-chat-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-weight: 700;
-  }
-  a {
-    font-weight: 700;
-    color: #000000;
-    text-decoration: underline;
-  }
-  a:hover {
-    color: #107180;
-  }
-  .rcb-bot-message a {
-    text-decoration: none;
-    color: #ffffff;
-  }
-  .rcb-bot-message a:hover {
-    text-decoration: underline;
-  }
-  .rcb-chat-input-textarea {
-    overflow-y: auto;
-  }
-  .rcb-chat-footer-container {
-    font-size: 10px;
-  }
-}
-.embedded-qa-bot {
-  .rcb-chat-window {
-    width: 100% !important;
-    max-width: 100%;
-  } 
-}
+/* Import modular styles */
+@import './styles/index.css';

@@ -1,0 +1,54 @@
+/* General React Chatbotify (rcb) styles */
+.rcb-toggle-button.rcb-button-show {
+  background-size: 72%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: rgb(26, 91, 110);
+}
+
+.rcb-chat-window {
+  width: 550px !important;
+  max-width: calc(100%);
+  max-height: 600px; /* TODO: why do we need this now */
+}
+
+.rcb-chat-window .rcb-bot-avatar {
+  background-size: contain;
+  border-radius: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.rcb-chat-window .rcb-chat-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-weight: 700;
+}
+
+.rcb-chat-window a {
+  font-weight: 700;
+  color: #000000;
+  text-decoration: underline;
+}
+
+.rcb-chat-window a:hover {
+  color: #107180;
+}
+
+.rcb-chat-window .rcb-bot-message a {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.rcb-chat-window .rcb-bot-message a:hover {
+  text-decoration: underline;
+}
+
+.rcb-chat-window .rcb-chat-input-textarea {
+  overflow-y: auto;
+}
+
+.rcb-chat-window .rcb-chat-footer-container {
+  font-size: 10px;
+}

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import QABot from './components/QABot';
+import './styles/index.css'; // Import all styles
 
 // Create a Web Component wrapper for the React component
 class AccessQABot extends HTMLElement {
@@ -16,6 +17,36 @@ class AccessQABot extends HTMLElement {
 
     // Copy over CSS from main document to ensure all styles are available
     this.injectStyles();
+
+    // Store reference to QABot component
+    this.qaRef = React.createRef();
+  }
+
+  // Methods for programmatic control
+  toggle() {
+    if (this.qaRef && this.qaRef.current) {
+      return this.qaRef.current.toggle();
+    }
+    return false;
+  }
+
+  open() {
+    if (this.qaRef && this.qaRef.current) {
+      this.qaRef.current.open();
+    }
+  }
+
+  close() {
+    if (this.qaRef && this.qaRef.current) {
+      this.qaRef.current.close();
+    }
+  }
+
+  isOpen() {
+    if (this.qaRef && this.qaRef.current) {
+      return this.qaRef.current.isOpen();
+    }
+    return false;
   }
 
   // Inject CSS from document to shadow DOM to maintain consistent styling
@@ -88,10 +119,12 @@ class AccessQABot extends HTMLElement {
             if (!rules) continue;
 
             for (let j = 0; j < rules.length; j++) {
-              // Only include rules targeting rcb- prefixed classes (react-chatbotify)
+              // Include rules for chatbot, embedded chat, and related classes
               if (rules[j].selectorText &&
                   (rules[j].selectorText.includes('.rcb-') ||
-                   rules[j].selectorText.includes('.access-qa-bot'))) {
+                   rules[j].selectorText.includes('.access-qa-bot') ||
+                   rules[j].selectorText.includes('.embedded-chat') ||
+                   rules[j].selectorText.includes('.qa-bot-container'))) {
                 cssText += rules[j].cssText + '\n';
               }
             }
@@ -120,7 +153,7 @@ class AccessQABot extends HTMLElement {
       'is-logged-in',
       'is-anonymous',
       'disabled',
-      'is-open',
+      'default-open',
       'api-key'
     ];
   }
@@ -141,11 +174,9 @@ class AccessQABot extends HTMLElement {
       isLoggedIn: this.hasAttribute('is-logged-in'),
       isAnonymous: this.hasAttribute('is-anonymous'),
       disabled: this.hasAttribute('disabled'),
-      isOpen: this.hasAttribute('is-open'),
-      // Always provide an apiKey to prevent process.env reference errors
+      defaultOpen: this.hasAttribute('default-open'),
       apiKey: this.getAttribute('api-key') || 'demo-key',
       onClose: () => {
-        // Dispatch custom event when closed
         this.dispatchEvent(new CustomEvent('qabot-close'));
       }
     };
@@ -201,7 +232,7 @@ class AccessQABot extends HTMLElement {
     const props = this._getProps();
     this.root.render(
       <React.StrictMode>
-        <QABot {...props} />
+        <QABot {...props} ref={this.qaRef} />
       </React.StrictMode>
     );
   }
@@ -215,7 +246,7 @@ export const WebComponentQABot = AccessQABot;
 
 // Create a function-based API for programmatic initialization
 export function webComponentQAndATool(config) {
-  const { target, ...props } = config;
+  const { target, returnRef, ...props } = config;
 
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
@@ -231,8 +262,8 @@ export function webComponentQAndATool(config) {
   if (props.embedded) qaBot.setAttribute('embedded', '');
   if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
   if (props.isAnonymous) qaBot.setAttribute('is-anonymous', '');
+  if (props.defaultOpen) qaBot.setAttribute('default-open', '');
   if (props.disabled) qaBot.setAttribute('disabled', '');
-  if (props.isOpen) qaBot.setAttribute('is-open', '');
   if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
 
   // Set CSS custom properties if provided
@@ -251,6 +282,17 @@ export function webComponentQAndATool(config) {
 
   // Append to target
   target.appendChild(qaBot);
+
+  // If returnRef is true, return control methods for the web component
+  if (returnRef) {
+    // Return the control methods from the web component instance
+    return {
+      toggle: () => qaBot.toggle(),
+      open: () => qaBot.open(),
+      close: () => qaBot.close(),
+      isOpen: () => qaBot.isOpen()
+    };
+  }
 
   // Return cleanup function
   return () => {
