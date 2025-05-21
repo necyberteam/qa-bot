@@ -14,9 +14,19 @@ export { WebComponentQABot };
 
 // Function-based API that prioritizes web component usage
 // and then attempts a react render (since some people may use the function within a react context)
-export function qAndATool(config) {
-  const { target, version, isLoggedIn, isAnonymous, defaultOpen, ...otherProps } = config;
-
+export function qAndATool({
+  target,
+  version,
+  isLoggedIn,
+  isAnonymous,
+  defaultOpen,
+  embedded,
+  welcome,
+  prompt,
+  disabled,
+  onClose,
+  apiKey
+}) {
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
     return;
@@ -30,7 +40,12 @@ export function qAndATool(config) {
       isLoggedIn,
       isAnonymous,
       defaultOpen,
-      ...otherProps
+      embedded,
+      welcome,
+      prompt,
+      disabled,
+      onClose,
+      apiKey
     });
   } else {
     // Use direct react rendering
@@ -39,15 +54,15 @@ export function qAndATool(config) {
     root.render(
       <React.StrictMode>
         <App
-          embedded={otherProps.embedded}
+          embedded={embedded}
           defaultOpen={defaultOpen}
-          welcome={otherProps.welcome}
-          prompt={otherProps.prompt}
+          welcome={welcome}
+          prompt={prompt}
           isLoggedIn={isLoggedIn}
           isAnonymous={isAnonymous}
-          disabled={otherProps.disabled}
-          onClose={otherProps.onClose}
-          apiKey={otherProps.apiKey}
+          disabled={disabled}
+          onClose={onClose}
+          apiKey={apiKey}
         />
       </React.StrictMode>
     );

@@ -120,15 +120,14 @@ Replace `v0.2.0` with the specific version you want to use. This method provides
 | isLoggedIn / is-logged-in | boolean | Whether the user is logged in |
 | isAnonymous / is-anonymous | boolean | Whether the user is anonymous |
 | disabled | boolean | Disable the chat input |
-| defaultOpen / default-open | boolean | Whether the floating chat window is initially open (only applies to non-embedded mode) |
+| defaultOpen / default-open | boolean | Whether the floating chat window is initially open |
 | visible | boolean | Whether the bot is visible |
 | apiKey / api-key | string | API key for authentication |
 | onClose | function | Callback when the chat is closed (React only) |
 
 ## Important Notes
 
-1. The `defaultOpen` property only applies to the floating chat window (non-embedded mode). When in embedded mode, the chat is always open.
-2. Embedded mode chat windows always display in the open state and cannot be toggled closed.
+1. The `defaultOpen` property only applies to the floating chat window. When in embedded mode, the chat is always open.
 
 ## Events
 
@@ -166,8 +165,9 @@ npm start
 To test the standalone demo files (`index.html` and `web-component-demo.html`) at the root level, you need to:
 
 1. Stop the development server (if running)
-2. Build the project (`npm run build`)
-3. Serve the root directory using a static file server:
+2. Build the library (`npm run build:lib`)
+3. Build the project (`npm run build`)
+4. Serve the root directory using a static file server:
 
 ```bash
 # After building, serve the files from root
