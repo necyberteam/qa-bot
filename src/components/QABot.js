@@ -52,8 +52,6 @@ const QABot = React.forwardRef((props, ref) => {
     }
   }, []);
 
-  console.log('| bot should handle isLoggedIn:', isLoggedIn);
-
   const handleQuery = async (params) => {
     // POST question to the QA API
     try {

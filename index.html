@@ -27,10 +27,36 @@
             border-left: 4px solid #6c757d;
             margin-bottom: 20px;
         }
+        .log-in-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
-<body class="user-logged-in">
+
+<script>
+    window.mockUserLoggedIn = false;
+    const body = document.querySelector('body');
+    const checkbox = document.getElementById('user-logged-in');
+    checkbox.addEventListener('change', (e) => {
+        window.mockUserLoggedIn = e.target.checked;
+        if (window.mockUserLoggedIn) body.classList.add('user-logged-in');
+        else body.classList.remove('user-logged-in');
+        console.log('| user logged in:', window.mockUserLoggedIn);
+    });
+</script>
+<body>
     <h1>ACCESS Q&A Bot Standalone Demo</h1>
+    <div class="log-in-area">
+        <input type="checkbox" id="user-logged-in" />
+        <label for="user-logged-in">User logged in <i>(toggle to simulate login/logout)</i></label>
+    </div>
 
     <!-- This empty div matches the original index.html structure -->
     <div id="qa-bot"></div>
@@ -76,12 +102,6 @@
     </div>
 
     <script>
-        // Determine if user is logged in by checking for a class on the body
-        function isAnonymous() {
-            return !document.querySelector('body').classList.contains('user-logged-in');
-        }
-        window.isAnonymous = isAnonymous();
-
         // Function to initialize QABot instances for Method 1 and Method 2
         function initializeQABot() {
             // Method 1: Auto-detect div#qa-bot
@@ -89,7 +109,7 @@
             if (qaBot && window.qAndATool && !qaBot.hasChildNodes()) {
                 window.qAndATool({
                     target: qaBot,
-                    isLoggedIn: !window.isAnonymous,
+                    isLoggedIn: window.mockUserLoggedIn,
                     defaultOpen: false
                 });
             }
@@ -102,7 +122,7 @@
                         embedded: true,
                         welcome: container.dataset.welcome || "Hello!",
                         prompt: container.dataset.prompt || "Ask me a question...",
-                        isLoggedIn: !window.isAnonymous
+                        isLoggedIn: window.mockUserLoggedIn,
                     });
                 }
             });
@@ -134,7 +154,7 @@
                     embedded: true,
                     welcome: "This is configured using JavaScript!",
                     prompt: "Try asking a question about ACCESS...",
-                    isLoggedIn: !window.isAnonymous,
+                    isLoggedIn: window.mockUserLoggedIn,
                     defaultOpen: true
                 });
             } else if (!window.qAndATool) {

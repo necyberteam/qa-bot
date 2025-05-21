@@ -114,16 +114,16 @@ Replace `v0.2.0` with the specific version you want to use. This method provides
 
 | Property | Type | Description |
 |----------|------|-------------|
-| welcome | string | Welcome message shown to the user |
-| prompt | string | Text shown in the input field |
+| apiKey / api-key | string | API key for authentication |
+| defaultOpen / default-open | boolean | Whether the floating chat window is initially open |
+| disabled | boolean | Disable the chat input |
 | embedded | boolean | Display in embedded mode |
 | isLoggedIn / is-logged-in | boolean | Whether the user is logged in |
-| isAnonymous / is-anonymous | boolean | Whether the user is anonymous |
-| disabled | boolean | Disable the chat input |
-| defaultOpen / default-open | boolean | Whether the floating chat window is initially open |
-| visible | boolean | Whether the bot is visible |
-| apiKey / api-key | string | API key for authentication |
+| loginUrl / login-url | string | URL to redirect for login |
 | onClose | function | Callback when the chat is closed (React only) |
+| prompt | string | Text shown in the input field |
+| visible | boolean | Whether the bot is visible |
+| welcome | string | Welcome message shown to the user |
 
 ## Important Notes
 

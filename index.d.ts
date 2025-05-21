@@ -1,14 +1,14 @@
 interface QABotProps {
-  isLoggedIn?: boolean;
-  isAnonymous?: boolean;
-  defaultOpen?: boolean;
   apiKey?: string;
-  embedded?: boolean;
-  welcome?: string;
-  prompt?: string;
+  defaultOpen?: boolean;
   disabled?: boolean;
-  visible?: boolean;
+  embedded?: boolean;
+  isLoggedIn?: boolean;
+  loginUrl?: string;
   onClose?: () => void;
+  prompt?: string;
+  visible?: boolean;
+  welcome?: string;
   [key: string]: any; // Allow additional props
 }
 
