@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import QABot from './components/QABot';
 import App from './App';
@@ -14,9 +14,19 @@ export { WebComponentQABot };
 
 // Function-based API that prioritizes web component usage
 // and then attempts a react render (since some people may use the function within a react context)
-export function qAndATool(config) {
-  const { target, version, isLoggedIn, isAnonymous, defaultOpen, returnRef, ...otherProps } = config;
-
+export function qAndATool({
+  target,
+  version,
+  isLoggedIn,
+  isAnonymous,
+  defaultOpen,
+  embedded,
+  welcome,
+  prompt,
+  disabled,
+  onClose,
+  apiKey
+}) {
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
     return;
@@ -30,43 +40,34 @@ export function qAndATool(config) {
       isLoggedIn,
       isAnonymous,
       defaultOpen,
-      returnRef,
-      ...otherProps
+      embedded,
+      welcome,
+      prompt,
+      disabled,
+      onClose,
+      apiKey
     });
   } else {
-    // Use direct react rendering with ref support
+    // Use direct react rendering
     const root = ReactDOM.createRoot(target);
-    const qaRef = React.createRef();
 
     root.render(
       <React.StrictMode>
-        <QABot
-          ref={qaRef}
-          embedded={otherProps.embedded}
+        <App
+          embedded={embedded}
           defaultOpen={defaultOpen}
-          welcome={otherProps.welcome}
-          prompt={otherProps.prompt}
+          welcome={welcome}
+          prompt={prompt}
           isLoggedIn={isLoggedIn}
           isAnonymous={isAnonymous}
-          disabled={otherProps.disabled}
-          onClose={otherProps.onClose}
-          apiKey={otherProps.apiKey}
+          disabled={disabled}
+          onClose={onClose}
+          apiKey={apiKey}
         />
       </React.StrictMode>
     );
 
-    // If returnRef is true, return ref methods for programmatic control
-    if (returnRef) {
-      // Return an object with the control methods that match the QABot component's API
-      return {
-        toggle: () => qaRef.current && qaRef.current.toggle(),
-        open: () => qaRef.current && qaRef.current.open(),
-        close: () => qaRef.current && qaRef.current.close(),
-        isOpen: () => qaRef.current && qaRef.current.isOpen()
-      };
-    }
-
-    // Otherwise return a cleanup function
+    // Return a cleanup function
     return () => {
       root.unmount();
     };

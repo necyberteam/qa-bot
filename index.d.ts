@@ -12,17 +12,9 @@ interface QABotProps {
   [key: string]: any; // Allow additional props
 }
 
-// React component with ref
-interface QABotRef {
-  toggle: () => boolean;
-  open: () => void;
-  close: () => void;
-  isOpen: () => boolean;
-}
-
 // React component
 export const QABot: React.ForwardRefExoticComponent<
-  QABotProps & React.RefAttributes<QABotRef>
+  QABotProps & React.RefAttributes<unknown>
 >;
 
 // Web Component class (available in the standalone build)
@@ -31,31 +23,18 @@ export class WebComponentQABot extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
   connectedCallback(): void;
   disconnectedCallback(): void;
-  toggle(): boolean;
-  open(): void;
-  close(): void;
-  isOpen(): boolean;
 }
 
 // Function for non-React integration
 interface QAndAToolConfig extends QABotProps {
   target: HTMLElement;
-  returnRef?: boolean;
-}
-
-// Return type when returnRef is true
-interface QABotControlMethods {
-  toggle: () => boolean;
-  open: () => void;
-  close: () => void;
-  isOpen: () => boolean;
 }
 
 // Main function for programmatic usage (works with React or Web Component)
-export function qAndATool(config: QAndAToolConfig): (() => void) | QABotControlMethods;
+export function qAndATool(config: QAndAToolConfig): () => void;
 
 // Web Component specific function (exposed in the standalone bundle)
-export function webComponentQAndATool(config: QAndAToolConfig): (() => void) | QABotControlMethods;
+export function webComponentQAndATool(config: QAndAToolConfig): () => void;
 
 // Default export (React component)
 export default QABot;
