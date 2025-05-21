@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
+import LoginButton from './LoginButton';
 import '../styles/rcb-base.css';
 
 /**
@@ -18,6 +19,15 @@ import '../styles/rcb-base.css';
  * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
  */
+
+const buildWelcomeMessage = (isLoggedIn, loginUrl, welcomeMessage) => {
+  if (isLoggedIn) {
+    return welcomeMessage;
+  } else {
+    return `Hello! To ask questions, please log in.`;
+  }
+}
+
 const QABot = React.forwardRef((props, ref) => {
   const containerRef = useRef(null);
   const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
@@ -31,7 +41,7 @@ const QABot = React.forwardRef((props, ref) => {
   const onClose = props.onClose;
   const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
   const visible = props.visible !== undefined ? props.visible : true;
-  const welcome = props.welcome || 'Hello! What can I help you with?';
+  const welcome = buildWelcomeMessage(isLoggedIn, loginUrl, props.welcome);
 
   let hasError = false;
 
@@ -70,7 +80,14 @@ const QABot = React.forwardRef((props, ref) => {
   const flow = {
     start: {
       message: welcome,
-      path: 'loop'
+      path: (props.isLoggedIn) ? 'loop' : 'login'
+    },
+    login: {
+      message: 'Please log in to ask questions.',
+      component: (
+        <LoginButton loginUrl={loginUrl} />
+      ),
+      path: (props.isLoggedIn) ? 'loop' : 'login'
     },
     loop: {
       message: async (params) => {
