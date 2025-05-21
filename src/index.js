@@ -10,15 +10,12 @@ import reportWebVitals from './reportWebVitals';
 window.qAndATool = qAndATool;
 
 // simulated consuming app's user state
-// In current usage, disabled is a function of isLoggedIn
-// But that will not always be the case
-// The bot will eventually have some functionality when not logged in
 const userLoggedIn = false;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App isLoggedIn={userLoggedIn} disabled={!userLoggedIn} />
+    <App isLoggedIn={userLoggedIn} loginUrl="/login" />
   </React.StrictMode>
 );
 

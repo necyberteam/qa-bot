@@ -5,17 +5,17 @@ import '../styles/rcb-base.css';
 /**
  * ACCESS Q&A Bot Component
  *
- * @param {Object} props
- * @param {string} [props.apiKey] - API key for the Q&A endpoint
- * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only)
- * @param {boolean} [props.disabled=false] - Whether the chat input is disabled
- * @param {boolean} [props.embedded=false] - Whether the bot is embedded in the page
- * @param {boolean} [props.isLoggedIn=false] - Whether the user is logged in
- * @param {string} [props.loginUrl='/login'] - URL to redirect for login
- * @param {Function} [props.onClose] - Callback when the chat window is closed
- * @param {string} [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
- * @param {boolean} [props.visible=true] - Whether the bot is visible
- * @param {string} [props.welcome='Hello! What can I help you with?'] - Welcome message
+ * @param {Object}    [props]
+ * @param {string}    [props.apiKey] - API key for the Q&A endpoint
+ * @param {boolean}   [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only)
+ * @param {boolean}   [props.disabled=false] - Whether the chat input is disabled
+ * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page
+ * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
+ * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
+ * @param {Function}  [props.onClose] - Callback when the chat window is closed
+ * @param {string}    [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
+ * @param {boolean}   [props.visible=true] - Whether the bot is visible
+ * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
  */
 const QABot = React.forwardRef((props, ref) => {
@@ -60,10 +60,7 @@ const QABot = React.forwardRef((props, ref) => {
       const body = await response.json();
       const text = body.response;
 
-      for (let i = 0; i < text.length; i++) {
-        await params.streamMessage(text.slice(0, i + 1));
-        await new Promise(resolve => setTimeout(resolve, 2));
-      }
+      await params.streamMessage(text);
     } catch (error) {
       await params.injectMessage("Unable to contact the Q&A Bot. Please try again later.");
       hasError = true;
