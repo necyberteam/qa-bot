@@ -7,14 +7,15 @@ import '../styles/rcb-base.css';
  *
  * @param {Object} props
  * @param {string} [props.apiKey] - API key for the Q&A endpoint
- * @param {string} [props.welcome='Hello! What can I help you with?'] - Welcome message
- * @param {string} [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
+ * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only)
+ * @param {boolean} [props.disabled=false] - Whether the chat input is disabled
  * @param {boolean} [props.embedded=false] - Whether the bot is embedded in the page
  * @param {boolean} [props.isLoggedIn=false] - Whether the user is logged in
- * @param {boolean} [props.disabled=false] - Whether the chat input is disabled
- * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only)
- * @param {boolean} [props.visible=true] - Whether the bot is visible
+ * @param {string} [props.loginUrl='/login'] - URL to redirect for login
  * @param {Function} [props.onClose] - Callback when the chat window is closed
+ * @param {string} [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
+ * @param {boolean} [props.visible=true] - Whether the bot is visible
+ * @param {string} [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
  */
 const QABot = React.forwardRef((props, ref) => {
@@ -22,14 +23,15 @@ const QABot = React.forwardRef((props, ref) => {
   const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
   const queryEndpoint = 'https://access-ai.ccs.uky.edu/api/query';
 
-  const welcome = props.welcome || 'Hello! What can I help you with?';
-  const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
+  const defaultOpen = props.defaultOpen !== undefined ? props.defaultOpen : false;
+  const disabled = props.disabled !== undefined ? props.disabled : false;
   const embedded = props.embedded || false;
   const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
-  const disabled = props.disabled !== undefined ? props.disabled : false;
-  const defaultOpen = props.defaultOpen !== undefined ? props.defaultOpen : false;
-  const visible = props.visible !== undefined ? props.visible : true;
+  const loginUrl = props.loginUrl || '/login';
   const onClose = props.onClose;
+  const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
+  const visible = props.visible !== undefined ? props.visible : true;
+  const welcome = props.welcome || 'Hello! What can I help you with?';
 
   let hasError = false;
 

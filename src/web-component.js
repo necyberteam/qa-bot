@@ -116,13 +116,14 @@ class AccessQABot extends HTMLElement {
   // Observe these attributes for changes
   static get observedAttributes() {
     return [
-      'welcome',
-      'prompt',
+      'api-key',
+      'default-open',
+      'disabled',
       'embedded',
       'is-logged-in',
-      'disabled',
-      'default-open',
-      'api-key'
+      'login-url',
+      'prompt',
+      'welcome'
     ];
   }
 
@@ -136,16 +137,17 @@ class AccessQABot extends HTMLElement {
   // Convert attributes to props
   _getProps() {
     return {
-      welcome: this.getAttribute('welcome'),
-      prompt: this.getAttribute('prompt'),
+      apiKey: this.getAttribute('api-key') || 'demo-key',
+      defaultOpen: this.hasAttribute('default-open'),
+      disabled: this.hasAttribute('disabled'),
       embedded: this.hasAttribute('embedded'),
       isLoggedIn: this.hasAttribute('is-logged-in'),
-      disabled: this.hasAttribute('disabled'),
-      defaultOpen: this.hasAttribute('default-open'),
-      apiKey: this.getAttribute('api-key') || 'demo-key',
+      loginUrl: this.getAttribute('login-url'),
       onClose: () => {
         this.dispatchEvent(new CustomEvent('qabot-close'));
-      }
+      },
+      prompt: this.getAttribute('prompt'),
+      welcome: this.getAttribute('welcome')
     };
   }
 
@@ -224,13 +226,14 @@ export function webComponentQAndATool(config) {
   const qaBot = document.createElement('access-qa-bot');
 
   // Set attributes based on props
-  if (props.welcome) qaBot.setAttribute('welcome', props.welcome);
-  if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
-  if (props.embedded) qaBot.setAttribute('embedded', '');
-  if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
+  if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
   if (props.defaultOpen) qaBot.setAttribute('default-open', '');
   if (props.disabled) qaBot.setAttribute('disabled', '');
-  if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
+  if (props.embedded) qaBot.setAttribute('embedded', '');
+  if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
+  if (props.loginUrl) qaBot.setAttribute('login-url', props.loginUrl);
+  if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
+  if (props.welcome) qaBot.setAttribute('welcome', props.welcome);
 
   // Set CSS custom properties if provided
   if (props.primaryColor) {

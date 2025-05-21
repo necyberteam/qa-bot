@@ -5,14 +5,15 @@ import QABot from './components/QABot';
 function App(props) {
   return (
     <QABot
-      embedded={props.embedded}
-      defaultOpen={props.defaultOpen}
-      welcome={props.welcome}
-      prompt={props.prompt}
-      isLoggedIn={props.isLoggedIn}
-      disabled={props.disabled}
-      onClose={props.onClose}
       apiKey={props.apiKey}
+      defaultOpen={props.defaultOpen}
+      disabled={props.disabled}
+      embedded={props.embedded}
+      isLoggedIn={props.isLoggedIn}
+      loginUrl={props.loginUrl}
+      onClose={props.onClose}
+      prompt={props.prompt}
+      welcome={props.welcome}
     />
   );
 }

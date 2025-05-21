@@ -16,15 +16,16 @@ export { WebComponentQABot };
 // and then attempts a react render (since some people may use the function within a react context)
 export function qAndATool({
   target,
-  version,
-  isLoggedIn,
+  apiKey,
   defaultOpen,
-  embedded,
-  welcome,
-  prompt,
   disabled,
+  embedded,
+  isLoggedIn,
+  loginUrl,
   onClose,
-  apiKey
+  prompt,
+  version,
+  welcome
 }) {
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
@@ -36,14 +37,15 @@ export function qAndATool({
       customElements.get('access-qa-bot')) {
     return webComponentQAndATool({
       target,
-      isLoggedIn,
+      apiKey,
       defaultOpen,
-      embedded,
-      welcome,
-      prompt,
       disabled,
+      embedded,
+      isLoggedIn,
+      loginUrl,
       onClose,
-      apiKey
+      prompt,
+      welcome
     });
   } else {
     // Use direct react rendering
@@ -52,14 +54,15 @@ export function qAndATool({
     root.render(
       <React.StrictMode>
         <App
-          embedded={embedded}
-          defaultOpen={defaultOpen}
-          welcome={welcome}
-          prompt={prompt}
-          isLoggedIn={isLoggedIn}
-          disabled={disabled}
-          onClose={onClose}
           apiKey={apiKey}
+          defaultOpen={defaultOpen}
+          disabled={disabled}
+          embedded={embedded}
+          isLoggedIn={isLoggedIn}
+          loginUrl={loginUrl}
+          onClose={onClose}
+          prompt={prompt}
+          welcome={welcome}
         />
       </React.StrictMode>
     );
