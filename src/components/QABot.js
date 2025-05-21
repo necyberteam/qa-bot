@@ -20,9 +20,9 @@ import '../styles/rcb-base.css';
  * @returns {JSX.Element}
  */
 
-const buildWelcomeMessage = (isLoggedIn, loginUrl, welcomeMessage) => {
+const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
   if (isLoggedIn) {
-    return welcomeMessage;
+    return welcomeMessage || 'Hello! What can I help you with?';
   } else {
     return `Hello! To ask questions, please log in.`;
   }
@@ -41,7 +41,7 @@ const QABot = React.forwardRef((props, ref) => {
   const onClose = props.onClose;
   const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
   const visible = props.visible !== undefined ? props.visible : true;
-  const welcome = buildWelcomeMessage(isLoggedIn, loginUrl, props.welcome);
+  const welcome = buildWelcomeMessage(isLoggedIn, props.welcome);
 
   let hasError = false;
 
@@ -80,6 +80,9 @@ const QABot = React.forwardRef((props, ref) => {
   const flow = {
     start: {
       message: welcome,
+      component: (
+        <LoginButton loginUrl={loginUrl} />
+      ),
       path: (props.isLoggedIn) ? 'loop' : 'login'
     },
     login: {
