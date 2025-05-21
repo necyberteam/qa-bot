@@ -11,8 +11,7 @@ import '../styles/rcb-base.css';
  * @param {string} [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
  * @param {boolean} [props.embedded=false] - Whether the bot is embedded in the page
  * @param {boolean} [props.isLoggedIn=false] - Whether the user is logged in
- * @param {boolean} [props.isAnonymous] - Whether the user is anonymous (defaults to !isLoggedIn)
- * @param {boolean} [props.disabled] - Whether the chat input is disabled (defaults to isAnonymous)
+ * @param {boolean} [props.disabled=false] - Whether the chat input is disabled
  * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only)
  * @param {boolean} [props.visible=true] - Whether the bot is visible
  * @param {Function} [props.onClose] - Callback when the chat window is closed
@@ -27,8 +26,7 @@ const QABot = React.forwardRef((props, ref) => {
   const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
   const embedded = props.embedded || false;
   const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
-  const isAnonymous = props.isAnonymous !== undefined ? props.isAnonymous : !isLoggedIn;
-  const disabled = props.disabled !== undefined ? props.disabled : isAnonymous;
+  const disabled = props.disabled !== undefined ? props.disabled : false;
   const defaultOpen = props.defaultOpen !== undefined ? props.defaultOpen : false;
   const visible = props.visible !== undefined ? props.visible : true;
   const onClose = props.onClose;
@@ -41,6 +39,8 @@ const QABot = React.forwardRef((props, ref) => {
       // If container's parent has CSS variables, they'll be picked up in getThemeColors
     }
   }, []);
+
+  console.log('| bot should handle isLoggedIn:', isLoggedIn);
 
   const handleQuery = async (params) => {
     // POST question to the QA API

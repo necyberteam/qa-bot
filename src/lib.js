@@ -18,7 +18,6 @@ export function qAndATool({
   target,
   version,
   isLoggedIn,
-  isAnonymous,
   defaultOpen,
   embedded,
   welcome,
@@ -38,7 +37,6 @@ export function qAndATool({
     return webComponentQAndATool({
       target,
       isLoggedIn,
-      isAnonymous,
       defaultOpen,
       embedded,
       welcome,
@@ -59,7 +57,6 @@ export function qAndATool({
           welcome={welcome}
           prompt={prompt}
           isLoggedIn={isLoggedIn}
-          isAnonymous={isAnonymous}
           disabled={disabled}
           onClose={onClose}
           apiKey={apiKey}

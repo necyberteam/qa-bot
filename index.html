@@ -90,7 +90,6 @@
                 window.qAndATool({
                     target: qaBot,
                     isLoggedIn: !window.isAnonymous,
-                    isAnonymous: window.isAnonymous,
                     defaultOpen: false
                 });
             }
@@ -103,8 +102,7 @@
                         embedded: true,
                         welcome: container.dataset.welcome || "Hello!",
                         prompt: container.dataset.prompt || "Ask me a question...",
-                        isLoggedIn: !window.isAnonymous,
-                        isAnonymous: window.isAnonymous
+                        isLoggedIn: !window.isAnonymous
                     });
                 }
             });
@@ -137,7 +135,6 @@
                     welcome: "This is configured using JavaScript!",
                     prompt: "Try asking a question about ACCESS...",
                     isLoggedIn: !window.isAnonymous,
-                    isAnonymous: window.isAnonymous,
                     defaultOpen: true
                 });
             } else if (!window.qAndATool) {

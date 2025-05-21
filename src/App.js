@@ -10,7 +10,6 @@ function App(props) {
       welcome={props.welcome}
       prompt={props.prompt}
       isLoggedIn={props.isLoggedIn}
-      isAnonymous={props.isAnonymous}
       disabled={props.disabled}
       onClose={props.onClose}
       apiKey={props.apiKey}

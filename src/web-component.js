@@ -120,7 +120,6 @@ class AccessQABot extends HTMLElement {
       'prompt',
       'embedded',
       'is-logged-in',
-      'is-anonymous',
       'disabled',
       'default-open',
       'api-key'
@@ -141,7 +140,6 @@ class AccessQABot extends HTMLElement {
       prompt: this.getAttribute('prompt'),
       embedded: this.hasAttribute('embedded'),
       isLoggedIn: this.hasAttribute('is-logged-in'),
-      isAnonymous: this.hasAttribute('is-anonymous'),
       disabled: this.hasAttribute('disabled'),
       defaultOpen: this.hasAttribute('default-open'),
       apiKey: this.getAttribute('api-key') || 'demo-key',
@@ -230,7 +228,6 @@ export function webComponentQAndATool(config) {
   if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
   if (props.embedded) qaBot.setAttribute('embedded', '');
   if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
-  if (props.isAnonymous) qaBot.setAttribute('is-anonymous', '');
   if (props.defaultOpen) qaBot.setAttribute('default-open', '');
   if (props.disabled) qaBot.setAttribute('disabled', '');
   if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
