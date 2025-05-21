@@ -17,36 +17,6 @@ class AccessQABot extends HTMLElement {
 
     // Copy over CSS from main document to ensure all styles are available
     this.injectStyles();
-
-    // Store reference to QABot component
-    this.qaRef = React.createRef();
-  }
-
-  // Methods for programmatic control
-  toggle() {
-    if (this.qaRef && this.qaRef.current) {
-      return this.qaRef.current.toggle();
-    }
-    return false;
-  }
-
-  open() {
-    if (this.qaRef && this.qaRef.current) {
-      this.qaRef.current.open();
-    }
-  }
-
-  close() {
-    if (this.qaRef && this.qaRef.current) {
-      this.qaRef.current.close();
-    }
-  }
-
-  isOpen() {
-    if (this.qaRef && this.qaRef.current) {
-      return this.qaRef.current.isOpen();
-    }
-    return false;
   }
 
   // Inject CSS from document to shadow DOM to maintain consistent styling
@@ -123,7 +93,6 @@ class AccessQABot extends HTMLElement {
               if (rules[j].selectorText &&
                   (rules[j].selectorText.includes('.rcb-') ||
                    rules[j].selectorText.includes('.access-qa-bot') ||
-                   rules[j].selectorText.includes('.embedded-chat') ||
                    rules[j].selectorText.includes('.qa-bot-container'))) {
                 cssText += rules[j].cssText + '\n';
               }
@@ -232,7 +201,7 @@ class AccessQABot extends HTMLElement {
     const props = this._getProps();
     this.root.render(
       <React.StrictMode>
-        <QABot {...props} ref={this.qaRef} />
+        <QABot {...props} />
       </React.StrictMode>
     );
   }
@@ -246,14 +215,14 @@ export const WebComponentQABot = AccessQABot;
 
 // Create a function-based API for programmatic initialization
 export function webComponentQAndATool(config) {
-  const { target, returnRef, ...props } = config;
+  const { target, ...props } = config;
 
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
     return;
   }
 
-  // Create and configure the element
+  // Create a new QA bot web component instance
   const qaBot = document.createElement('access-qa-bot');
 
   // Set attributes based on props
@@ -267,32 +236,20 @@ export function webComponentQAndATool(config) {
   if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
 
   // Set CSS custom properties if provided
-  if (props.styles) {
-    Object.entries(props.styles).forEach(([prop, value]) => {
-      if (prop.startsWith('--')) {
-        qaBot.style.setProperty(prop, value);
-      }
-    });
+  if (props.primaryColor) {
+    qaBot.style.setProperty('--primary-color', props.primaryColor);
   }
 
-  // Add event listener for close if provided
-  if (props.onClose) {
-    qaBot.addEventListener('qabot-close', props.onClose);
+  if (props.secondaryColor) {
+    qaBot.style.setProperty('--secondary-color', props.secondaryColor);
+  }
+
+  if (props.fontFamily) {
+    qaBot.style.setProperty('--font-family', props.fontFamily);
   }
 
   // Append to target
   target.appendChild(qaBot);
-
-  // If returnRef is true, return control methods for the web component
-  if (returnRef) {
-    // Return the control methods from the web component instance
-    return {
-      toggle: () => qaBot.toggle(),
-      open: () => qaBot.open(),
-      close: () => qaBot.close(),
-      isOpen: () => qaBot.isOpen()
-    };
-  }
 
   // Return cleanup function
   return () => {

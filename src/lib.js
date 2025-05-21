@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import QABot from './components/QABot';
 import App from './App';
@@ -15,7 +15,7 @@ export { WebComponentQABot };
 // Function-based API that prioritizes web component usage
 // and then attempts a react render (since some people may use the function within a react context)
 export function qAndATool(config) {
-  const { target, version, isLoggedIn, isAnonymous, defaultOpen, returnRef, ...otherProps } = config;
+  const { target, version, isLoggedIn, isAnonymous, defaultOpen, ...otherProps } = config;
 
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
@@ -30,18 +30,15 @@ export function qAndATool(config) {
       isLoggedIn,
       isAnonymous,
       defaultOpen,
-      returnRef,
       ...otherProps
     });
   } else {
-    // Use direct react rendering with ref support
+    // Use direct react rendering
     const root = ReactDOM.createRoot(target);
-    const qaRef = React.createRef();
 
     root.render(
       <React.StrictMode>
-        <QABot
-          ref={qaRef}
+        <App
           embedded={otherProps.embedded}
           defaultOpen={defaultOpen}
           welcome={otherProps.welcome}
@@ -55,18 +52,7 @@ export function qAndATool(config) {
       </React.StrictMode>
     );
 
-    // If returnRef is true, return ref methods for programmatic control
-    if (returnRef) {
-      // Return an object with the control methods that match the QABot component's API
-      return {
-        toggle: () => qaRef.current && qaRef.current.toggle(),
-        open: () => qaRef.current && qaRef.current.open(),
-        close: () => qaRef.current && qaRef.current.close(),
-        isOpen: () => qaRef.current && qaRef.current.isOpen()
-      };
-    }
-
-    // Otherwise return a cleanup function
+    // Return a cleanup function
     return () => {
       root.unmount();
     };

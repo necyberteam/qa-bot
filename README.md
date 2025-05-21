@@ -88,8 +88,7 @@ function MyApp() {
         welcome: "This is created using the JavaScript API!",
         prompt: "Ask a question about ACCESS...",
         isLoggedIn: true,
-        embedded: true,
-        defaultOpen: true
+        embedded: true
       });
     }
   });
@@ -121,9 +120,15 @@ Replace `v0.2.0` with the specific version you want to use. This method provides
 | isLoggedIn / is-logged-in | boolean | Whether the user is logged in |
 | isAnonymous / is-anonymous | boolean | Whether the user is anonymous |
 | disabled | boolean | Disable the chat input |
-| defaultOpen / default-open | boolean | Whether the chat is initially open |
+| defaultOpen / default-open | boolean | Whether the floating chat window is initially open (only applies to non-embedded mode) |
+| visible | boolean | Whether the bot is visible |
 | apiKey / api-key | string | API key for authentication |
 | onClose | function | Callback when the chat is closed (React only) |
+
+## Important Notes
+
+1. The `defaultOpen` property only applies to the floating chat window (non-embedded mode). When in embedded mode, the chat is always open.
+2. Embedded mode chat windows always display in the open state and cannot be toggled closed.
 
 ## Events
 

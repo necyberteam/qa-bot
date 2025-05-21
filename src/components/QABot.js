@@ -1,7 +1,5 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
-import EmbeddedChatContainer from './EmbeddedChatContainer';
-import { getThemeColors } from '../utils/ThemeUtils';
 import '../styles/rcb-base.css';
 
 /**
@@ -15,14 +13,13 @@ import '../styles/rcb-base.css';
  * @param {boolean} [props.isLoggedIn=false] - Whether the user is logged in
  * @param {boolean} [props.isAnonymous] - Whether the user is anonymous (defaults to !isLoggedIn)
  * @param {boolean} [props.disabled] - Whether the chat input is disabled (defaults to isAnonymous)
- * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default
+ * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only)
  * @param {boolean} [props.visible=true] - Whether the bot is visible
  * @param {Function} [props.onClose] - Callback when the chat window is closed
  * @returns {JSX.Element}
  */
-const QABot = forwardRef((props, ref) => {
+const QABot = React.forwardRef((props, ref) => {
   const containerRef = useRef(null);
-  const embeddedContainerRef = useRef(null);
   const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
   const queryEndpoint = 'https://access-ai.ccs.uky.edu/api/query';
 
@@ -35,34 +32,6 @@ const QABot = forwardRef((props, ref) => {
   const defaultOpen = props.defaultOpen !== undefined ? props.defaultOpen : false;
   const visible = props.visible !== undefined ? props.visible : true;
   const onClose = props.onClose;
-
-  console.log("| QABot instantiated with props:", { ...props, defaultOpen });
-
-  // Expose methods for controlling the bot
-  useImperativeHandle(ref, () => ({
-    toggle: () => {
-      if (embedded && embeddedContainerRef.current) {
-        return embeddedContainerRef.current.toggle();
-      }
-      return false;
-    },
-    open: () => {
-      if (embedded && embeddedContainerRef.current) {
-        embeddedContainerRef.current.open();
-      }
-    },
-    close: () => {
-      if (embedded && embeddedContainerRef.current) {
-        embeddedContainerRef.current.close();
-      }
-    },
-    isOpen: () => {
-      if (embedded && embeddedContainerRef.current) {
-        return embeddedContainerRef.current.isOpen();
-      }
-      return false;
-    }
-  }));
 
   let hasError = false;
 
@@ -117,35 +86,50 @@ const QABot = forwardRef((props, ref) => {
     }
   }
 
-  const containerClassName = `access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`;
+  // Get theme colors to pass to ChatBot
+  const getThemeColors = () => {
+    // Get colors from CSS variables if available, fall back to defaults
+    const getCSSVariable = (name, fallback) => {
+      if (containerRef.current) {
+        // First check the container itself
+        const containerStyle = getComputedStyle(containerRef.current);
+        const containerValue = containerStyle.getPropertyValue(name);
+        if (containerValue && containerValue.trim() !== '') {
+          return containerValue.trim();
+        }
 
-  // Create a close button for embedded mode
-  const createCloseButton = (embeddedRef) => {
-    return (
-      <button
-        className="embedded-close-button"
-        onClick={() => embeddedRef.current && embeddedRef.current.close()}
-      >
-        ×
-      </button>
-    );
+        // Then check parent (useful for web component shadow DOM)
+        if (containerRef.current.parentElement) {
+          const parentStyle = getComputedStyle(containerRef.current.parentElement);
+          const parentValue = parentStyle.getPropertyValue(name);
+          if (parentValue && parentValue.trim() !== '') {
+            return parentValue.trim();
+          }
+        }
+      }
+      return fallback;
+    };
+
+    return {
+      primaryColor: getCSSVariable('--primary-color', '#1a5b6e'),
+      secondaryColor: getCSSVariable('--secondary-color', '#107180'),
+      fontFamily: getCSSVariable('--font-family', 'Arial, sans-serif')
+    };
   };
 
   const chatBot = (
     <ChatBot
       settings={{
         general: {
-          ...getThemeColors(containerRef),
+          ...getThemeColors(),
           embedded: embedded
         },
         header: {
           title: 'ACCESS Q&A Bot',
           avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
-          // Only override buttons in embedded mode, otherwise keep default
-          ...(embedded ? { buttons: [createCloseButton(embeddedContainerRef)] } : {})
         },
         chatWindow: {
-          defaultOpen: defaultOpen, // Will be ignored if embedded=true
+          defaultOpen: embedded ? true : defaultOpen, // Always open if embedded
         },
         chatInput: {
           enabledPlaceholderText: prompt,
@@ -189,18 +173,9 @@ const QABot = forwardRef((props, ref) => {
   }
 
   return (
-    <div className={containerClassName} ref={containerRef}>
+    <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`} ref={containerRef}>
       <ChatBotProvider>
-        {embedded ? (
-          <EmbeddedChatContainer
-            ref={embeddedContainerRef}
-            embeddedDefaultOpen={defaultOpen}
-          >
-            {chatBot}
-          </EmbeddedChatContainer>
-        ) : (
-          chatBot
-        )}
+        {chatBot}
       </ChatBotProvider>
     </div>
   );

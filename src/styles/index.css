@@ -8,6 +8,4 @@
 
 /* Import all component styles */
 @import './rcb-base.css';
-@import './embedded-container.css';
-@import './embedded-states.css';
 @import './responsive.css';
