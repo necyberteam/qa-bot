@@ -83,25 +83,13 @@ const QABot = React.forwardRef((props, ref) => {
       component: (
         <LoginButton loginUrl={loginUrl} />
       ),
-      path: (props.isLoggedIn) ? 'loop' : 'login'
-    },
-    login: {
-      message: 'Please log in to ask questions.',
-      component: (
-        <LoginButton loginUrl={loginUrl} />
-      ),
-      path: (props.isLoggedIn) ? 'loop' : 'login'
+      path: isLoggedIn ? 'loop' : 'start'
     },
     loop: {
       message: async (params) => {
         await handleQuery(params);
       },
-      path: () => {
-        if (hasError) {
-          return 'start'
-        }
-        return 'loop'
-      }
+      path: () => hasError ? 'start' : 'loop'
     }
   }
 
