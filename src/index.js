@@ -18,7 +18,7 @@ const userLoggedIn = false;
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App disabled={!userLoggedIn} />
+    <App isLoggedIn={userLoggedIn} disabled={!userLoggedIn} />
   </React.StrictMode>
 );
 
