@@ -37,12 +37,27 @@
         .hello-button:hover {
             background-color: #107180;
         }
+        .log-in-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
     </style>
     <!-- Load the standalone bundle from local path -->
     <script src="./dist/access-qa-bot.standalone.js"></script>
 </head>
 <body>
     <h1>ACCESS Q&A Bot Web Component Demo</h1>
+
+    <div class="log-in-area">
+        <input type="checkbox" id="user-logged-in" />
+        <label for="user-logged-in">User logged in <i>(toggle to simulate login/logout)</i></label>
+    </div>
 
     <div class="demo-section">
         <h2>Method 1: Standard Floating Button</h2>
@@ -90,6 +105,9 @@
         // Store bot controllers
         let bot1, bot2, bot3;
 
+        // Global state
+        let userLoggedIn = true; // Start with logged in since the web components have is-logged-in attribute
+
         window.addEventListener('load', function() {
             // Get references to Method 1 and Method 2 web components
             bot1 = document.getElementById('floating-bot');
@@ -101,9 +119,27 @@
                     target: document.getElementById('js-api-container'),
                     welcome: "This is created using the JavaScript API!",
                     prompt: "Ask a question about ACCESS...",
-                    isLoggedIn: true,
+                    isLoggedIn: userLoggedIn,
                     embedded: true,
                     apiKey: 'demo-key'
+                });
+            }
+
+            // Setup login checkbox
+            const checkbox = document.getElementById('user-logged-in');
+            if (checkbox) {
+                // Initialize checkbox state
+                checkbox.checked = userLoggedIn;
+
+                checkbox.addEventListener('change', (e) => {
+                    userLoggedIn = e.target.checked;
+
+                    // Update login status for all bots
+                    if (bot1) bot1.setIsLoggedIn(userLoggedIn);
+                    if (bot2) bot2.setIsLoggedIn(userLoggedIn);
+                    if (bot3) bot3.setIsLoggedIn(userLoggedIn);
+
+                    console.log('| user logged in:', userLoggedIn);
                 });
             }
 

@@ -53,13 +53,23 @@ const QABot = React.forwardRef((props, ref) => {
   const chatBotRef = useRef(null);
   // Create a ref to access message functions
   const messagesRef = useRef(null);
+  // Create a ref to access flow functions
+  const flowRef = useRef(null);
 
-  // Expose only the addMessage method via the forwarded ref
+  // Expose methods via the forwarded ref
   useImperativeHandle(ref, () => ({
     // Add a message to the chat
     addMessage: (message) => {
       if (messagesRef.current && messagesRef.current.injectMessage) {
         messagesRef.current.injectMessage(message);
+      }
+    },
+    // Set login status
+    setIsLoggedIn: (status) => {
+      setIsLoggedIn(status);
+      // Restart flow to apply the login state change
+      if (flowRef.current && flowRef.current.restartFlow) {
+        flowRef.current.restartFlow();
       }
     }
   }));
@@ -146,9 +156,11 @@ const QABot = React.forwardRef((props, ref) => {
   // Messages controller component to capture the messages hooks
   const MessagesController = () => {
     const messages = useMessages();
+    const flow = useFlow();
 
-    // Store the messages functions in the ref
+    // Store the hooks in refs
     messagesRef.current = messages;
+    flowRef.current = flow;
 
     return null;
   };

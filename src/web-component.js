@@ -30,6 +30,20 @@ class AccessQABot extends HTMLElement {
     }
   }
 
+  // Public API method for setting login status
+  setIsLoggedIn(status) {
+    if (this._qaRef.current) {
+      this._qaRef.current.setIsLoggedIn(status);
+    } else {
+      // If not rendered yet, set attribute for when it renders
+      if (status) {
+        this.setAttribute('is-logged-in', '');
+      } else {
+        this.removeAttribute('is-logged-in');
+      }
+    }
+  }
+
   // Inject CSS from document to shadow DOM to maintain consistent styling
   injectStyles() {
     // Add base styles for proper element display
@@ -266,6 +280,8 @@ export function webComponentQAndATool(config) {
   return {
     // Add a message to the chat
     addMessage: (message) => qaBot.addMessage(message),
+    // Set login status
+    setIsLoggedIn: (status) => qaBot.setIsLoggedIn(status),
     // Cleanup function (backward compatibility)
     destroy: () => {
       target.removeChild(qaBot);

@@ -77,6 +77,12 @@ export function qAndATool({
           qaRef.current.addMessage(message);
         }
       },
+      // Set login status
+      setIsLoggedIn: (status) => {
+        if (qaRef.current) {
+          qaRef.current.setIsLoggedIn(status);
+        }
+      },
       // Cleanup function (backward compatibility)
       destroy: () => {
         root.unmount();

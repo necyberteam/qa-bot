@@ -184,6 +184,11 @@
                     if (window.mockUserLoggedIn) document.body.classList.add('user-logged-in');
                     else document.body.classList.remove('user-logged-in');
 
+                    // Update login status for all bots using the controller's setIsLoggedIn method
+                    if (bot1Controller) bot1Controller.setIsLoggedIn(window.mockUserLoggedIn);
+                    if (bot2Controller) bot2Controller.setIsLoggedIn(window.mockUserLoggedIn);
+                    if (bot3Controller) bot3Controller.setIsLoggedIn(window.mockUserLoggedIn);
+
                     console.log('| user logged in:', window.mockUserLoggedIn);
                 });
             }
