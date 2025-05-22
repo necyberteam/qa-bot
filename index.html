@@ -38,25 +38,17 @@
             background-color: #f8f9fa;
         }
         .message-control {
-            display: flex;
             margin-top: 10px;
-            gap: 10px;
         }
-        .message-input {
-            flex-grow: 1;
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .send-button {
-            padding: 5px 10px;
+        .hello-button {
+            padding: 8px 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #1a5b6e;
             color: white;
             cursor: pointer;
         }
-        .send-button:hover {
+        .hello-button:hover {
             background-color: #107180;
         }
     </style>
@@ -97,8 +89,7 @@
         <p>This is created when you include an empty <code>&lt;div id="qa-bot"&gt;&lt;/div&gt;</code> element and the JavaScript files.
         The library automatically detects this element and initializes the widget.</p>
         <div class="message-control">
-            <input type="text" class="message-input" id="bot1-message" placeholder="Type a message to inject..." />
-            <button class="send-button" id="bot1-send">Add Message</button>
+            <button class="hello-button" id="bot1-send">Make Bot Say Hello World!</button>
         </div>
     </div>
 
@@ -108,8 +99,7 @@
         <pre>&lt;div class="embedded-qa-bot" data-welcome="Hello!" data-prompt="Ask me..."&gt;&lt;/div&gt;</pre>
         <div class="embedded-qa-bot" data-welcome="Hello from the embedded widget!" data-prompt="Ask me anything about ACCESS..."></div>
         <div class="message-control">
-            <input type="text" class="message-input" id="bot2-message" placeholder="Type a message to inject..." />
-            <button class="send-button" id="bot2-send">Add Message</button>
+            <button class="hello-button" id="bot2-send">Make Bot Say Hello World!</button>
         </div>
     </div>
 
@@ -118,8 +108,7 @@
         <p>Use the global <code>qAndATool()</code> function for complete configuration:</p>
         <div id="custom-qa-bot"></div>
         <div class="message-control">
-            <input type="text" class="message-input" id="bot3-message" placeholder="Type a message to inject..." />
-            <button class="send-button" id="bot3-send">Add Message</button>
+            <button class="hello-button" id="bot3-send">Make Bot Say Hello World!</button>
         </div>
     </div>
 
@@ -199,46 +188,30 @@
                 });
             }
 
-            // Setup message controls
-            setupMessageControls();
+            // Setup hello world buttons
+            setupHelloButtons();
         });
 
-        function setupMessageControls() {
-            // Bot 1 message control
+        function setupHelloButtons() {
+            // Bot 1 button
             document.getElementById('bot1-send').addEventListener('click', () => {
-                const messageInput = document.getElementById('bot1-message');
-                if (bot1Controller && messageInput.value.trim() !== '') {
-                    bot1Controller.addMessage(messageInput.value);
-                    messageInput.value = '';
+                if (bot1Controller) {
+                    bot1Controller.addMessage("Hello World!");
                 }
             });
 
-            // Bot 2 message control
+            // Bot 2 button
             document.getElementById('bot2-send').addEventListener('click', () => {
-                const messageInput = document.getElementById('bot2-message');
-                if (bot2Controller && messageInput.value.trim() !== '') {
-                    bot2Controller.addMessage(messageInput.value);
-                    messageInput.value = '';
+                if (bot2Controller) {
+                    bot2Controller.addMessage("Hello World!");
                 }
             });
 
-            // Bot 3 message control
+            // Bot 3 button
             document.getElementById('bot3-send').addEventListener('click', () => {
-                const messageInput = document.getElementById('bot3-message');
-                if (bot3Controller && messageInput.value.trim() !== '') {
-                    bot3Controller.addMessage(messageInput.value);
-                    messageInput.value = '';
+                if (bot3Controller) {
+                    bot3Controller.addMessage("Hello World!");
                 }
-            });
-
-            // Add ability to press enter to send messages
-            document.querySelectorAll('.message-input').forEach(input => {
-                input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        const botNumber = input.id.split('-')[0];
-                        document.getElementById(`${botNumber}-send`).click();
-                    }
-                });
             });
         }
     </script>

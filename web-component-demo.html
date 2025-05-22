@@ -24,25 +24,17 @@
             min-height: 400px;
         }
         .message-control {
-            display: flex;
             margin-top: 10px;
-            gap: 10px;
         }
-        .message-input {
-            flex-grow: 1;
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .send-button {
-            padding: 5px 10px;
+        .hello-button {
+            padding: 8px 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #1a5b6e;
             color: white;
             cursor: pointer;
         }
-        .send-button:hover {
+        .hello-button:hover {
             background-color: #107180;
         }
     </style>
@@ -63,8 +55,7 @@
             api-key="demo-key">
         </access-qa-bot>
         <div class="message-control">
-            <input type="text" class="message-input" id="bot1-message" placeholder="Type a message to inject..." />
-            <button class="send-button" id="bot1-send">Add Message</button>
+            <button class="hello-button" id="bot1-send">Make Bot Say Hello World!</button>
         </div>
     </div>
 
@@ -82,8 +73,7 @@
             </access-qa-bot>
         </div>
         <div class="message-control">
-            <input type="text" class="message-input" id="bot2-message" placeholder="Type a message to inject..." />
-            <button class="send-button" id="bot2-send">Add Message</button>
+            <button class="hello-button" id="bot2-send">Make Bot Say Hello World!</button>
         </div>
     </div>
 
@@ -92,8 +82,7 @@
         <p>This creates the bot programmatically via JavaScript:</p>
         <div id="js-api-container" class="qa-container"></div>
         <div class="message-control">
-            <input type="text" class="message-input" id="bot3-message" placeholder="Type a message to inject..." />
-            <button class="send-button" id="bot3-send">Add Message</button>
+            <button class="hello-button" id="bot3-send">Make Bot Say Hello World!</button>
         </div>
     </div>
 
@@ -118,46 +107,30 @@
                 });
             }
 
-            // Setup message controls
-            setupMessageControls();
+            // Setup hello world buttons
+            setupHelloButtons();
         });
 
-        function setupMessageControls() {
-            // Bot 1 message control
+        function setupHelloButtons() {
+            // Bot 1 button
             document.getElementById('bot1-send').addEventListener('click', () => {
-                const messageInput = document.getElementById('bot1-message');
-                if (bot1 && messageInput.value.trim() !== '') {
-                    bot1.addMessage(messageInput.value);
-                    messageInput.value = '';
+                if (bot1) {
+                    bot1.addMessage("Hello World!");
                 }
             });
 
-            // Bot 2 message control
+            // Bot 2 button
             document.getElementById('bot2-send').addEventListener('click', () => {
-                const messageInput = document.getElementById('bot2-message');
-                if (bot2 && messageInput.value.trim() !== '') {
-                    bot2.addMessage(messageInput.value);
-                    messageInput.value = '';
+                if (bot2) {
+                    bot2.addMessage("Hello World!");
                 }
             });
 
-            // Bot 3 message control
+            // Bot 3 button
             document.getElementById('bot3-send').addEventListener('click', () => {
-                const messageInput = document.getElementById('bot3-message');
-                if (bot3 && messageInput.value.trim() !== '') {
-                    bot3.addMessage(messageInput.value);
-                    messageInput.value = '';
+                if (bot3) {
+                    bot3.addMessage("Hello World!");
                 }
-            });
-
-            // Add ability to press enter to send messages
-            document.querySelectorAll('.message-input').forEach(input => {
-                input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        const botNumber = input.id.split('-')[0];
-                        document.getElementById(`${botNumber}-send`).click();
-                    }
-                });
             });
         }
     </script>
