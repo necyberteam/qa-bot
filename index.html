@@ -27,7 +27,7 @@
             border-left: 4px solid #6c757d;
             margin-bottom: 20px;
         }
-        .log-in-area {
+        .control-area {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -36,6 +36,10 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #f8f9fa;
+        }
+        .control-group {
+            display: flex;
+            gap: 20px;
         }
         .message-control {
             margin-top: 10px;
@@ -55,9 +59,14 @@
 </head>
 <body>
     <h1>ACCESS Q&A Bot Standalone Demo</h1>
-    <div class="log-in-area">
-        <input type="checkbox" id="user-logged-in" checked />
-        <label for="user-logged-in">User logged in <i>(toggle to simulate login/logout)</i></label>
+    <div class="control-area">
+        <div class="control-group">
+            <div>
+                <input type="checkbox" id="user-logged-in" checked />
+                <label for="user-logged-in">User logged in</label>
+            </div>
+        </div>
+        <div><i>(toggle to control the bots)</i></div>
     </div>
 
     <!-- This empty div matches the original index.html structure -->
@@ -150,7 +159,7 @@
                         embedded: true,
                         welcome: container.dataset.welcome || "Hello!",
                         prompt: container.dataset.prompt || "Ask me a question...",
-                        isLoggedIn: window.mockUserLoggedIn,
+                        isLoggedIn: window.mockUserLoggedIn
                     });
                 }
             });
@@ -176,10 +185,10 @@
                 console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
             }
 
-            // Setup checkbox event listener
-            const checkbox = document.getElementById('user-logged-in');
-            if (checkbox) {
-                checkbox.addEventListener('change', (e) => {
+            // Setup login checkbox event listener
+            const loginCheckbox = document.getElementById('user-logged-in');
+            if (loginCheckbox) {
+                loginCheckbox.addEventListener('change', (e) => {
                     window.mockUserLoggedIn = e.target.checked;
                     if (window.mockUserLoggedIn) document.body.classList.add('user-logged-in');
                     else document.body.classList.remove('user-logged-in');

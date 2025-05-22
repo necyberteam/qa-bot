@@ -183,7 +183,7 @@ const QABot = React.forwardRef((props, ref) => {
         chatInput: {
           enabledPlaceholderText: prompt,
           disabledPlaceholderText: 'Please log in to ask questions.',
-          disabled: disabled || !isLoggedIn
+          disabled: disabled // Decoupled from isLoggedIn state
         },
         chatHistory: { disabled: true },
         botBubble: {

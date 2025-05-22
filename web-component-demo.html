@@ -37,7 +37,7 @@
         .hello-button:hover {
             background-color: #107180;
         }
-        .log-in-area {
+        .control-area {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -47,6 +47,10 @@
             border-radius: 5px;
             background-color: #f8f9fa;
         }
+        .control-group {
+            display: flex;
+            gap: 20px;
+        }
     </style>
     <!-- Load the standalone bundle from local path -->
     <script src="./dist/access-qa-bot.standalone.js"></script>
@@ -54,9 +58,14 @@
 <body>
     <h1>ACCESS Q&A Bot Web Component Demo</h1>
 
-    <div class="log-in-area">
-        <input type="checkbox" id="user-logged-in" />
-        <label for="user-logged-in">User logged in <i>(toggle to simulate login/logout)</i></label>
+    <div class="control-area">
+        <div class="control-group">
+            <div>
+                <input type="checkbox" id="user-logged-in" checked />
+                <label for="user-logged-in">User logged in</label>
+            </div>
+        </div>
+        <div><i>(toggle to control the bots)</i></div>
     </div>
 
     <div class="demo-section">
@@ -126,12 +135,12 @@
             }
 
             // Setup login checkbox
-            const checkbox = document.getElementById('user-logged-in');
-            if (checkbox) {
+            const loginCheckbox = document.getElementById('user-logged-in');
+            if (loginCheckbox) {
                 // Initialize checkbox state
-                checkbox.checked = userLoggedIn;
+                loginCheckbox.checked = userLoggedIn;
 
-                checkbox.addEventListener('change', (e) => {
+                loginCheckbox.addEventListener('change', (e) => {
                     userLoggedIn = e.target.checked;
 
                     // Update login status for all bots
