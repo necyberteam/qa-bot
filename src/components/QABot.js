@@ -185,7 +185,7 @@ const QABot = React.forwardRef((props, ref) => {
           disabledPlaceholderText: 'Please log in to ask questions.',
           disabled: disabled // Decoupled from isLoggedIn state
         },
-        chatHistory: { disabled: true },
+        chatHistory: { disabled: false },
         botBubble: {
           simulateStream: true,
           dangerouslySetInnerHtml: true
