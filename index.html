@@ -37,20 +37,27 @@
             border-radius: 5px;
             background-color: #f8f9fa;
         }
-        .control-buttons {
+        .message-control {
             display: flex;
-            gap: 10px;
             margin-top: 10px;
+            gap: 10px;
         }
-        .control-button {
+        .message-input {
+            flex-grow: 1;
             padding: 5px 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #f8f9fa;
+        }
+        .send-button {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #1a5b6e;
+            color: white;
             cursor: pointer;
         }
-        .control-button:hover {
-            background-color: #e9ecef;
+        .send-button:hover {
+            background-color: #107180;
         }
     </style>
 </head>
@@ -89,14 +96,9 @@
         <p>The floating widget that appears in the bottom-right corner.</p>
         <p>This is created when you include an empty <code>&lt;div id="qa-bot"&gt;&lt;/div&gt;</code> element and the JavaScript files.
         The library automatically detects this element and initializes the widget.</p>
-        <div class="control-buttons">
-            <button class="control-button" id="bot1-open">Open</button>
-            <button class="control-button" id="bot1-close">Close</button>
-            <button class="control-button" id="bot1-toggle">Toggle</button>
-            <button class="control-button" id="bot1-disable">Disable</button>
-            <button class="control-button" id="bot1-enable">Enable</button>
-            <button class="control-button" id="bot1-hide">Hide</button>
-            <button class="control-button" id="bot1-show">Show</button>
+        <div class="message-control">
+            <input type="text" class="message-input" id="bot1-message" placeholder="Type a message to inject..." />
+            <button class="send-button" id="bot1-send">Add Message</button>
         </div>
     </div>
 
@@ -105,11 +107,9 @@
         <p>Add the <code>embedded-qa-bot</code> class and data attributes to a <code>&lt;div&gt;</code> element:</p>
         <pre>&lt;div class="embedded-qa-bot" data-welcome="Hello!" data-prompt="Ask me..."&gt;&lt;/div&gt;</pre>
         <div class="embedded-qa-bot" data-welcome="Hello from the embedded widget!" data-prompt="Ask me anything about ACCESS..."></div>
-        <div class="control-buttons">
-            <button class="control-button" id="bot2-disable">Disable</button>
-            <button class="control-button" id="bot2-enable">Enable</button>
-            <button class="control-button" id="bot2-hide">Hide</button>
-            <button class="control-button" id="bot2-show">Show</button>
+        <div class="message-control">
+            <input type="text" class="message-input" id="bot2-message" placeholder="Type a message to inject..." />
+            <button class="send-button" id="bot2-send">Add Message</button>
         </div>
     </div>
 
@@ -117,11 +117,9 @@
         <h2>Method 3: Explicitly Call JavaScript Function</h2>
         <p>Use the global <code>qAndATool()</code> function for complete configuration:</p>
         <div id="custom-qa-bot"></div>
-        <div class="control-buttons">
-            <button class="control-button" id="bot3-disable">Disable</button>
-            <button class="control-button" id="bot3-enable">Enable</button>
-            <button class="control-button" id="bot3-hide">Hide</button>
-            <button class="control-button" id="bot3-show">Show</button>
+        <div class="message-control">
+            <input type="text" class="message-input" id="bot3-message" placeholder="Type a message to inject..." />
+            <button class="send-button" id="bot3-send">Add Message</button>
         </div>
     </div>
 
@@ -197,81 +195,50 @@
                     if (window.mockUserLoggedIn) document.body.classList.add('user-logged-in');
                     else document.body.classList.remove('user-logged-in');
 
-                    // Update bot login status using the controllers
-                    if (bot1Controller) bot1Controller.setLoggedIn(window.mockUserLoggedIn);
-                    if (bot2Controller) bot2Controller.setLoggedIn(window.mockUserLoggedIn);
-                    if (bot3Controller) bot3Controller.setLoggedIn(window.mockUserLoggedIn);
-
                     console.log('| user logged in:', window.mockUserLoggedIn);
                 });
             }
 
-            // Setup control buttons
-            setupControlButtons();
+            // Setup message controls
+            setupMessageControls();
         });
 
-        function setupControlButtons() {
-            // Bot 1 controls
-            document.getElementById('bot1-open').addEventListener('click', () => {
-                if (bot1Controller) bot1Controller.open();
+        function setupMessageControls() {
+            // Bot 1 message control
+            document.getElementById('bot1-send').addEventListener('click', () => {
+                const messageInput = document.getElementById('bot1-message');
+                if (bot1Controller && messageInput.value.trim() !== '') {
+                    bot1Controller.addMessage(messageInput.value);
+                    messageInput.value = '';
+                }
             });
 
-            document.getElementById('bot1-close').addEventListener('click', () => {
-                if (bot1Controller) bot1Controller.close();
+            // Bot 2 message control
+            document.getElementById('bot2-send').addEventListener('click', () => {
+                const messageInput = document.getElementById('bot2-message');
+                if (bot2Controller && messageInput.value.trim() !== '') {
+                    bot2Controller.addMessage(messageInput.value);
+                    messageInput.value = '';
+                }
             });
 
-            document.getElementById('bot1-toggle').addEventListener('click', () => {
-                if (bot1Controller) bot1Controller.toggle();
+            // Bot 3 message control
+            document.getElementById('bot3-send').addEventListener('click', () => {
+                const messageInput = document.getElementById('bot3-message');
+                if (bot3Controller && messageInput.value.trim() !== '') {
+                    bot3Controller.addMessage(messageInput.value);
+                    messageInput.value = '';
+                }
             });
 
-            document.getElementById('bot1-disable').addEventListener('click', () => {
-                if (bot1Controller) bot1Controller.setDisabled(true);
-            });
-
-            document.getElementById('bot1-enable').addEventListener('click', () => {
-                if (bot1Controller) bot1Controller.setDisabled(false);
-            });
-
-            document.getElementById('bot1-hide').addEventListener('click', () => {
-                if (bot1Controller) bot1Controller.setVisible(false);
-            });
-
-            document.getElementById('bot1-show').addEventListener('click', () => {
-                if (bot1Controller) bot1Controller.setVisible(true);
-            });
-
-            // Bot 2 controls
-            document.getElementById('bot2-disable').addEventListener('click', () => {
-                if (bot2Controller) bot2Controller.setDisabled(true);
-            });
-
-            document.getElementById('bot2-enable').addEventListener('click', () => {
-                if (bot2Controller) bot2Controller.setDisabled(false);
-            });
-
-            document.getElementById('bot2-hide').addEventListener('click', () => {
-                if (bot2Controller) bot2Controller.setVisible(false);
-            });
-
-            document.getElementById('bot2-show').addEventListener('click', () => {
-                if (bot2Controller) bot2Controller.setVisible(true);
-            });
-
-            // Bot 3 controls
-            document.getElementById('bot3-disable').addEventListener('click', () => {
-                if (bot3Controller) bot3Controller.setDisabled(true);
-            });
-
-            document.getElementById('bot3-enable').addEventListener('click', () => {
-                if (bot3Controller) bot3Controller.setDisabled(false);
-            });
-
-            document.getElementById('bot3-hide').addEventListener('click', () => {
-                if (bot3Controller) bot3Controller.setVisible(false);
-            });
-
-            document.getElementById('bot3-show').addEventListener('click', () => {
-                if (bot3Controller) bot3Controller.setVisible(true);
+            // Add ability to press enter to send messages
+            document.querySelectorAll('.message-input').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const botNumber = input.id.split('-')[0];
+                        document.getElementById(`${botNumber}-send`).click();
+                    }
+                });
             });
         }
     </script>

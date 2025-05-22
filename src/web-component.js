@@ -23,56 +23,10 @@ class AccessQABot extends HTMLElement {
     this.injectStyles();
   }
 
-  // Public API methods for controlling the bot
-  setLoggedIn(status) {
+  // Public API method for adding messages
+  addMessage(message) {
     if (this._qaRef.current) {
-      this._qaRef.current.setLoggedIn(status);
-    } else {
-      // If not rendered yet, set attribute for when it renders
-      if (status) {
-        this.setAttribute('is-logged-in', '');
-      } else {
-        this.removeAttribute('is-logged-in');
-      }
-    }
-  }
-
-  open() {
-    if (this._qaRef.current) {
-      this._qaRef.current.open();
-    }
-  }
-
-  close() {
-    if (this._qaRef.current) {
-      this._qaRef.current.close();
-    }
-  }
-
-  toggle() {
-    if (this._qaRef.current) {
-      this._qaRef.current.toggle();
-    }
-  }
-
-  setDisabled(status) {
-    if (this._qaRef.current) {
-      this._qaRef.current.setDisabled(status);
-    } else {
-      if (status) {
-        this.setAttribute('disabled', '');
-      } else {
-        this.removeAttribute('disabled');
-      }
-    }
-  }
-
-  setVisible(status) {
-    if (this._qaRef.current) {
-      this._qaRef.current.setVisible(status);
-    } else {
-      // Element-level visibility
-      this.style.display = status ? '' : 'none';
+      this._qaRef.current.addMessage(message);
     }
   }
 
@@ -310,13 +264,8 @@ export function webComponentQAndATool(config) {
 
   // Return controller object
   return {
-    // Access the bot's methods
-    setLoggedIn: (status) => qaBot.setLoggedIn(status),
-    open: () => qaBot.open(),
-    close: () => qaBot.close(),
-    toggle: () => qaBot.toggle(),
-    setDisabled: (status) => qaBot.setDisabled(status),
-    setVisible: (status) => qaBot.setVisible(status),
+    // Add a message to the chat
+    addMessage: (message) => qaBot.addMessage(message),
     // Cleanup function (backward compatibility)
     destroy: () => {
       target.removeChild(qaBot);

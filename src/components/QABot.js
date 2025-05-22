@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useImperativeHandle, useState } from 'react';
-import ChatBot, { ChatBotProvider, useFlow } from "react-chatbotify";
+import ChatBot, { ChatBotProvider, useFlow, useMessages } from "react-chatbotify";
 import LoginButton from './LoginButton';
 import '../styles/rcb-base.css';
 
@@ -33,7 +33,7 @@ const QABot = React.forwardRef((props, ref) => {
   const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
   const queryEndpoint = 'https://access-ai.ccs.uky.edu/api/query';
 
-  // Add state for controlling props that need to be updated after initialization
+  // Props converted to state
   const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn !== undefined ? props.isLoggedIn : false);
   const [disabled, setDisabled] = useState(props.disabled !== undefined ? props.disabled : false);
   const [visible, setVisible] = useState(props.visible !== undefined ? props.visible : true);
@@ -51,43 +51,16 @@ const QABot = React.forwardRef((props, ref) => {
 
   // Create a ref to store the ChatBot component instance
   const chatBotRef = useRef(null);
-  // Create a ref to store restartFlow function
-  const flowRef = useRef(null);
+  // Create a ref to access message functions
+  const messagesRef = useRef(null);
 
-  // Expose methods to parent components via the forwarded ref
+  // Expose only the addMessage method via the forwarded ref
   useImperativeHandle(ref, () => ({
-    // Set login status
-    setLoggedIn: (status) => {
-      setIsLoggedIn(status);
-      if (flowRef.current) {
-        flowRef.current.restartFlow();
+    // Add a message to the chat
+    addMessage: (message) => {
+      if (messagesRef.current && messagesRef.current.injectMessage) {
+        messagesRef.current.injectMessage(message);
       }
-    },
-    // Open chat window
-    open: () => {
-      if (!embedded) {
-        setIsOpen(true);
-      }
-    },
-    // Close chat window
-    close: () => {
-      if (!embedded) {
-        setIsOpen(false);
-      }
-    },
-    // Toggle chat window
-    toggle: () => {
-      if (!embedded) {
-        setIsOpen(prev => !prev);
-      }
-    },
-    // Enable/disable input
-    setDisabled: (status) => {
-      setDisabled(status);
-    },
-    // Show/hide bot
-    setVisible: (status) => {
-      setVisible(status);
     }
   }));
 
@@ -170,12 +143,12 @@ const QABot = React.forwardRef((props, ref) => {
     };
   };
 
-  // FlowController component to capture the flow functions
-  const FlowController = () => {
-    const flow = useFlow();
+  // Messages controller component to capture the messages hooks
+  const MessagesController = () => {
+    const messages = useMessages();
 
-    // Store the flow functions in the ref
-    flowRef.current = flow;
+    // Store the messages functions in the ref
+    messagesRef.current = messages;
 
     return null;
   };
@@ -239,7 +212,7 @@ const QABot = React.forwardRef((props, ref) => {
   return (
     <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`} ref={containerRef}>
       <ChatBotProvider>
-        <FlowController />
+        <MessagesController />
         {chatBot}
       </ChatBotProvider>
     </div>

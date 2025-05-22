@@ -69,37 +69,12 @@ export function qAndATool({
       </React.StrictMode>
     );
 
-    // Return a controller object with methods to manipulate the bot
+    // Return a controller object with the addMessage method
     return {
-      // Control methods that delegate to the QABot component via ref
-      setLoggedIn: (status) => {
+      // Add a message to the chat
+      addMessage: (message) => {
         if (qaRef.current) {
-          qaRef.current.setLoggedIn(status);
-        }
-      },
-      open: () => {
-        if (qaRef.current) {
-          qaRef.current.open();
-        }
-      },
-      close: () => {
-        if (qaRef.current) {
-          qaRef.current.close();
-        }
-      },
-      toggle: () => {
-        if (qaRef.current) {
-          qaRef.current.toggle();
-        }
-      },
-      setDisabled: (status) => {
-        if (qaRef.current) {
-          qaRef.current.setDisabled(status);
-        }
-      },
-      setVisible: (status) => {
-        if (qaRef.current) {
-          qaRef.current.setVisible(status);
+          qaRef.current.addMessage(message);
         }
       },
       // Cleanup function (backward compatibility)
