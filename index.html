@@ -56,7 +56,7 @@
 <body>
     <h1>ACCESS Q&A Bot Standalone Demo</h1>
     <div class="log-in-area">
-        <input type="checkbox" id="user-logged-in" />
+        <input type="checkbox" id="user-logged-in" checked />
         <label for="user-logged-in">User logged in <i>(toggle to simulate login/logout)</i></label>
     </div>
 
@@ -128,7 +128,7 @@
         let bot1Controller, bot2Controller, bot3Controller;
 
         // Global state
-        window.mockUserLoggedIn = false;
+        window.mockUserLoggedIn = true;
 
         // Function to initialize QABot instances for Method 1 and Method 2
         function initializeQABot() {
