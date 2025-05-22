@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import ChatBot, { ChatBotProvider } from "react-chatbotify";
+import React, { useEffect, useRef, useImperativeHandle, useState } from 'react';
+import ChatBot, { ChatBotProvider, useFlow } from "react-chatbotify";
 import LoginButton from './LoginButton';
 import '../styles/rcb-base.css';
 
@@ -33,15 +33,63 @@ const QABot = React.forwardRef((props, ref) => {
   const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
   const queryEndpoint = 'https://access-ai.ccs.uky.edu/api/query';
 
-  const defaultOpen = props.defaultOpen !== undefined ? props.defaultOpen : false;
-  const disabled = props.disabled !== undefined ? props.disabled : false;
+  // Add state for controlling props that need to be updated after initialization
+  const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn !== undefined ? props.isLoggedIn : false);
+  const [disabled, setDisabled] = useState(props.disabled !== undefined ? props.disabled : false);
+  const [visible, setVisible] = useState(props.visible !== undefined ? props.visible : true);
+  const [isOpen, setIsOpen] = useState(props.defaultOpen !== undefined ? props.defaultOpen : false);
+
+  const defaultOpen = isOpen;
   const embedded = props.embedded || false;
-  const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
   const loginUrl = props.loginUrl || '/login';
-  const onClose = props.onClose;
+  const onClose = () => {
+    setIsOpen(false);
+    if (props.onClose) props.onClose();
+  };
   const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
-  const visible = props.visible !== undefined ? props.visible : true;
   const welcome = buildWelcomeMessage(isLoggedIn, props.welcome);
+
+  // Create a ref to store the ChatBot component instance
+  const chatBotRef = useRef(null);
+  // Create a ref to store restartFlow function
+  const flowRef = useRef(null);
+
+  // Expose methods to parent components via the forwarded ref
+  useImperativeHandle(ref, () => ({
+    // Set login status
+    setLoggedIn: (status) => {
+      setIsLoggedIn(status);
+      if (flowRef.current) {
+        flowRef.current.restartFlow();
+      }
+    },
+    // Open chat window
+    open: () => {
+      if (!embedded) {
+        setIsOpen(true);
+      }
+    },
+    // Close chat window
+    close: () => {
+      if (!embedded) {
+        setIsOpen(false);
+      }
+    },
+    // Toggle chat window
+    toggle: () => {
+      if (!embedded) {
+        setIsOpen(prev => !prev);
+      }
+    },
+    // Enable/disable input
+    setDisabled: (status) => {
+      setDisabled(status);
+    },
+    // Show/hide bot
+    setVisible: (status) => {
+      setVisible(status);
+    }
+  }));
 
   let hasError = false;
 
@@ -122,8 +170,19 @@ const QABot = React.forwardRef((props, ref) => {
     };
   };
 
+  // FlowController component to capture the flow functions
+  const FlowController = () => {
+    const flow = useFlow();
+
+    // Store the flow functions in the ref
+    flowRef.current = flow;
+
+    return null;
+  };
+
   const chatBot = (
     <ChatBot
+      ref={chatBotRef}
       settings={{
         general: {
           ...getThemeColors(),
@@ -139,7 +198,7 @@ const QABot = React.forwardRef((props, ref) => {
         chatInput: {
           enabledPlaceholderText: prompt,
           disabledPlaceholderText: 'Please log in to ask questions.',
-          disabled: disabled
+          disabled: disabled || !isLoggedIn
         },
         chatHistory: { disabled: true },
         botBubble: {
@@ -180,6 +239,7 @@ const QABot = React.forwardRef((props, ref) => {
   return (
     <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`} ref={containerRef}>
       <ChatBotProvider>
+        <FlowController />
         {chatBot}
       </ChatBotProvider>
     </div>

@@ -2,9 +2,10 @@ import React from 'react';
 import './App.css';
 import QABot from './components/QABot';
 
-function App(props) {
+const App = React.forwardRef((props, ref) => {
   return (
     <QABot
+      ref={ref}
       apiKey={props.apiKey}
       defaultOpen={props.defaultOpen}
       disabled={props.disabled}
@@ -16,6 +17,6 @@ function App(props) {
       welcome={props.welcome}
     />
   );
-}
+});
 
 export default App;

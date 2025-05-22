@@ -37,20 +37,23 @@
             border-radius: 5px;
             background-color: #f8f9fa;
         }
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .control-button {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+        .control-button:hover {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
-
-<script>
-    window.mockUserLoggedIn = false;
-    const body = document.querySelector('body');
-    const checkbox = document.getElementById('user-logged-in');
-    checkbox.addEventListener('change', (e) => {
-        window.mockUserLoggedIn = e.target.checked;
-        if (window.mockUserLoggedIn) body.classList.add('user-logged-in');
-        else body.classList.remove('user-logged-in');
-        console.log('| user logged in:', window.mockUserLoggedIn);
-    });
-</script>
 <body>
     <h1>ACCESS Q&A Bot Standalone Demo</h1>
     <div class="log-in-area">
@@ -86,6 +89,15 @@
         <p>The floating widget that appears in the bottom-right corner.</p>
         <p>This is created when you include an empty <code>&lt;div id="qa-bot"&gt;&lt;/div&gt;</code> element and the JavaScript files.
         The library automatically detects this element and initializes the widget.</p>
+        <div class="control-buttons">
+            <button class="control-button" id="bot1-open">Open</button>
+            <button class="control-button" id="bot1-close">Close</button>
+            <button class="control-button" id="bot1-toggle">Toggle</button>
+            <button class="control-button" id="bot1-disable">Disable</button>
+            <button class="control-button" id="bot1-enable">Enable</button>
+            <button class="control-button" id="bot1-hide">Hide</button>
+            <button class="control-button" id="bot1-show">Show</button>
+        </div>
     </div>
 
     <div class="demo-section">
@@ -93,41 +105,25 @@
         <p>Add the <code>embedded-qa-bot</code> class and data attributes to a <code>&lt;div&gt;</code> element:</p>
         <pre>&lt;div class="embedded-qa-bot" data-welcome="Hello!" data-prompt="Ask me..."&gt;&lt;/div&gt;</pre>
         <div class="embedded-qa-bot" data-welcome="Hello from the embedded widget!" data-prompt="Ask me anything about ACCESS..."></div>
+        <div class="control-buttons">
+            <button class="control-button" id="bot2-disable">Disable</button>
+            <button class="control-button" id="bot2-enable">Enable</button>
+            <button class="control-button" id="bot2-hide">Hide</button>
+            <button class="control-button" id="bot2-show">Show</button>
+        </div>
     </div>
 
     <div class="demo-section">
         <h2>Method 3: Explicitly Call JavaScript Function</h2>
         <p>Use the global <code>qAndATool()</code> function for complete configuration:</p>
         <div id="custom-qa-bot"></div>
+        <div class="control-buttons">
+            <button class="control-button" id="bot3-disable">Disable</button>
+            <button class="control-button" id="bot3-enable">Enable</button>
+            <button class="control-button" id="bot3-hide">Hide</button>
+            <button class="control-button" id="bot3-show">Show</button>
+        </div>
     </div>
-
-    <script>
-        // Function to initialize QABot instances for Method 1 and Method 2
-        function initializeQABot() {
-            // Method 1: Auto-detect div#qa-bot
-            const qaBot = document.getElementById('qa-bot');
-            if (qaBot && window.qAndATool && !qaBot.hasChildNodes()) {
-                window.qAndATool({
-                    target: qaBot,
-                    isLoggedIn: window.mockUserLoggedIn,
-                    defaultOpen: false
-                });
-            }
-
-            // Method 2: Auto-detect embedded-qa-bot divs
-            document.querySelectorAll('.embedded-qa-bot').forEach(container => {
-                if (window.qAndATool && !container.hasChildNodes()) {
-                    window.qAndATool({
-                        target: container,
-                        embedded: true,
-                        welcome: container.dataset.welcome || "Hello!",
-                        prompt: container.dataset.prompt || "Ask me a question...",
-                        isLoggedIn: window.mockUserLoggedIn,
-                    });
-                }
-            });
-        }
-    </script>
 
     <!--
         Load the main JavaScript bundle which includes:
@@ -141,6 +137,38 @@
     <script src="./build/static/js/453.chunk.js"></script>
 
     <script>
+        // Store bot controllers
+        let bot1Controller, bot2Controller, bot3Controller;
+
+        // Global state
+        window.mockUserLoggedIn = false;
+
+        // Function to initialize QABot instances for Method 1 and Method 2
+        function initializeQABot() {
+            // Method 1: Auto-detect div#qa-bot
+            const qaBot = document.getElementById('qa-bot');
+            if (qaBot && window.qAndATool && !qaBot.hasChildNodes()) {
+                bot1Controller = window.qAndATool({
+                    target: qaBot,
+                    isLoggedIn: window.mockUserLoggedIn,
+                    defaultOpen: false
+                });
+            }
+
+            // Method 2: Auto-detect embedded-qa-bot divs
+            document.querySelectorAll('.embedded-qa-bot').forEach(container => {
+                if (window.qAndATool && !container.hasChildNodes()) {
+                    bot2Controller = window.qAndATool({
+                        target: container,
+                        embedded: true,
+                        welcome: container.dataset.welcome || "Hello!",
+                        prompt: container.dataset.prompt || "Ask me a question...",
+                        isLoggedIn: window.mockUserLoggedIn,
+                    });
+                }
+            });
+        }
+
         // Wait for window.qAndATool to be available
         window.addEventListener('load', function() {
             // Initialize Method 1 and Method 2
@@ -149,7 +177,7 @@
             // Method 3 (explicit JS function call)
             const customBot = document.getElementById('custom-qa-bot');
             if (window.qAndATool && customBot && !customBot.hasChildNodes()) {
-                window.qAndATool({
+                bot3Controller = window.qAndATool({
                     target: customBot,
                     embedded: true,
                     welcome: "This is configured using JavaScript!",
@@ -160,7 +188,92 @@
             } else if (!window.qAndATool) {
                 console.error("qAndATool function not found. Make sure the JS files are loaded properly.");
             }
+
+            // Setup checkbox event listener
+            const checkbox = document.getElementById('user-logged-in');
+            if (checkbox) {
+                checkbox.addEventListener('change', (e) => {
+                    window.mockUserLoggedIn = e.target.checked;
+                    if (window.mockUserLoggedIn) document.body.classList.add('user-logged-in');
+                    else document.body.classList.remove('user-logged-in');
+
+                    // Update bot login status using the controllers
+                    if (bot1Controller) bot1Controller.setLoggedIn(window.mockUserLoggedIn);
+                    if (bot2Controller) bot2Controller.setLoggedIn(window.mockUserLoggedIn);
+                    if (bot3Controller) bot3Controller.setLoggedIn(window.mockUserLoggedIn);
+
+                    console.log('| user logged in:', window.mockUserLoggedIn);
+                });
+            }
+
+            // Setup control buttons
+            setupControlButtons();
         });
+
+        function setupControlButtons() {
+            // Bot 1 controls
+            document.getElementById('bot1-open').addEventListener('click', () => {
+                if (bot1Controller) bot1Controller.open();
+            });
+
+            document.getElementById('bot1-close').addEventListener('click', () => {
+                if (bot1Controller) bot1Controller.close();
+            });
+
+            document.getElementById('bot1-toggle').addEventListener('click', () => {
+                if (bot1Controller) bot1Controller.toggle();
+            });
+
+            document.getElementById('bot1-disable').addEventListener('click', () => {
+                if (bot1Controller) bot1Controller.setDisabled(true);
+            });
+
+            document.getElementById('bot1-enable').addEventListener('click', () => {
+                if (bot1Controller) bot1Controller.setDisabled(false);
+            });
+
+            document.getElementById('bot1-hide').addEventListener('click', () => {
+                if (bot1Controller) bot1Controller.setVisible(false);
+            });
+
+            document.getElementById('bot1-show').addEventListener('click', () => {
+                if (bot1Controller) bot1Controller.setVisible(true);
+            });
+
+            // Bot 2 controls
+            document.getElementById('bot2-disable').addEventListener('click', () => {
+                if (bot2Controller) bot2Controller.setDisabled(true);
+            });
+
+            document.getElementById('bot2-enable').addEventListener('click', () => {
+                if (bot2Controller) bot2Controller.setDisabled(false);
+            });
+
+            document.getElementById('bot2-hide').addEventListener('click', () => {
+                if (bot2Controller) bot2Controller.setVisible(false);
+            });
+
+            document.getElementById('bot2-show').addEventListener('click', () => {
+                if (bot2Controller) bot2Controller.setVisible(true);
+            });
+
+            // Bot 3 controls
+            document.getElementById('bot3-disable').addEventListener('click', () => {
+                if (bot3Controller) bot3Controller.setDisabled(true);
+            });
+
+            document.getElementById('bot3-enable').addEventListener('click', () => {
+                if (bot3Controller) bot3Controller.setDisabled(false);
+            });
+
+            document.getElementById('bot3-hide').addEventListener('click', () => {
+                if (bot3Controller) bot3Controller.setVisible(false);
+            });
+
+            document.getElementById('bot3-show').addEventListener('click', () => {
+                if (bot3Controller) bot3Controller.setVisible(true);
+            });
+        }
     </script>
 </body>
 </html>

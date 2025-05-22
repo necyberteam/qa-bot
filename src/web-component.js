@@ -15,8 +15,65 @@ class AccessQABot extends HTMLElement {
     this.container.className = 'qa-bot-container';
     this.shadowRoot.appendChild(this.container);
 
+    // Internal refs
+    this._root = null;
+    this._qaRef = React.createRef();
+
     // Copy over CSS from main document to ensure all styles are available
     this.injectStyles();
+  }
+
+  // Public API methods for controlling the bot
+  setLoggedIn(status) {
+    if (this._qaRef.current) {
+      this._qaRef.current.setLoggedIn(status);
+    } else {
+      // If not rendered yet, set attribute for when it renders
+      if (status) {
+        this.setAttribute('is-logged-in', '');
+      } else {
+        this.removeAttribute('is-logged-in');
+      }
+    }
+  }
+
+  open() {
+    if (this._qaRef.current) {
+      this._qaRef.current.open();
+    }
+  }
+
+  close() {
+    if (this._qaRef.current) {
+      this._qaRef.current.close();
+    }
+  }
+
+  toggle() {
+    if (this._qaRef.current) {
+      this._qaRef.current.toggle();
+    }
+  }
+
+  setDisabled(status) {
+    if (this._qaRef.current) {
+      this._qaRef.current.setDisabled(status);
+    } else {
+      if (status) {
+        this.setAttribute('disabled', '');
+      } else {
+        this.removeAttribute('disabled');
+      }
+    }
+  }
+
+  setVisible(status) {
+    if (this._qaRef.current) {
+      this._qaRef.current.setVisible(status);
+    } else {
+      // Element-level visibility
+      this.style.display = status ? '' : 'none';
+    }
   }
 
   // Inject CSS from document to shadow DOM to maintain consistent styling
@@ -170,8 +227,8 @@ class AccessQABot extends HTMLElement {
       this.styleObserver.disconnect();
     }
 
-    if (this.root) {
-      this.root.unmount();
+    if (this._root) {
+      this._root.unmount();
     }
   }
 
@@ -194,14 +251,14 @@ class AccessQABot extends HTMLElement {
 
   // Render the React component
   _render() {
-    if (!this.root) {
-      this.root = ReactDOM.createRoot(this.container);
+    if (!this._root) {
+      this._root = ReactDOM.createRoot(this.container);
     }
 
     const props = this._getProps();
-    this.root.render(
+    this._root.render(
       <React.StrictMode>
-        <QABot {...props} />
+        <QABot ref={this._qaRef} {...props} />
       </React.StrictMode>
     );
   }
@@ -251,9 +308,19 @@ export function webComponentQAndATool(config) {
   // Append to target
   target.appendChild(qaBot);
 
-  // Return cleanup function
-  return () => {
-    target.removeChild(qaBot);
+  // Return controller object
+  return {
+    // Access the bot's methods
+    setLoggedIn: (status) => qaBot.setLoggedIn(status),
+    open: () => qaBot.open(),
+    close: () => qaBot.close(),
+    toggle: () => qaBot.toggle(),
+    setDisabled: (status) => qaBot.setDisabled(status),
+    setVisible: (status) => qaBot.setVisible(status),
+    // Cleanup function (backward compatibility)
+    destroy: () => {
+      target.removeChild(qaBot);
+    }
   };
 }
 
