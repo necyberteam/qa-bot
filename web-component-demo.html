@@ -143,10 +143,24 @@
                 loginCheckbox.addEventListener('change', (e) => {
                     userLoggedIn = e.target.checked;
 
+                    // Create message based on login status
+                    const message = userLoggedIn
+                        ? "You are now logged in. How can I help you?"
+                        : "You have been logged out.";
+
                     // Update login status for all bots
-                    if (bot1) bot1.setIsLoggedIn(userLoggedIn);
-                    if (bot2) bot2.setIsLoggedIn(userLoggedIn);
-                    if (bot3) bot3.setIsLoggedIn(userLoggedIn);
+                    if (bot1) {
+                        bot1.updateLoginStatus(userLoggedIn);
+                        bot1.addMessage(message);
+                    }
+                    if (bot2) {
+                        bot2.updateLoginStatus(userLoggedIn);
+                        bot2.addMessage(message);
+                    }
+                    if (bot3) {
+                        bot3.updateLoginStatus(userLoggedIn);
+                        bot3.addMessage(message);
+                    }
 
                     console.log('| user logged in:', userLoggedIn);
                 });

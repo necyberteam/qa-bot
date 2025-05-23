@@ -78,9 +78,9 @@ export function qAndATool({
         }
       },
       // Set login status
-      setIsLoggedIn: (status) => {
+      updateLoginStatus: (status) => {
         if (qaRef.current) {
-          qaRef.current.setIsLoggedIn(status);
+          qaRef.current.updateLoginStatus(status);
         }
       },
       // Cleanup function (backward compatibility)

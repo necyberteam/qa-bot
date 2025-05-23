@@ -31,9 +31,9 @@ class AccessQABot extends HTMLElement {
   }
 
   // Public API method for setting login status
-  setIsLoggedIn(status) {
+  updateLoginStatus(status) {
     if (this._qaRef.current) {
-      this._qaRef.current.setIsLoggedIn(status);
+      this._qaRef.current.updateLoginStatus(status);
     } else {
       // If not rendered yet, set attribute for when it renders
       if (status) {
@@ -281,7 +281,7 @@ export function webComponentQAndATool(config) {
     // Add a message to the chat
     addMessage: (message) => qaBot.addMessage(message),
     // Set login status
-    setIsLoggedIn: (status) => qaBot.setIsLoggedIn(status),
+    updateLoginStatus: (status) => qaBot.updateLoginStatus(status),
     // Cleanup function (backward compatibility)
     destroy: () => {
       target.removeChild(qaBot);

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useImperativeHandle, useState } from 'react';
-import ChatBot, { ChatBotProvider, useFlow, useMessages } from "react-chatbotify";
+import ChatBot, { ChatBotProvider, useFlow, useMessages, Button, useSettings } from "react-chatbotify";
 import LoginButton from './LoginButton';
 import '../styles/rcb-base.css';
 
@@ -58,19 +58,13 @@ const QABot = React.forwardRef((props, ref) => {
 
   // Expose methods via the forwarded ref
   useImperativeHandle(ref, () => ({
-    // Add a message to the chat
     addMessage: (message) => {
       if (messagesRef.current && messagesRef.current.injectMessage) {
         messagesRef.current.injectMessage(message);
       }
     },
-    // Set login status
-    setIsLoggedIn: (status) => {
+    updateLoginStatus: (status) => {
       setIsLoggedIn(status);
-      // Restart flow to apply the login state change
-      if (flowRef.current && flowRef.current.restartFlow) {
-        flowRef.current.restartFlow();
-      }
     }
   }));
 
@@ -82,6 +76,37 @@ const QABot = React.forwardRef((props, ref) => {
       // If container's parent has CSS variables, they'll be picked up in getThemeColors
     }
   }, []);
+
+  // User icon component that shows when logged in
+  const UserIcon = () => (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '30px',
+        height: '30px',
+        borderRadius: '50%',
+        backgroundColor: '#1a5b6e',
+        marginRight: '5px'
+      }}
+      title="Logged in as user"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+  );
 
   const handleQuery = async (params) => {
     // POST question to the QA API
@@ -112,7 +137,7 @@ const QABot = React.forwardRef((props, ref) => {
       component: (
         <LoginButton loginUrl={loginUrl} />
       ),
-      path: isLoggedIn ? 'loop' : 'start'
+      path: () => isLoggedIn ? 'loop' : 'start'  // Use function to evaluate current state
     },
     loop: {
       message: async (params) => {
@@ -157,10 +182,23 @@ const QABot = React.forwardRef((props, ref) => {
   const MessagesController = () => {
     const messages = useMessages();
     const flow = useFlow();
+    const { updateSettings } = useSettings();
 
     // Store the hooks in refs
     messagesRef.current = messages;
     flowRef.current = flow;
+
+    // Update header buttons when isLoggedIn changes
+    useEffect(() => {
+      updateSettings({
+        header: {
+          buttons: [
+            ...(isLoggedIn ? [<UserIcon key="user-icon" />] : []),
+            Button.CLOSE_CHAT_BUTTON
+          ]
+        }
+      });
+    }, [isLoggedIn, updateSettings]);
 
     return null;
   };
@@ -176,6 +214,10 @@ const QABot = React.forwardRef((props, ref) => {
         header: {
           title: 'ACCESS Q&A Bot',
           avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
+          buttons: [
+            ...(isLoggedIn ? [<UserIcon key="user-icon" />] : []),
+            Button.CLOSE_CHAT_BUTTON
+          ]
         },
         chatWindow: {
           defaultOpen: embedded ? true : defaultOpen, // Always open if embedded

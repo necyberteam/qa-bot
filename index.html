@@ -187,45 +187,29 @@
 
             // Setup login checkbox event listener
             const loginCheckbox = document.getElementById('user-logged-in');
-            if (loginCheckbox) {
-                loginCheckbox.addEventListener('change', (e) => {
-                    window.mockUserLoggedIn = e.target.checked;
-                    if (window.mockUserLoggedIn) document.body.classList.add('user-logged-in');
-                    else document.body.classList.remove('user-logged-in');
+            loginCheckbox.addEventListener('change', (e) => {
+                window.mockUserLoggedIn = e.target.checked;
+                if (bot1Controller) bot1Controller.updateLoginStatus(window.mockUserLoggedIn)
+                if (bot2Controller) bot2Controller.updateLoginStatus(window.mockUserLoggedIn)
+                if (bot3Controller) bot3Controller.updateLoginStatus(window.mockUserLoggedIn)
+            });
 
-                    // Update login status for all bots using the controller's setIsLoggedIn method
-                    if (bot1Controller) bot1Controller.setIsLoggedIn(window.mockUserLoggedIn);
-                    if (bot2Controller) bot2Controller.setIsLoggedIn(window.mockUserLoggedIn);
-                    if (bot3Controller) bot3Controller.setIsLoggedIn(window.mockUserLoggedIn);
-
-                    console.log('| user logged in:', window.mockUserLoggedIn);
-                });
-            }
 
             // Setup hello world buttons
             setupHelloButtons();
         });
 
         function setupHelloButtons() {
-            // Bot 1 button
             document.getElementById('bot1-send').addEventListener('click', () => {
-                if (bot1Controller) {
-                    bot1Controller.addMessage("Hello World!");
-                }
+                if (bot1Controller) bot1Controller.addMessage("Hello World!");
             });
 
-            // Bot 2 button
             document.getElementById('bot2-send').addEventListener('click', () => {
-                if (bot2Controller) {
-                    bot2Controller.addMessage("Hello World!");
-                }
+                if (bot2Controller) bot2Controller.addMessage("Hello World!");
             });
 
-            // Bot 3 button
             document.getElementById('bot3-send').addEventListener('click', () => {
-                if (bot3Controller) {
-                    bot3Controller.addMessage("Hello World!");
-                }
+                if (bot3Controller) bot3Controller.addMessage("Hello World!");
             });
         }
     </script>
