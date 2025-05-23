@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ACCESS Q&A Bot Standalone Demo</title>
+    <script src="./build/static/js/main.js"></script>
+    <script src="./build/static/js/453.chunk.js"></script>
     <link rel="stylesheet" href="./build/static/css/main.css">
     <style>
         body {
@@ -120,17 +122,6 @@
             <button class="hello-button" id="bot3-send">Make Bot Say Hello World!</button>
         </div>
     </div>
-
-    <!--
-        Load the main JavaScript bundle which includes:
-        1. The React components that power the Q&A tool
-        2. The globally exposed qAndATool function (from src/index.js)
-
-        Note: All three integration methods depend on window.qAndATool
-        being exposed by the JavaScript bundle
-    -->
-    <script src="./build/static/js/main.js"></script>
-    <script src="./build/static/js/453.chunk.js"></script>
 
     <script>
         // Store bot controllers

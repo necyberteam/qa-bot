@@ -243,8 +243,6 @@ const QABot = React.forwardRef((props, ref) => {
         },
         audio: {
           disabled: true,
-          defaultToggledOn: false,
-          tapToPlay: false
         },
         emoji: {
           disabled: true,
