@@ -182,11 +182,17 @@ const QABot = React.forwardRef((props, ref) => {
   const MessagesController = () => {
     const messages = useMessages();
     const flow = useFlow();
-    const { updateSettings } = useSettings();
 
     // Store the hooks in refs
     messagesRef.current = messages;
     flowRef.current = flow;
+
+    return null;
+  };
+
+  // Settings controller component to handle dynamic settings updates
+  const SettingsController = ({ isLoggedIn }) => {
+    const { updateSettings } = useSettings();
 
     // Update header buttons when isLoggedIn changes
     useEffect(() => {
@@ -267,6 +273,7 @@ const QABot = React.forwardRef((props, ref) => {
     <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`} ref={containerRef}>
       <ChatBotProvider>
         <MessagesController />
+        <SettingsController isLoggedIn={isLoggedIn} />
         {chatBot}
       </ChatBotProvider>
     </div>
