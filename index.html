@@ -62,7 +62,7 @@
     <div class="control-area">
         <div class="control-group">
             <div>
-                <input type="checkbox" id="user-logged-in" checked />
+                <input type="checkbox" id="user-logged-in" />
                 <label for="user-logged-in">User logged in</label>
             </div>
         </div>
@@ -137,7 +137,7 @@
         let bot1Controller, bot2Controller, bot3Controller;
 
         // Global state
-        window.mockUserLoggedIn = true;
+        window.mockUserLoggedIn = false;
 
         // Function to initialize QABot instances for Method 1 and Method 2
         function initializeQABot() {
