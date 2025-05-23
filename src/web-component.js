@@ -44,6 +44,20 @@ class AccessQABot extends HTMLElement {
     }
   }
 
+  // Public API method for setting bot disabled state
+  setBotDisabled(disabled) {
+    if (this._qaRef.current) {
+      this._qaRef.current.setBotDisabled(disabled);
+    } else {
+      // If not rendered yet, set attribute for when it renders
+      if (disabled) {
+        this.setAttribute('disabled', '');
+      } else {
+        this.removeAttribute('disabled');
+      }
+    }
+  }
+
   // Inject CSS from document to shadow DOM to maintain consistent styling
   injectStyles() {
     // Add base styles for proper element display

@@ -15,7 +15,6 @@ import '../styles/rcb-base.css';
  * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
  * @param {Function}  [props.onClose] - Callback when the chat window is closed
  * @param {string}    [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
- * @param {boolean}   [props.visible=true] - Whether the bot is visible
  * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
  */
@@ -35,8 +34,6 @@ const QABot = React.forwardRef((props, ref) => {
 
   // Props converted to state
   const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn !== undefined ? props.isLoggedIn : false);
-  const [disabled, setDisabled] = useState(props.disabled !== undefined ? props.disabled : false);
-  const [visible, setVisible] = useState(props.visible !== undefined ? props.visible : true);
   const [isOpen, setIsOpen] = useState(props.defaultOpen !== undefined ? props.defaultOpen : false);
 
   const defaultOpen = isOpen;
@@ -226,12 +223,12 @@ const QABot = React.forwardRef((props, ref) => {
           ]
         },
         chatWindow: {
-          defaultOpen: embedded ? true : defaultOpen, // Always open if embedded
+          defaultOpen: embedded || defaultOpen, // Open if embedded OR if defaultOpen is true
         },
         chatInput: {
           enabledPlaceholderText: prompt,
           disabledPlaceholderText: 'Please log in to ask questions.',
-          disabled: disabled // Decoupled from isLoggedIn state
+          disabled: false // Decoupled from isLoggedIn state
         },
         chatHistory: { disabled: false },
         botBubble: {
@@ -246,6 +243,8 @@ const QABot = React.forwardRef((props, ref) => {
         },
         audio: {
           disabled: true,
+          defaultToggledOn: false,
+          tapToPlay: false
         },
         emoji: {
           disabled: true,
@@ -265,12 +264,8 @@ const QABot = React.forwardRef((props, ref) => {
     />
   );
 
-  if (!visible) {
-    return null;
-  }
-
   return (
-    <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`} ref={containerRef}>
+    <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
       <ChatBotProvider>
         <MessagesController />
         <SettingsController isLoggedIn={isLoggedIn} />
