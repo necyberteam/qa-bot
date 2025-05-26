@@ -86,3 +86,81 @@
 .access-qa-bot.bot-logged-in .user-login-icon {
   display: flex !important;
 }
+
+.rcb-tooltip-show.phone-ring {
+  /* tooltip slides in from off-screen right, then pulses three times slowly*/
+  animation: phone-ring 3s ease-out !important;
+  z-index: 10000 !important;
+}
+
+@keyframes phone-ring {
+  /* 0% {
+    transform: translateX(100vw) scale(1);
+    opacity: 0;
+  }
+  20% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  } */
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  /* First ring - quick shake */
+  2% {
+    transform: translateX(0) translateY(-8px) rotate(-2deg);
+  }
+  4% {
+    transform: translateX(0) translateY(-6px) rotate(2deg);
+  }
+  6% {
+    transform: translateX(0) translateY(-8px) rotate(-1deg);
+  }
+  8% {
+    transform: translateX(0) translateY(-6px) rotate(1deg);
+  }
+  10% {
+    transform: translateX(0) translateY(-8px) rotate(-2deg);
+  }
+  12% {
+    transform: translateX(0) translateY(-6px) rotate(2deg);
+  }
+  /* Settle down */
+  20% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  40% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  49% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  /* Second ring - quick shake */
+  50% {
+    transform: translateX(0) translateY(-8px) rotate(-2deg);
+  }
+  52% {
+    transform: translateX(0) translateY(-6px) rotate(2deg);
+  }
+  54% {
+    transform: translateX(0) translateY(-8px) rotate(-1deg);
+  }
+  56% {
+    transform: translateX(0) translateY(-6px) rotate(1deg);
+  }
+  58% {
+    transform: translateX(0) translateY(-8px) rotate(-2deg);
+  }
+  60% {
+    transform: translateX(0) translateY(-6px) rotate(2deg);
+  }
+  /* Final settle */
+  70% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+}

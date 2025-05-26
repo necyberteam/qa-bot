@@ -57,6 +57,7 @@ const useChatBotSettings = ({
       },
       tooltip: {
         text: DEFAULT_CONFIG.CHATBOT.TOOLTIP_TEXT,
+        mode: 'START'
       },
       audio: {
         disabled: true,
