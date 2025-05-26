@@ -1,10 +1,10 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import QABot from './components/QABot';
 import App from './App';
 import './App.css';
 import './index.css';
-import { WebComponentQABot, webComponentQAndATool } from './web-component';
+import { WebComponentQABot, webComponentAccessQABot } from './web-component';
 
 // Export QABot component directly for users who want to use it as a React component
 export { QABot };
@@ -14,9 +14,18 @@ export { WebComponentQABot };
 
 // Function-based API that prioritizes web component usage
 // and then attempts a react render (since some people may use the function within a react context)
-export function qAndATool(config) {
-  const { target, version, isLoggedIn, isAnonymous, defaultOpen, returnRef, ...otherProps } = config;
-
+export function accessQABot({
+  target,
+  apiKey,
+  defaultOpen,
+  disabled,
+  embedded,
+  isLoggedIn,
+  loginUrl,
+  prompt,
+  version,
+  welcome
+}) {
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
     return;
@@ -25,50 +34,74 @@ export function qAndATool(config) {
   // If the web component is available, use it
   if (typeof window !== 'undefined' && typeof customElements !== 'undefined' &&
       customElements.get('access-qa-bot')) {
-    return webComponentQAndATool({
+    return webComponentAccessQABot({
       target,
-      isLoggedIn,
-      isAnonymous,
+      apiKey,
       defaultOpen,
-      returnRef,
-      ...otherProps
+      disabled,
+      embedded,
+      isLoggedIn,
+      loginUrl,
+      prompt,
+      welcome
     });
   } else {
-    // Use direct react rendering with ref support
+    // Use direct react rendering
     const root = ReactDOM.createRoot(target);
     const qaRef = React.createRef();
 
     root.render(
       <React.StrictMode>
-        <QABot
+        <App
           ref={qaRef}
-          embedded={otherProps.embedded}
+          apiKey={apiKey}
           defaultOpen={defaultOpen}
-          welcome={otherProps.welcome}
-          prompt={otherProps.prompt}
+          disabled={disabled}
+          embedded={embedded}
           isLoggedIn={isLoggedIn}
-          isAnonymous={isAnonymous}
-          disabled={otherProps.disabled}
-          onClose={otherProps.onClose}
-          apiKey={otherProps.apiKey}
+          loginUrl={loginUrl}
+          prompt={prompt}
+          welcome={welcome}
         />
       </React.StrictMode>
     );
 
-    // If returnRef is true, return ref methods for programmatic control
-    if (returnRef) {
-      // Return an object with the control methods that match the QABot component's API
-      return {
-        toggle: () => qaRef.current && qaRef.current.toggle(),
-        open: () => qaRef.current && qaRef.current.open(),
-        close: () => qaRef.current && qaRef.current.close(),
-        isOpen: () => qaRef.current && qaRef.current.isOpen()
-      };
-    }
-
-    // Otherwise return a cleanup function
-    return () => {
-      root.unmount();
+    // Return a controller object with the addMessage method
+    return {
+      // Add a message to the chat
+      addMessage: (message) => {
+        if (qaRef.current) {
+          qaRef.current.addMessage(message);
+        }
+      },
+      // Set login status
+      setBotIsLoggedIn: (status) => {
+        if (qaRef.current) {
+          qaRef.current.setBotIsLoggedIn(status);
+        }
+      },
+      // Open the chat window (floating mode only)
+      openChat: () => {
+        if (qaRef.current) {
+          qaRef.current.openChat();
+        }
+      },
+      // Close the chat window (floating mode only)
+      closeChat: () => {
+        if (qaRef.current) {
+          qaRef.current.closeChat();
+        }
+      },
+      // Toggle the chat window (floating mode only)
+      toggleChat: () => {
+        if (qaRef.current) {
+          qaRef.current.toggleChat();
+        }
+      },
+      // Cleanup function (backward compatibility)
+      destroy: () => {
+        root.unmount();
+      }
     };
   }
 }

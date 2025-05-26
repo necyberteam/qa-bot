@@ -1,28 +1,30 @@
 interface QABotProps {
-  isLoggedIn?: boolean;
-  isAnonymous?: boolean;
-  defaultOpen?: boolean;
   apiKey?: string;
-  embedded?: boolean;
-  welcome?: string;
-  prompt?: string;
+  /** Whether the chat window is open by default (floating mode only, ignored for embedded) */
+  defaultOpen?: boolean;
   disabled?: boolean;
-  visible?: boolean;
-  onClose?: () => void;
+  /** Whether the bot is embedded in the page (always open when embedded) */
+  embedded?: boolean;
+  isLoggedIn?: boolean;
+  loginUrl?: string;
+  prompt?: string;
+  welcome?: string;
   [key: string]: any; // Allow additional props
 }
 
-// React component with ref
-interface QABotRef {
-  toggle: () => boolean;
-  open: () => void;
-  close: () => void;
-  isOpen: () => boolean;
-}
+// Note: To control the chat window externally, use the useChatWindow hook from react-chatbotify:
+// import { useChatWindow } from 'react-chatbotify';
+// const { toggleChatWindow } = useChatWindow();
 
 // React component
 export const QABot: React.ForwardRefExoticComponent<
-  QABotProps & React.RefAttributes<QABotRef>
+  QABotProps & React.RefAttributes<{
+    addMessage: (message: string) => void;
+    setBotIsLoggedIn: (status: boolean) => void;
+    openChat: () => void;
+    closeChat: () => void;
+    toggleChat: () => void;
+  }>
 >;
 
 // Web Component class (available in the standalone build)
@@ -31,31 +33,25 @@ export class WebComponentQABot extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
   connectedCallback(): void;
   disconnectedCallback(): void;
-  toggle(): boolean;
-  open(): void;
-  close(): void;
-  isOpen(): boolean;
 }
 
 // Function for non-React integration
-interface QAndAToolConfig extends QABotProps {
+interface AccessQABotConfig extends QABotProps {
   target: HTMLElement;
-  returnRef?: boolean;
-}
-
-// Return type when returnRef is true
-interface QABotControlMethods {
-  toggle: () => boolean;
-  open: () => void;
-  close: () => void;
-  isOpen: () => boolean;
 }
 
 // Main function for programmatic usage (works with React or Web Component)
-export function qAndATool(config: QAndAToolConfig): (() => void) | QABotControlMethods;
+export function accessQABot(config: AccessQABotConfig): {
+  addMessage: (message: string) => void;
+  setBotIsLoggedIn: (status: boolean) => void;
+  openChat: () => void;
+  closeChat: () => void;
+  toggleChat: () => void;
+  destroy: () => void;
+};
 
 // Web Component specific function (exposed in the standalone bundle)
-export function webComponentQAndATool(config: QAndAToolConfig): (() => void) | QABotControlMethods;
+export function webComponentAccessQABot(config: AccessQABotConfig): () => void;
 
 // Default export (React component)
 export default QABot;
@@ -68,9 +64,9 @@ declare global {
 
   // Global object for standalone usage
   interface Window {
-    accessQABot?: {
-      WebComponentQABot: typeof WebComponentQABot;
-      qAndATool: typeof webComponentQAndATool;
-    }
+    accessQABot?: typeof webComponentAccessQABot;
   }
+
+  // Global function available without window prefix
+  var accessQABot: typeof webComponentAccessQABot;
 }

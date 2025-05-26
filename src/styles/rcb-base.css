@@ -52,3 +52,37 @@
 .rcb-chat-window .rcb-chat-footer-container {
   font-size: 10px;
 }
+
+/* Embedded bot styles */
+.embedded-qa-bot .rcb-chat-window {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.access-qa-bot.hidden {
+  display: none;
+}
+
+.embedded-qa-bot .rcb-bot-message,
+.embedded-qa-bot .rcb-user-message {
+  max-width: 90% !important;
+  word-break: break-word;
+}
+
+.embedded-qa-bot .rcb-chat-input-textarea {
+  width: 100% !important;
+}
+
+.qa-bot-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* UserIcon visibility based on login state */
+.access-qa-bot .user-login-icon {
+  display: none !important;
+}
+
+.access-qa-bot.bot-logged-in .user-login-icon {
+  display: flex !important;
+}

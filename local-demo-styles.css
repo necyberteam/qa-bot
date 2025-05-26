@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+}
+
+.demo-section {
+    margin-bottom: 40px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.explanation {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-left: 4px solid #6c757d;
+    margin-bottom: 20px;
+}
+
+.control-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.control-group {
+    display: flex;
+    gap: 20px;
+}
+
+.message-control {
+    margin-top: 10px;
+}
+
+.hello-button {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #1a5b6e;
+    color: white;
+    cursor: pointer;
+}
+
+.hello-button:hover {
+    background-color: #107180;
+}
