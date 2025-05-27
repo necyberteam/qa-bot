@@ -41,9 +41,9 @@ git tag -l "v0.3.0"
 
 ## Release Process
 
-Our release process is designed to work with our existing CDN infrastructure.
+Our release process is designed to work with our existing CDN infrastructure and includes release candidate testing for integration with dependent repositories (like access-ci-ui).
 
-### 1. Feature Development (Including Version Update)
+### 1. Feature Development (Including Release Candidate Version)
 
 During feature development:
 
@@ -57,27 +57,72 @@ git checkout -b feature/my-feature main
 # Check existing versions before updating
 git tag -l "v*"
 
-# Update version in package.json (manually edit)
+# Update version in package.json with rc suffix (manually edit)
+# Example: "1.1.0-rc.1"
 # IMPORTANT: Choose a NEW version that doesn't have an existing git tag
 # This is necessary for our CDN links to work correctly
 
 # Commit the version change
-git commit -am "Bump version to X.Y.Z"
+git commit -am "Bump version to X.Y.Z-rc.1"
 ```
 
 ### 2. Merge to Main
 
-Create a PR. Once approved, merge your feature branch to main, including the version change.
+Create a PR. Once approved, merge your feature branch to main, including the release candidate version change.
 
-### 3. Create Tag
+### 3. Publish Release Candidate to npm (No GitHub Release Yet)
 
-After merging to main, create a tag matching your version, and make a GitHub release:
+Publish the release candidate version for integration testing:
 
 ```bash
+# Make sure npm-release branch has latest changes from main
+git checkout npm-release
+git merge main
+# Resolve any conflicts if needed
+
+# Test the package
+npm pack
+tar -tf @snf-access-qa-bot-*.tgz
+
+# Publish release candidate to npm with rc tag
+npm publish --tag rc --access public
+
+# Push changes to npm-release branch
+git push upstream npm-release
+```
+
+### 4. Integration Testing
+
+Test the release candidate version with dependent repositories:
+
+```bash
+# In access-ci-ui or other consuming repos
+npm install @snf/access-qa-bot@rc
+
+# Test integration thoroughly
+# ...
+```
+
+### 5. Promote to Stable Release
+
+If integration testing passes, promote the release candidate to a stable release:
+
+```bash
+# Update version in package.json to remove rc suffix
+# Example: "1.1.0-rc.1" becomes "1.1.0"
+
+# Commit the stable version
+git commit -am "Release version X.Y.Z"
+
+# Merge to main
 git checkout main
-git pull
-git tag -a v0.3.0 -m "Release version 0.3.0"  # Match your actual version
-git push upstream v0.3.0  # would typically be `origin` but my local dev environment uses a fork as `origin`
+git merge npm-release
+
+# Create git tag and GitHub release
+git tag -a vX.Y.Z -m "Release version X.Y.Z"  # Match your actual version
+git push upstream vX.Y.Z
+
+# Create GitHub release
 ```
 - Click on the "Releases" tab in the GitHub repository
 - Click "Draft a new release"
@@ -85,42 +130,23 @@ git push upstream v0.3.0  # would typically be `origin` but my local dev environ
 - Add a title and description
 - Click "Publish release"
 
-This tag will be used by the jsdelivr CDN.
-
-### 4. Prepare for npm Publishing
-
-Now we need to publish to npm from the npm-release branch:
-
 ```bash
-# Make sure npm-release branch has latest changes from main
+# Publish stable version to npm
 git checkout npm-release
-git merge main
-# Resolve any conflicts if needed
-```
-
-### 5. Test the Package
-
-```bash
-# Create a tarball without publishing
-npm pack
-
-# Review the contents
-tar -tf @snf-access-qa-bot-*.tgz
-```
-
-### 6. Publish the Package
-
-```bash
 npm publish --access public
-```
 
-### 7. Push Changes
-
-Push the commit to the npm-release branch:
-
-```bash
+# Push final changes
 git push upstream npm-release
+git push upstream main
 ```
+
+### Alternative: Direct Release (Skip Release Candidate)
+
+For smaller changes or when integration testing isn't needed:
+
+1. Use stable version number (no rc suffix) from the start
+2. Follow steps 1-2 above
+3. Skip to step 5 (Create tag, GitHub release, and publish to npm)
 
 ## Maintaining the Release Branch
 
