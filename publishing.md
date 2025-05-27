@@ -41,7 +41,7 @@ git tag -l "v0.3.0"
 
 ## Release Process
 
-Our release process is designed to work with our existing CDN infrastructure and includes release candidate testing for integration with dependent repositories (like access-ci-ui).
+Our release process is designed to work with our existing CDN infrastructure and includes release candidate testing for integration with dependent repositories (like access-ci-ui). The process allows for testing integration BEFORE opening a PR to ensure end-to-end functionality.
 
 ### 1. Feature Development (Including Release Candidate Version)
 
@@ -66,18 +66,14 @@ git tag -l "v*"
 git commit -am "Bump version to X.Y.Z-rc.1"
 ```
 
-### 2. Merge to Main
+### 2. Publish Release Candidate from Feature Branch (Before PR)
 
-Create a PR. Once approved, merge your feature branch to main, including the release candidate version change.
-
-### 3. Publish Release Candidate to npm (No GitHub Release Yet)
-
-Publish the release candidate version for integration testing:
+Publish the release candidate version for integration testing BEFORE opening the PR:
 
 ```bash
-# Make sure npm-release branch has latest changes from main
+# From your feature branch (not main yet)
 git checkout npm-release
-git merge main
+git merge feature/my-feature  # Merge your feature branch to npm-release
 # Resolve any conflicts if needed
 
 # Test the package
@@ -89,9 +85,12 @@ npm publish --tag rc --access public
 
 # Push changes to npm-release branch
 git push upstream npm-release
+
+# Return to your feature branch
+git checkout feature/my-feature
 ```
 
-### 4. Integration Testing
+### 3. Integration Testing
 
 Test the release candidate version with dependent repositories:
 
@@ -100,23 +99,36 @@ Test the release candidate version with dependent repositories:
 npm install @snf/access-qa-bot@rc
 
 # Test integration thoroughly
-# ...
+# Document any issues or successful tests
 ```
 
-### 5. Promote to Stable Release
+### 4. Open Pull Request
 
-If integration testing passes, promote the release candidate to a stable release:
+Now that integration testing is complete, open the PR:
+
+- Create PR from `feature/my-feature` to `main`
+- Include integration test results in PR description
+- Note that RC version has been published and tested
+- Reviewers can be confident the changes work end-to-end
+
+### 5. Merge to Main
+
+Once PR is approved and merged to main, the feature branch changes are now in main.
+
+### 6. Promote to Stable Release
+
+After successful PR merge, promote the release candidate to a stable release:
 
 ```bash
+# Switch to main and pull latest
+git checkout main
+git pull upstream main
+
 # Update version in package.json to remove rc suffix
 # Example: "1.1.0-rc.1" becomes "1.1.0"
 
 # Commit the stable version
 git commit -am "Release version X.Y.Z"
-
-# Merge to main
-git checkout main
-git merge npm-release
 
 # Create git tag and GitHub release
 git tag -a vX.Y.Z -m "Release version X.Y.Z"  # Match your actual version
@@ -131,13 +143,24 @@ git push upstream vX.Y.Z
 - Click "Publish release"
 
 ```bash
-# Publish stable version to npm
+# Update npm-release branch with stable version
 git checkout npm-release
+git merge main
+
+# Publish stable version to npm
 npm publish --access public
 
 # Push final changes
 git push upstream npm-release
-git push upstream main
+```
+
+### 7. Cleanup (Optional)
+
+If desired, you can remove the RC tag from npm after stable release:
+
+```bash
+# Remove the rc tag (optional)
+npm dist-tag rm @snf/access-qa-bot rc
 ```
 
 ### Alternative: Direct Release (Skip Release Candidate)
