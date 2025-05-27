@@ -29,6 +29,7 @@ const useChatFlow = ({ welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, has
       ),
       path: isBotLoggedIn ? 'loop' : 'start'
     },
+
     loop: {
       message: async (params) => {
         await handleQuery(params);

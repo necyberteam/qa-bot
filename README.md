@@ -86,7 +86,6 @@ window.addEventListener('load', function() {
         prompt: "Ask me about ACCESS...",
         isLoggedIn: true,
         defaultOpen: false,
-        ringEffect: true  // Enable phone ring animation on tooltip
     });
 
     // Use the controller to interact with the bot
@@ -191,7 +190,6 @@ function MyApp() {
                 embedded: true,
                 welcome: "Programmatically created bot!",
                 isLoggedIn: isLoggedIn,
-                ringEffect: true
             });
         }
     };
@@ -215,7 +213,6 @@ function MyApp() {
                 defaultOpen={false}
                 welcome="Welcome to the ACCESS Q&A Bot!"
                 prompt="How can I help you today?"
-                ringEffect={true}
                 apiKey={process.env.REACT_APP_API_KEY}
             />
 

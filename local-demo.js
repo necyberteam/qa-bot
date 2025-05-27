@@ -9,7 +9,6 @@ function initializeQABot() {
             target: qaBot,
             isLoggedIn: window.mockUserLoggedIn,
             defaultOpen: false,
-            ringEffect: true
         });
     }
 }
@@ -44,6 +43,7 @@ function setupLoginCheckbox() {
         loginCheckbox.addEventListener('change', (e) => {
             window.mockUserLoggedIn = e.target.checked;
             updateBotLoginStatus(window.mockUserLoggedIn);
+            if (window.mockUserLoggedIn)
             console.log('| user logged in:', window.mockUserLoggedIn);
         });
     }

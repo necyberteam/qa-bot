@@ -257,17 +257,42 @@ class AccessQABot extends HTMLElement {
     }
   }
 
+  // Helper method to parse boolean attributes with default values
+  _getBooleanAttribute(name, defaultValue = false) {
+    if (!this.hasAttribute(name)) {
+      return defaultValue;
+    }
+
+    const value = this.getAttribute(name);
+    if (value === null || value === '') {
+      // Attribute present without value (e.g., <element attr>) means true
+      return true;
+    }
+
+    // Parse string values
+    const lowerValue = value.toLowerCase();
+    if (lowerValue === 'false' || lowerValue === '0') {
+      return false;
+    }
+    if (lowerValue === 'true' || lowerValue === '1') {
+      return true;
+    }
+
+    // For any other value, treat as true if attribute is present
+    return true;
+  }
+
   // Convert attributes to props
   _getProps() {
     return {
       apiKey: this.getAttribute('api-key') || 'demo-key',
-      defaultOpen: this.hasAttribute('default-open'),
-      disabled: this.hasAttribute('disabled'),
-      embedded: this.hasAttribute('embedded'),
-      isLoggedIn: this.hasAttribute('is-logged-in'),
+      defaultOpen: this._getBooleanAttribute('default-open', false),
+      disabled: this._getBooleanAttribute('disabled', false),
+      embedded: this._getBooleanAttribute('embedded', false),
+      isLoggedIn: this._getBooleanAttribute('is-logged-in', false),
       loginUrl: this.getAttribute('login-url'),
       prompt: this.getAttribute('prompt'),
-      ringEffect: this.hasAttribute('ring-effect'),
+      ringEffect: this._getBooleanAttribute('ring-effect', true),
       welcome: this.getAttribute('welcome')
     };
   }
@@ -354,7 +379,9 @@ export function webComponentAccessQABot(config) {
   if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
   if (props.loginUrl) qaBot.setAttribute('login-url', props.loginUrl);
   if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
-  if (props.ringEffect) qaBot.setAttribute('ring-effect', '');
+  if (props.ringEffect !== undefined) {
+    qaBot.setAttribute('ring-effect', props.ringEffect.toString());
+  }
   if (props.welcome) qaBot.setAttribute('welcome', props.welcome);
 
   // Set CSS custom properties if provided
