@@ -47,6 +47,7 @@ function ExampleApp() {
         welcome="Welcome to the ACCESS Q&A Bot development environment!"
         prompt="Ask me anything about ACCESS..."
         apiKey={process.env.REACT_APP_API_KEY}
+        ringEffect={true}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import useChatBotSettings from '../hooks/useChatBotSettings';
 import useHandleAIQuery from '../hooks/useHandleAIQuery';
 import useChatFlow from '../hooks/useChatFlow';
 import useUpdateHeader from '../hooks/useUpdateHeader';
+import useRingEffect from '../hooks/useRingEffect';
 import { DEFAULT_CONFIG } from '../config/constants';
 import '../styles/rcb-base.css';
 
@@ -20,6 +21,7 @@ import '../styles/rcb-base.css';
  * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
  * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
  * @param {string}    [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
+ * @param {boolean}   [props.ringEffect=false] - Whether to apply the phone ring animation effect to the tooltip
  * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
  */
@@ -42,6 +44,7 @@ const QABot = React.forwardRef((props, ref) => {
     isLoggedIn,
     loginUrl = DEFAULT_CONFIG.LOGIN_URL,
     prompt = DEFAULT_CONFIG.PROMPT_TEXT,
+    ringEffect = false,
     welcome
   } = props;
 
@@ -89,6 +92,9 @@ const QABot = React.forwardRef((props, ref) => {
 
   // Use custom hook to update header title dynamically
   useUpdateHeader(isBotLoggedIn, containerRef);
+
+  // Use custom hook to apply ring effect if enabled
+  useRingEffect(ringEffect, containerRef);
 
   return (
     <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>

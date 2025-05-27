@@ -114,6 +114,76 @@ class AccessQABot extends HTMLElement {
       .rcb-send-button {
         background-color: var(--primary-color) !important;
       }
+
+      /* Phone ring animation for tooltip */
+      .rcb-tooltip-show.phone-ring {
+        animation: phone-ring 3s ease-out !important;
+        z-index: 10000 !important;
+      }
+
+      @keyframes phone-ring {
+        0% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        /* First ring - quick shake */
+        2% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        4% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        6% {
+          transform: translateX(0) translateY(-8px) rotate(-1deg);
+        }
+        8% {
+          transform: translateX(0) translateY(-6px) rotate(1deg);
+        }
+        10% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        12% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        /* Settle down */
+        20% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        30% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        40% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        49% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        /* Second ring - quick shake */
+        50% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        52% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        54% {
+          transform: translateX(0) translateY(-8px) rotate(-1deg);
+        }
+        56% {
+          transform: translateX(0) translateY(-6px) rotate(1deg);
+        }
+        58% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        60% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        /* Final settle */
+        70% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        100% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+      }
     `;
     this.shadowRoot.appendChild(chatbotStyles);
 
@@ -169,6 +239,7 @@ class AccessQABot extends HTMLElement {
       'is-logged-in',
       'login-url',
       'prompt',
+      'ring-effect',
       'welcome'
     ];
   }
@@ -196,6 +267,7 @@ class AccessQABot extends HTMLElement {
       isLoggedIn: this.hasAttribute('is-logged-in'),
       loginUrl: this.getAttribute('login-url'),
       prompt: this.getAttribute('prompt'),
+      ringEffect: this.hasAttribute('ring-effect'),
       welcome: this.getAttribute('welcome')
     };
   }
@@ -282,6 +354,7 @@ export function webComponentAccessQABot(config) {
   if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
   if (props.loginUrl) qaBot.setAttribute('login-url', props.loginUrl);
   if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
+  if (props.ringEffect) qaBot.setAttribute('ring-effect', '');
   if (props.welcome) qaBot.setAttribute('welcome', props.welcome);
 
   // Set CSS custom properties if provided

@@ -8,7 +8,8 @@ function initializeQABot() {
         bot1Controller = accessQABot({
             target: qaBot,
             isLoggedIn: window.mockUserLoggedIn,
-            defaultOpen: false
+            defaultOpen: false,
+            ringEffect: true
         });
     }
 }
