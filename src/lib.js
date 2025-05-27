@@ -23,6 +23,7 @@ export function accessQABot({
   isLoggedIn,
   loginUrl,
   prompt,
+  ringEffect,
   version,
   welcome
 }) {
@@ -43,6 +44,7 @@ export function accessQABot({
       isLoggedIn,
       loginUrl,
       prompt,
+      ringEffect,
       welcome
     });
   } else {
@@ -61,6 +63,7 @@ export function accessQABot({
           isLoggedIn={isLoggedIn}
           loginUrl={loginUrl}
           prompt={prompt}
+          ringEffect={ringEffect}
           welcome={welcome}
         />
       </React.StrictMode>

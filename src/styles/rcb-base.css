@@ -87,6 +87,10 @@
   display: flex !important;
 }
 
+.access-qa-bot.bot-logged-in .user-login-icon svg {
+  transform: scale(1.3) translateY(-2px);
+}
+
 .rcb-tooltip-show.phone-ring {
   /* tooltip slides in from off-screen right, then pulses three times slowly*/
   animation: phone-ring 3s ease-out !important;

@@ -69,7 +69,8 @@ window.addEventListener('load', function() {
         welcome: "Custom welcome message!",
         prompt: "Ask me about ACCESS...",
         isLoggedIn: true,
-        defaultOpen: false
+        defaultOpen: false,
+        ringEffect: true  // Enable phone ring animation on tooltip
     });
 
     // Use the controller to interact with the bot
@@ -91,7 +92,8 @@ Use the `<access-qa-bot>` custom element directly in your HTML:
     welcome="Welcome to the Q&A Bot!"
     prompt="Ask me anything about ACCESS..."
     is-logged-in
-    default-open>
+    default-open
+    ring-effect>
 </access-qa-bot>
 
 <!-- Embedded mode -->
@@ -110,6 +112,7 @@ Use the `<access-qa-bot>` custom element directly in your HTML:
 - `is-logged-in` - User is logged in (boolean attribute)
 - `login-url` - URL for login redirect
 - `prompt` - Input placeholder text
+- `ring-effect` - Enable phone ring animation on tooltip (boolean attribute)
 - `welcome` - Welcome message
 
 **Accessing the Custom Element Programmatically:**
@@ -171,7 +174,8 @@ function MyApp() {
                 target: container,
                 embedded: true,
                 welcome: "Programmatically created bot!",
-                isLoggedIn: isLoggedIn
+                isLoggedIn: isLoggedIn,
+                ringEffect: true
             });
         }
     };
@@ -195,6 +199,7 @@ function MyApp() {
                 defaultOpen={false}
                 welcome="Welcome to the ACCESS Q&A Bot!"
                 prompt="How can I help you today?"
+                ringEffect={true}
                 apiKey={process.env.REACT_APP_API_KEY}
             />
 
@@ -215,6 +220,7 @@ function MyApp() {
 | `isLoggedIn` / `is-logged-in` | boolean | Whether the user is logged in |
 | `loginUrl` / `login-url` | string | URL to redirect for login (default: '/login') |
 | `prompt` | string | Placeholder text shown in the input field |
+| `ringEffect` / `ring-effect` | boolean | Enable phone ring animation on tooltip (floating mode only) |
 | `welcome` | string | Welcome message shown to the user |
 
 ### CSS Custom Properties (Theming)
@@ -284,13 +290,19 @@ npx serve
    - Floating mode shows a chat button; `defaultOpen` controls initial state
    - Chat window controls (`openChat`, `closeChat`, `toggleChat`) only work in floating mode
 
-2. **Auto-Detection**: The standalone script automatically detects and initializes:
+2. **Ring Effect**:
+   - Only works in floating mode when the tooltip is visible
+   - Triggers a phone-like ring animation to draw attention
+   - Activates once when the bot is first loaded (500ms delay)
+   - Won't repeat if user has already interacted with the chat
+
+3. **Auto-Detection**: The standalone script automatically detects and initializes:
    - `#qa-bot` → Floating mode
    - `.embedded-qa-bot` → Embedded mode
 
-3. **API Key**: Defaults to demo key if not provided
+4. **API Key**: Defaults to demo key if not provided
 
-4. **Browser Support**: Uses modern browser features; consider polyfills for older browsers
+5. **Browser Support**: Uses modern browser features; consider polyfills for older browsers
 
 ## Examples Repository
 

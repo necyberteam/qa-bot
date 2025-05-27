@@ -17,6 +17,7 @@ const App = React.forwardRef((props, ref) => {
       loginUrl={props.loginUrl}
       onClose={props.onClose}
       prompt={props.prompt}
+      ringEffect={props.ringEffect}
       welcome={props.welcome}
     />
   );
