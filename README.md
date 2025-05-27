@@ -8,7 +8,23 @@ A React component and Web Component for integrating the ACCESS Q&A Bot into your
 npm install @snf/access-qa-bot
 ```
 
-## Quick Start
+## Developing React App
+
+```bash
+npm install
+npm run start
+```
+
+## Running the Demo
+
+This will serve the index.html file in the root directory, which demonsrates two different ways to integrate the bot.
+
+```bash
+npm run build:lib
+npm run build
+npx serve
+```
+
 
 ### Floating vs Embedded Modes
 
@@ -21,10 +37,10 @@ The ACCESS Q&A Bot supports two display modes:
 
 | Method | Default Mode | Override |
 |--------|--------------|----------|
-| Element ID (`#qa-bot`) | Floating | Set `embedded: true` in JS config |
-| CSS Class (`.embedded-qa-bot`) | Embedded | Cannot override |
-| JavaScript API | Floating | Set `embedded: true` in config object |
-| **Custom Element (`<access-qa-bot>`)** | **Floating** | **Add `embedded` attribute** |
+| Element ID (`#qa-bot`) | Floating | Set `embedded: true` |
+| CSS Class (`.embedded-qa-bot`) | Embedded | n/a |
+| JavaScript API | Floating | Set `embedded: true` |
+| Custom Element (`<access-qa-bot>`) | Floating | Add `embedded` attribute |
 
 ## Integration Methods
 
