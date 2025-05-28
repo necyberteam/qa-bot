@@ -1,13 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ## [Unreleased]
 
-## [2.0.0-rc.1] - 2025-05-29
+## [2.0.0-rc.1] - 2025-05-28
 
 ### BREAKING CHANGES
 - **JavaScript API**: Function name changed from `accessQABot()` to `qaBot()`
@@ -20,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - New streamlined API with shorter, cleaner naming conventions
+- Refer to README for complete list of available props and methods
 
 ### Note
 - Package name (`@snf/access-qa-bot`) and script filename (`access-qa-bot.standalone.js`) remain unchanged
