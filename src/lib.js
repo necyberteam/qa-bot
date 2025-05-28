@@ -4,7 +4,7 @@ import QABot from './components/QABot';
 import App from './App';
 import './App.css';
 import './index.css';
-import { WebComponentQABot, webComponentAccessQABot } from './web-component';
+import { WebComponentQABot, webComponentQABot } from './web-component';
 
 // Export QABot component directly for users who want to use it as a React component
 export { QABot };
@@ -14,15 +14,13 @@ export { WebComponentQABot };
 
 // Function-based API that prioritizes web component usage
 // and then attempts a react render (since some people may use the function within a react context)
-export function accessQABot({
+export function qaBot({
   target,
   apiKey,
   defaultOpen,
-  disabled,
   embedded,
   isLoggedIn,
   loginUrl,
-  prompt,
   ringEffect,
   version,
   welcome
@@ -34,16 +32,14 @@ export function accessQABot({
 
   // If the web component is available, use it
   if (typeof window !== 'undefined' && typeof customElements !== 'undefined' &&
-      customElements.get('access-qa-bot')) {
-    return webComponentAccessQABot({
+      customElements.get('qa-bot')) {
+    return webComponentQABot({
       target,
       apiKey,
       defaultOpen,
-      disabled,
       embedded,
       isLoggedIn,
       loginUrl,
-      prompt,
       ringEffect,
       welcome
     });
@@ -58,11 +54,9 @@ export function accessQABot({
           ref={qaRef}
           apiKey={apiKey}
           defaultOpen={defaultOpen}
-          disabled={disabled}
           embedded={embedded}
           isLoggedIn={isLoggedIn}
           loginUrl={loginUrl}
-          prompt={prompt}
           ringEffect={ringEffect}
           welcome={welcome}
         />

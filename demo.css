@@ -30,7 +30,7 @@ h2 {
 }
 
 /* Example of customizing web components */
-.demo-section:nth-child(3) access-qa-bot {
+.demo-section:nth-child(3) qa-bot {
     --primary-color: #2e7d32;
     --secondary-color: #4caf50;
     max-width: 500px;
@@ -74,7 +74,7 @@ h2 {
 }
 
 /* Custom styling for the first example */
-.demo-section:nth-child(2) access-qa-bot {
+.demo-section:nth-child(2) qa-bot {
     --primary-color: #1a5b6e;
     --secondary-color: #107180;
     max-width: 500px;

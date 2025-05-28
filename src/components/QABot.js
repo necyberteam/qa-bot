@@ -11,16 +11,15 @@ import { DEFAULT_CONFIG } from '../config/constants';
 import '../styles/rcb-base.css';
 
 /**
- * ACCESS Q&A Bot Component
+ * Q&A Bot Component
  *
  * @param {Object}    [props]
  * @param {string}    [props.apiKey] - API key for the Q&A endpoint
  * @param {boolean}   [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only, ignored for embedded)
- * @param {boolean}   [props.disabled=false] - Whether the chat input is disabled
  * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page (always open when embedded)
  * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
  * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
- * @param {string}    [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
+
  * @param {boolean}   [props.ringEffect=true] - Whether to apply the phone ring animation effect to the tooltip
  * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
@@ -39,11 +38,9 @@ const QABot = React.forwardRef((props, ref) => {
   const {
     apiKey,
     defaultOpen,
-    disabled,
     embedded = false,
     isLoggedIn,
     loginUrl = DEFAULT_CONFIG.LOGIN_URL,
-    prompt = DEFAULT_CONFIG.PROMPT_TEXT,
     ringEffect = true,
     welcome
   } = props;
@@ -73,8 +70,6 @@ const QABot = React.forwardRef((props, ref) => {
     themeColors,
     embedded,
     defaultOpen: defaultOpen,
-    prompt,
-    disabled: disabled,
     isLoggedIn: isBotLoggedIn
   });
 
@@ -97,12 +92,13 @@ const QABot = React.forwardRef((props, ref) => {
   useRingEffect(ringEffect, containerRef);
 
   return (
-    <div className={`access-qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
+    <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
       <ChatBotProvider>
         <BotController
           ref={ref}
           embedded={embedded}
           setIsBotLoggedIn={setIsBotLoggedIn}
+          isBotLoggedIn={isBotLoggedIn}
         />
         <ChatBot
           settings={chatBotSettings}

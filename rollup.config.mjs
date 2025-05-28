@@ -56,7 +56,7 @@ export default [
     output: {
       file: './dist/access-qa-bot.standalone.js',
       format: 'umd',
-      name: 'accessQABot',
+      name: 'qaBot',
       sourcemap: true,
       exports: 'named',
       globals: {

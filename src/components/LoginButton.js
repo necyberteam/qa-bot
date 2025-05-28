@@ -31,7 +31,7 @@ const LoginButton = ({ loginUrl, className = '', style }) => {
       href={loginUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`access-login-button ${className}`}
+      className={`qa-bot-login-button ${className}`}
       style={{ ...defaultStyle, ...style }}
     >
       Log In

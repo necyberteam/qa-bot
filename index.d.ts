@@ -2,12 +2,10 @@ interface QABotProps {
   apiKey?: string;
   /** Whether the chat window is open by default (floating mode only, ignored for embedded) */
   defaultOpen?: boolean;
-  disabled?: boolean;
   /** Whether the bot is embedded in the page (always open when embedded) */
   embedded?: boolean;
   isLoggedIn?: boolean;
   loginUrl?: string;
-  prompt?: string;
   welcome?: string;
   [key: string]: any; // Allow additional props
 }
@@ -36,12 +34,12 @@ export class WebComponentQABot extends HTMLElement {
 }
 
 // Function for non-React integration
-interface AccessQABotConfig extends QABotProps {
+interface QABotConfig extends QABotProps {
   target: HTMLElement;
 }
 
 // Main function for programmatic usage (works with React or Web Component)
-export function accessQABot(config: AccessQABotConfig): {
+export function qaBot(config: QABotConfig): {
   addMessage: (message: string) => void;
   setBotIsLoggedIn: (status: boolean) => void;
   openChat: () => void;
@@ -51,7 +49,7 @@ export function accessQABot(config: AccessQABotConfig): {
 };
 
 // Web Component specific function (exposed in the standalone bundle)
-export function webComponentAccessQABot(config: AccessQABotConfig): () => void;
+export function webComponentQABot(config: QABotConfig): () => void;
 
 // Default export (React component)
 export default QABot;
@@ -59,14 +57,14 @@ export default QABot;
 // Augment the HTMLElementTagNameMap to include our custom element
 declare global {
   interface HTMLElementTagNameMap {
-    'access-qa-bot': WebComponentQABot;
+    'qa-bot': WebComponentQABot;
   }
 
   // Global object for standalone usage
   interface Window {
-    accessQABot?: typeof webComponentAccessQABot;
+    qaBot?: typeof webComponentQABot;
   }
 
   // Global function available without window prefix
-  var accessQABot: typeof webComponentAccessQABot;
+  var qaBot: typeof webComponentQABot;
 }

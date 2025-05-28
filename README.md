@@ -1,6 +1,6 @@
-# ACCESS Q&A Bot
+# Q&A Bot
 
-A React component and Web Component for integrating the ACCESS Q&A Bot into your application. The bot can operate in two modes: **floating** (chat button that opens/closes a window) or **embedded** (always visible inline).
+A React component and Web Component for integrating the Q&A Bot into your application. The bot can operate in two modes: **floating** (chat button that opens/closes a window) or **embedded** (always visible inline).
 
 ## Installation
 
@@ -28,7 +28,7 @@ npx serve
 
 ### Floating vs Embedded Modes
 
-The ACCESS Q&A Bot supports two display modes:
+The Q&A Bot supports two display modes:
 
 - **Floating Mode** (default): Shows a chat button that opens/closes a floating chat window
 - **Embedded Mode**: Always visible, embedded directly in the page content
@@ -40,7 +40,7 @@ The ACCESS Q&A Bot supports two display modes:
 | Element ID (`#qa-bot`) | Floating | Set `embedded: true` |
 | CSS Class (`.embedded-qa-bot`) | Embedded | n/a |
 | JavaScript API | Floating | Set `embedded: true` |
-| Custom Element (`<access-qa-bot>`) | Floating | Add `embedded` attribute |
+| Custom Element (`<qa-bot>`) | Floating | Add `embedded` attribute |
 
 ## Integration Methods
 
@@ -64,13 +64,12 @@ Use the `embedded-qa-bot` class with optional data attributes:
 
 <!-- Automatically creates an embedded chat widget -->
 <div class="embedded-qa-bot"
-     data-welcome="Hello!"
-     data-prompt="Ask me anything..."></div>
+     data-welcome="Hello!"></div>
 ```
 
 ### Method 3: Programmatic JavaScript API (Floating by Default)
 
-Call the `accessQABot()` function with full control:
+Call the `qaBot()` function with full control:
 
 ```html
 <script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
@@ -78,62 +77,80 @@ Call the `accessQABot()` function with full control:
 <div id="my-bot-container"></div>
 
 <script>
+// Check if user is logged in by looking for auth cookie
+function isUserLoggedIn() {
+    return document.cookie.split(';').some(cookie => {
+        return cookie.trim().startsWith('SESSaccesscisso=');
+    });
+}
+
 window.addEventListener('load', function() {
-    const controller = accessQABot({
+    const botController = qaBot({
         target: document.getElementById('my-bot-container'),
         embedded: false,  // false = floating (default), true = embedded
         welcome: "Custom welcome message!",
-        prompt: "Ask me about ACCESS...",
-        isLoggedIn: true,
+        isLoggedIn: isUserLoggedIn(),
         defaultOpen: false,
     });
 
     // Use the controller to interact with the bot
-    controller.addMessage("Hello from JavaScript!");
-    controller.openChat();  // Only works in floating mode
+    botController.addMessage("Hello from JavaScript!");
+    botController.openChat();  // Only works in floating mode
 });
 </script>
 ```
 
 ### Method 4: Custom Web Component Element (Floating by Default)
 
-Use the `<access-qa-bot>` custom element directly in your HTML:
+Use the `<qa-bot>` custom element directly in your HTML:
 
 ```html
 <script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
 
+<script>
+// Check if user is logged in by looking for auth cookie
+function isUserLoggedIn() {
+    return document.cookie.split(';').some(cookie => {
+        return cookie.trim().startsWith('SESSaccesscisso=');
+    });
+}
+
+// Set login status dynamically when page loads
+window.addEventListener('load', function() {
+    const botElement = document.querySelector('qa-bot');
+    if (botElement && isUserLoggedIn()) {
+        botElement.setAttribute('is-logged-in', '');
+    }
+});
+</script>
+
 <!-- Floating mode (default) -->
-<access-qa-bot
+<qa-bot
     welcome="Welcome to the Q&A Bot!"
-    prompt="Ask me anything about ACCESS..."
-    is-logged-in
     default-open
     ring-effect>
-</access-qa-bot>
+</qa-bot>
 
 <!-- Embedded mode -->
-<access-qa-bot
+<qa-bot
     embedded
-    welcome="This is an embedded bot!"
-    prompt="Ask your questions here...">
-</access-qa-bot>
+    welcome="This is an embedded bot!">
+</qa-bot>
 ```
 
 **Custom Element Attributes:**
 - `api-key` - API key for authentication
 - `default-open` - Initially open floating chat (boolean attribute)
-- `disabled` - Disable chat input (boolean attribute)
 - `embedded` - Use embedded mode (boolean attribute)
 - `is-logged-in` - User is logged in (boolean attribute)
 - `login-url` - URL for login redirect
-- `prompt` - Input placeholder text
 - `ring-effect` - Enable phone ring animation on tooltip (boolean attribute)
 - `welcome` - Welcome message
 
 **Accessing the Custom Element Programmatically:**
 ```javascript
 // Get reference to the custom element
-const botElement = document.querySelector('access-qa-bot');
+const botElement = document.querySelector('qa-bot');
 
 // Call methods directly on the element
 botElement.addMessage("Hello World!");
@@ -148,21 +165,21 @@ botElement.toggleChat(); // Floating mode only
 When using the JavaScript API, you get a controller object with these methods:
 
 ```javascript
-const controller = accessQABot({...});
+const botController = qaBot({...});
 
 // Add a message to the chat
-controller.addMessage("Hello World!");
+botController.addMessage("Hello World!");
 
 // Set user login status
-controller.setBotIsLoggedIn(true);
+botController.setBotIsLoggedIn(true);
 
 // Control chat window (floating mode only)
-controller.openChat();
-controller.closeChat();
-controller.toggleChat();
+botController.openChat();
+botController.closeChat();
+botController.toggleChat();
 
 // Cleanup
-controller.destroy();
+botController.destroy();
 ```
 
 ## As a React Component
@@ -171,7 +188,7 @@ For React applications, import and use the component directly:
 
 ```jsx
 import React, { useRef, useState } from 'react';
-import { QABot, accessQABot } from '@snf/access-qa-bot';
+import { QABot, qaBot } from '@snf/access-qa-bot';
 
 function MyApp() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -185,7 +202,7 @@ function MyApp() {
     const handleCreateProgrammaticBot = () => {
         const container = document.getElementById('programmatic-bot');
         if (container) {
-            accessQABot({
+            qaBot({
                 target: container,
                 embedded: true,
                 welcome: "Programmatically created bot!",
@@ -212,7 +229,6 @@ function MyApp() {
                 isLoggedIn={isLoggedIn}
                 defaultOpen={false}
                 welcome="Welcome to the ACCESS Q&A Bot!"
-                prompt="How can I help you today?"
                 apiKey={process.env.REACT_APP_API_KEY}
             />
 
@@ -228,11 +244,9 @@ function MyApp() {
 |----------|------|-------------|
 | `apiKey` / `api-key` | string | API key for authentication (defaults to demo key) |
 | `defaultOpen` / `default-open` | boolean | Whether floating chat opens initially (ignored in embedded mode) |
-| `disabled` | boolean | Disable the chat input |
 | `embedded` | boolean | **false** = floating mode, **true** = embedded mode |
-| `isLoggedIn` / `is-logged-in` | boolean | Whether the user is logged in |
+| `isLoggedIn` / `is-logged-in` | boolean | Sets initial login state and reacts to changes |
 | `loginUrl` / `login-url` | string | URL to redirect for login (default: '/login') |
-| `prompt` | string | Placeholder text shown in the input field |
 | `ringEffect` / `ring-effect` | boolean | Enable phone ring animation on tooltip (floating mode only) |
 | `welcome` | string | Welcome message shown to the user |
 

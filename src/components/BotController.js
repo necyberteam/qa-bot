@@ -1,5 +1,6 @@
 import React, { useImperativeHandle } from 'react';
 import { useFlow, useMessages, useChatWindow } from "react-chatbotify";
+import useLoginStateTransition from '../hooks/useLoginStateTransition';
 
 /**
  * BotController Component
@@ -10,13 +11,17 @@ import { useFlow, useMessages, useChatWindow } from "react-chatbotify";
  * @param {Object} props - Component props
  * @param {boolean} props.embedded - Whether the bot is embedded (affects chat window controls)
  * @param {Function} props.setIsBotLoggedIn - Function to update login state
+ * @param {boolean} props.isBotLoggedIn - Current login state
  * @param {React.Ref} ref - The forwarded ref for the imperative API
  */
-const BotController = React.forwardRef(({ embedded, setIsBotLoggedIn }, ref) => {
+const BotController = React.forwardRef(({ embedded, setIsBotLoggedIn, isBotLoggedIn }, ref) => {
   // Get the chatbot hooks (must be inside ChatBotProvider)
   const messages = useMessages();
   const flow = useFlow();
   const chatWindow = useChatWindow();
+
+  // Handle login state transitions with automatic message injection
+  useLoginStateTransition(isBotLoggedIn);
 
   // Set up the imperative API methods
   useImperativeHandle(ref, () => ({
@@ -49,7 +54,7 @@ const BotController = React.forwardRef(({ embedded, setIsBotLoggedIn }, ref) => 
         chatWindow.toggleChatWindow();
       }
     }
-  }), [messages, flow, chatWindow, embedded, setIsBotLoggedIn]);
+  }), [messages, chatWindow, embedded, setIsBotLoggedIn]);
 
   // This component doesn't render anything
   return null;

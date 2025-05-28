@@ -3,49 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACCESS Q&A Bot Standalone Demo</title>
+    <title>Q&A Bot Standalone Demo</title>
     <link rel="stylesheet" href="./build/static/css/main.css">
     <link rel="stylesheet" href="./local-demo-styles.css">
     <script src="./dist/access-qa-bot.standalone.js" defer></script>
     <script src="./local-demo.js" defer></script>
 </head>
 <body>
-    <h1>ACCESS Q&A Bot Standalone Demo</h1>
+    <h1>Q&A Bot Standalone Demo</h1>
+
+    <em>All integration methods and options are documented in the <a href="https://github.com/necyberteam/qa-bot#readme" target="_blank">README</a></em>
+
+
     <div class="control-area">
-        <div class="control-group">
-            <div>
-                <input type="checkbox" id="user-logged-in" />
-                <label for="user-logged-in">User logged in</label>
-            </div>
-        </div>
-        <div><i>(toggle to control the bots)</i></div>
+        <input type="checkbox" id="user-logged-in" />
+        <label for="user-logged-in">User logged in</label>
+        <i>(toggle to control the bots login state)</i>
     </div>
 
-    <!-- This empty div matches the original index.html structure -->
     <div id="qa-bot"></div>
 
     <div class="demo-section">
-        <h2>Example 1: Floating Bot (Default)</h2>
-        <p>Automatic floating chat button in lower right corner</p>
+        <h2>Example Embedded Bot</h2>
+        <div class="message-control">
+            <button class="hello-button" id="bot2-send">Make Bot Say Hello World!</button>
+        </div>
+        <div id="custom-qa-bot"></div>
+    </div>
+
+    <div class="demo-section">
+        <h2>Example Floating Bot (in corner)</h2>
         <div class="message-control">
             <button class="hello-button" id="bot1-send">Make Bot Say Hello World!</button>
             <button class="hello-button" id="bot1-open">Open Chat</button>
             <button class="hello-button" id="bot1-close">Close Chat</button>
-            <button class="hello-button" id="bot1-toggle">Toggle Chat Window</button>
+            <button class="hello-button" id="bot1-toggle">Toggle Chat</button>
         </div>
-    </div>
-
-    <div class="demo-section">
-        <h2>Example 2: Embedded Bot (Programmatic)</h2>
-        <p>Embedded bot instantiated with function and target element</p>
-        <div id="custom-qa-bot"></div>
-        <div class="message-control">
-            <button class="hello-button" id="bot2-send">Make Bot Say Hello World!</button>
-        </div>
-    </div>
-
-    <div class="demo-section">
-        <p><em>Additional integration methods and options are documented in the <a href="https://github.com/necyberteam/qa-bot#readme" target="_blank">README</a></em></p>
     </div>
 </body>
 </html>

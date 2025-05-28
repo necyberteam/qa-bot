@@ -20,16 +20,19 @@ function calculateWelcomeMessage(isBotLoggedIn, welcomeMessage) {
   return isBotLoggedIn ? loggedInWelcome : loggedOutWelcome;
 }
 
+function calculateComponent(isBotLoggedIn, loginUrl){
+  return !isBotLoggedIn ? <LoginButton loginUrl={loginUrl} /> : null;
+}
+
 const useChatFlow = ({ welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, hasQueryError }) => {
+  console.log('| calculating flow | isBotLoggedIn', isBotLoggedIn);
+
   const flow = useMemo(() => ({
     start: {
       message: calculateWelcomeMessage(isBotLoggedIn, welcomeMessage),
-      component: (
-        <LoginButton loginUrl={loginUrl} />
-      ),
+      component: calculateComponent(isBotLoggedIn, loginUrl),
       path: isBotLoggedIn ? 'loop' : 'start'
     },
-
     loop: {
       message: async (params) => {
         await handleQuery(params);

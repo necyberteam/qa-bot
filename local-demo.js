@@ -1,13 +1,30 @@
-/* global accessQABot */
-window.mockUserLoggedIn = false;
+/* global qaBot */
 let bot1Controller, bot2Controller;
 
+function setAuthCookie(exists) {
+    if (exists) {
+        // Set cookie with inert value, expires in 1 day
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 1);
+        document.cookie = `SESSaccesscisso=cookie123; expires=${expirationDate.toUTCString()}; path=/`;
+    } else {
+        // Delete cookie by setting expiration to past date
+        document.cookie = 'SESSaccesscisso=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    }
+}
+
+function isUserLoggedIn() {
+    return document.cookie.split(';').some(cookie => {
+        return cookie.trim().startsWith('SESSaccesscisso=');
+    });
+}
+
 function initializeQABot() {
-    const qaBot = document.getElementById('qa-bot');
-    if (qaBot && accessQABot && !qaBot.hasChildNodes()) {
-        bot1Controller = accessQABot({
-            target: qaBot,
-            isLoggedIn: window.mockUserLoggedIn,
+    const qaBotElement = document.getElementById('qa-bot');
+    if (qaBotElement && qaBot && !qaBotElement.hasChildNodes()) {
+        bot1Controller = qaBot({
+            target: qaBotElement,
+            isLoggedIn: isUserLoggedIn(),
             defaultOpen: false,
         });
     }
@@ -15,16 +32,15 @@ function initializeQABot() {
 
 function initializeEmbeddedBot() {
     const customBot = document.getElementById('custom-qa-bot');
-    if (accessQABot && customBot && !customBot.hasChildNodes()) {
-        bot2Controller = accessQABot({
+    if (qaBot && customBot && !customBot.hasChildNodes()) {
+        bot2Controller = qaBot({
             target: customBot,
             embedded: true,
             welcome: "This is an embedded bot created programmatically!",
-            prompt: "Ask me about ACCESS...",
-            isLoggedIn: window.mockUserLoggedIn
+            isLoggedIn: isUserLoggedIn()
         });
-    } else if (!accessQABot) {
-        console.error("accessQABot not found. Make sure the standalone JS file is loaded properly.");
+    } else if (!qaBot) {
+        console.error("qaBot not found. Make sure the standalone JS file is loaded properly.");
     }
 }
 
@@ -40,11 +56,13 @@ function updateBotLoginStatus(isLoggedIn) {
 function setupLoginCheckbox() {
     const loginCheckbox = document.getElementById('user-logged-in');
     if (loginCheckbox) {
+        // Initialize checkbox state based on current cookie
+        loginCheckbox.checked = isUserLoggedIn();
+
         loginCheckbox.addEventListener('change', (e) => {
-            window.mockUserLoggedIn = e.target.checked;
-            updateBotLoginStatus(window.mockUserLoggedIn);
-            if (window.mockUserLoggedIn)
-            console.log('| user logged in:', window.mockUserLoggedIn);
+            setAuthCookie(e.target.checked);
+            updateBotLoginStatus(e.target.checked);
+            console.log('| user logged in:', e.target.checked);
         });
     }
 }

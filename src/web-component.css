@@ -25,7 +25,7 @@
 }
 
 /* Container styles */
-.access-qa-bot {
+.qa-bot {
   font-family: var(--font-family);
   color: var(--text-color);
   position: relative;

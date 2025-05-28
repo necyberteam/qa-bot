@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import QABot from './components/QABot';
-import { accessQABot } from './lib';
+import { qaBot } from './lib';
 import reportWebVitals from './reportWebVitals';
 
-// Expose accessQABot globally so it can be called directly from HTML files like index.html
+// Expose qaBot globally so it can be called directly from HTML files like index.html
 // This enables the non-React integration methods demonstrated in the top-level index.html
-window.accessQABot = accessQABot;
+window.qaBot = qaBot;
 
 // Example app component with interactive controls
 function ExampleApp() {
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [userLoggedIn, setUserLoggedIn] = useState(true);
 
   return (
     <div>
@@ -42,9 +42,7 @@ function ExampleApp() {
         isLoggedIn={userLoggedIn}
         embedded={false}
         defaultOpen={false}
-        disabled={false}
         loginUrl="/login"
-        welcome="Welcome to the ACCESS Q&A Bot development environment!"
         apiKey={process.env.REACT_APP_API_KEY}
       />
     </div>

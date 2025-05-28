@@ -5,7 +5,7 @@ import QABot from './components/QABot';
 import './styles/index.css'; // Import all styles
 
 // Create a Web Component wrapper for the React component
-class AccessQABot extends HTMLElement {
+class QABotWebComponent extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -208,7 +208,7 @@ class AccessQABot extends HTMLElement {
               // Include rules for chatbot, embedded chat, and related classes
               if (rules[j].selectorText &&
                   (rules[j].selectorText.includes('.rcb-') ||
-                   rules[j].selectorText.includes('.access-qa-bot') ||
+                   rules[j].selectorText.includes('.qa-bot') ||
                    rules[j].selectorText.includes('.qa-bot-container'))) {
                 cssText += rules[j].cssText + '\n';
               }
@@ -234,11 +234,9 @@ class AccessQABot extends HTMLElement {
     return [
       'api-key',
       'default-open',
-      'disabled',
       'embedded',
       'is-logged-in',
       'login-url',
-      'prompt',
       'ring-effect',
       'welcome'
     ];
@@ -287,11 +285,9 @@ class AccessQABot extends HTMLElement {
     return {
       apiKey: this.getAttribute('api-key') || 'demo-key',
       defaultOpen: this._getBooleanAttribute('default-open', false),
-      disabled: this._getBooleanAttribute('disabled', false),
       embedded: this._getBooleanAttribute('embedded', false),
       isLoggedIn: this._getBooleanAttribute('is-logged-in', false),
       loginUrl: this.getAttribute('login-url'),
-      prompt: this.getAttribute('prompt'),
       ringEffect: this._getBooleanAttribute('ring-effect', true),
       welcome: this.getAttribute('welcome')
     };
@@ -354,13 +350,13 @@ class AccessQABot extends HTMLElement {
 }
 
 // Define the custom element
-customElements.define('access-qa-bot', AccessQABot);
+customElements.define('qa-bot', QABotWebComponent);
 
 // Export the web component reference
-export const WebComponentQABot = AccessQABot;
+export const WebComponentQABot = QABotWebComponent;
 
 // Create a function-based API for programmatic initialization
-export function webComponentAccessQABot(config) {
+export function webComponentQABot(config) {
   const { target, ...props } = config;
 
   if (!target || !(target instanceof HTMLElement)) {
@@ -369,16 +365,14 @@ export function webComponentAccessQABot(config) {
   }
 
   // Create a new QA bot web component instance
-  const qaBot = document.createElement('access-qa-bot');
+  const qaBot = document.createElement('qa-bot');
 
   // Set attributes based on props
   if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
   if (props.defaultOpen) qaBot.setAttribute('default-open', '');
-  if (props.disabled) qaBot.setAttribute('disabled', '');
   if (props.embedded) qaBot.setAttribute('embedded', '');
   if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
   if (props.loginUrl) qaBot.setAttribute('login-url', props.loginUrl);
-  if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
   if (props.ringEffect !== undefined) {
     qaBot.setAttribute('ring-effect', props.ringEffect.toString());
   }
@@ -425,8 +419,8 @@ if (typeof window !== 'undefined') {
   window.process = { env: { REACT_APP_API_KEY: 'demo-key' } };
 
   // Expose the function directly on window for clean script tag usage
-  window.accessQABot = webComponentAccessQABot;
+  window.qaBot = webComponentQABot;
 
-  // Note: The UMD build (rollup.config.mjs) is configured with name: 'accessQABot'
-  // This automatically makes accessQABot available as a global variable
+  // Note: The UMD build (rollup.config.mjs) is configured with name: 'qaBot'
+  // This automatically makes qaBot available as a global variable
 }

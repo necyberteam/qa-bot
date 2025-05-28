@@ -1,5 +1,5 @@
 /**
- * Wrapper component used by the accessQABot() JavaScript API
+ * Wrapper component used by the qaBot() JavaScript API
  */
 import React from 'react';
 import './App.css';
@@ -11,12 +11,10 @@ const App = React.forwardRef((props, ref) => {
       ref={ref}
       apiKey={props.apiKey}
       defaultOpen={props.defaultOpen}
-      disabled={props.disabled}
       embedded={props.embedded}
       isLoggedIn={props.isLoggedIn}
       loginUrl={props.loginUrl}
       onClose={props.onClose}
-      prompt={props.prompt}
       ringEffect={props.ringEffect}
       welcome={props.welcome}
     />

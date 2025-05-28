@@ -9,8 +9,6 @@ import { Button } from "react-chatbotify"
  * @param {Object} params.themeColors - Theme colors from useThemeColors
  * @param {boolean} params.embedded - Whether the bot is embedded
  * @param {boolean} params.defaultOpen - Default open state (floating mode only)
- * @param {string} params.prompt - Input prompt text
- * @param {boolean} params.disabled - Whether input is disabled
  * @param {boolean} params.isLoggedIn - Whether user is logged in
  * @returns {Object} ChatBot settings object
  */
@@ -18,8 +16,6 @@ const useChatBotSettings = ({
   themeColors,
   embedded,
   defaultOpen,
-  prompt,
-  disabled,
   isLoggedIn
 }) => {
   // console.log('| useChatBotSettings | isLoggedIn', isLoggedIn);
@@ -41,9 +37,9 @@ const useChatBotSettings = ({
         defaultOpen: embedded ? true : defaultOpen,
       },
       chatInput: {
-        enabledPlaceholderText: prompt,
+        enabledPlaceholderText: DEFAULT_CONFIG.PROMPT_TEXT,
         disabledPlaceholderText: 'Please log in to ask questions.',
-        disabled: disabled
+        disabled: false
       },
       chatHistory: {
         disabled: false
@@ -75,7 +71,7 @@ const useChatBotSettings = ({
         text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
       },
     };
-  }, [themeColors, embedded, defaultOpen, prompt, disabled, isLoggedIn]);
+  }, [themeColors, embedded, defaultOpen, isLoggedIn]);
 
   return settings;
 };
