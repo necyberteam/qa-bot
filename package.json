@@ -61,7 +61,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "build:lib": "rollup -c",
-    "prepare": "npm run build:lib"
+    "prepublishOnly": "npm run build:lib"
   },
   "eslintConfig": {
     "extends": [

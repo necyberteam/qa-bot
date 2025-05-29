@@ -62,7 +62,12 @@ git tag -l "v*"
 # IMPORTANT: Choose a NEW version that doesn't have an existing git tag
 # This is necessary for our CDN links to work correctly
 
-# Commit the version change
+# Build the library and app for both npm and CDN delivery
+npm run build:lib
+npm run build
+
+# Commit the version change and builds
+git add .
 git commit -am "Bump version to X.Y.Z-rc.1"
 ```
 
@@ -127,7 +132,12 @@ git pull upstream main
 # Update version in package.json to remove rc suffix
 # Example: "1.1.0-rc.1" becomes "1.1.0"
 
-# Commit the stable version
+# Build the library and app for both npm and CDN delivery
+npm run build:lib
+npm run build
+
+# Commit the stable version and builds
+git add .
 git commit -am "Release version X.Y.Z"
 
 # Create git tag and GitHub release
@@ -168,8 +178,9 @@ npm dist-tag rm @snf/access-qa-bot rc
 For smaller changes or when integration testing isn't needed:
 
 1. Use stable version number (no rc suffix) from the start
-2. Follow steps 1-2 above
-3. Skip to step 5 (Create tag, GitHub release, and publish to npm)
+2. Build the library and app: `npm run build:lib && npm run build`
+3. Follow steps 1-2 above (including the build and commit steps)
+4. Skip to step 5 (Create tag, GitHub release, and publish to npm)
 
 ## Maintaining the Release Branch
 
