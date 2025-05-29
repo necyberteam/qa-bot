@@ -62,6 +62,10 @@ git tag -l "v*"
 # IMPORTANT: Choose a NEW version that doesn't have an existing git tag
 # This is necessary for our CDN links to work correctly
 
+# Sync package-lock.json with new version
+# NOTE: This ensures package-lock.json matches package.json version
+npm install
+
 # Build the library and app for both npm and CDN delivery
 npm run build:lib
 npm run build
@@ -131,6 +135,10 @@ git pull upstream main
 
 # Update version in package.json to remove rc suffix
 # Example: "1.1.0-rc.1" becomes "1.1.0"
+
+# Sync package-lock.json with new version
+# NOTE: This ensures package-lock.json matches package.json version
+npm install
 
 # Build the library and app for both npm and CDN delivery
 npm run build:lib
