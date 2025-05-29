@@ -1,21 +1,24 @@
+/**
+ * Wrapper component used by the qaBot() JavaScript API
+ */
 import React from 'react';
 import './App.css';
 import QABot from './components/QABot';
 
-function App(props) {
+const App = React.forwardRef((props, ref) => {
   return (
     <QABot
-      embedded={props.embedded}
-      defaultOpen={props.defaultOpen}
-      welcome={props.welcome}
-      prompt={props.prompt}
-      isLoggedIn={props.isLoggedIn}
-      isAnonymous={props.isAnonymous}
-      disabled={props.disabled}
-      onClose={props.onClose}
+      ref={ref}
       apiKey={props.apiKey}
+      defaultOpen={props.defaultOpen}
+      embedded={props.embedded}
+      isLoggedIn={props.isLoggedIn}
+      loginUrl={props.loginUrl}
+      onClose={props.onClose}
+      ringEffect={props.ringEffect}
+      welcome={props.welcome}
     />
   );
-}
+});
 
 export default App;

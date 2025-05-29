@@ -1,206 +1,109 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
-import EmbeddedChatContainer from './EmbeddedChatContainer';
-import { getThemeColors } from '../utils/ThemeUtils';
+import BotController from './BotController';
+import useThemeColors from '../hooks/useThemeColors';
+import useChatBotSettings from '../hooks/useChatBotSettings';
+import useHandleAIQuery from '../hooks/useHandleAIQuery';
+import useChatFlow from '../hooks/useChatFlow';
+import useUpdateHeader from '../hooks/useUpdateHeader';
+import useRingEffect from '../hooks/useRingEffect';
+import { DEFAULT_CONFIG } from '../config/constants';
 import '../styles/rcb-base.css';
 
 /**
- * ACCESS Q&A Bot Component
+ * Q&A Bot Component
  *
- * @param {Object} props
- * @param {string} [props.apiKey] - API key for the Q&A endpoint
- * @param {string} [props.welcome='Hello! What can I help you with?'] - Welcome message
- * @param {string} [props.prompt='Questions should stand alone and not refer to previous ones.'] - Input prompt text
- * @param {boolean} [props.embedded=false] - Whether the bot is embedded in the page
- * @param {boolean} [props.isLoggedIn=false] - Whether the user is logged in
- * @param {boolean} [props.isAnonymous] - Whether the user is anonymous (defaults to !isLoggedIn)
- * @param {boolean} [props.disabled] - Whether the chat input is disabled (defaults to isAnonymous)
- * @param {boolean} [props.defaultOpen=false] - Whether the chat window is open by default
- * @param {boolean} [props.visible=true] - Whether the bot is visible
- * @param {Function} [props.onClose] - Callback when the chat window is closed
+ * @param {Object}    [props]
+ * @param {string}    [props.apiKey] - API key for the Q&A endpoint
+ * @param {boolean}   [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only, ignored for embedded)
+ * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page (always open when embedded)
+ * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
+ * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
+
+ * @param {boolean}   [props.ringEffect=true] - Whether to apply the phone ring animation effect to the tooltip
+ * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
  */
-const QABot = forwardRef((props, ref) => {
-  const containerRef = useRef(null);
-  const embeddedContainerRef = useRef(null);
-  const apiKey = props.apiKey || process.env.REACT_APP_API_KEY;
-  const queryEndpoint = 'https://access-ai.ccs.uky.edu/api/query';
 
-  const welcome = props.welcome || 'Hello! What can I help you with?';
-  const prompt = props.prompt || 'Questions should stand alone and not refer to previous ones.';
-  const embedded = props.embedded || false;
-  const isLoggedIn = props.isLoggedIn !== undefined ? props.isLoggedIn : false;
-  const isAnonymous = props.isAnonymous !== undefined ? props.isAnonymous : !isLoggedIn;
-  const disabled = props.disabled !== undefined ? props.disabled : isAnonymous;
-  const defaultOpen = props.defaultOpen !== undefined ? props.defaultOpen : false;
-  const visible = props.visible !== undefined ? props.visible : true;
-  const onClose = props.onClose;
+const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
+  if (isLoggedIn) {
+    return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
+  } else {
+    return DEFAULT_CONFIG.WELCOME_MESSAGE_LOGGED_OUT;
+  }
+}
 
-  console.log("| QABot instantiated with props:", { ...props, defaultOpen });
+const QABot = React.forwardRef((props, ref) => {
+  // Destructure props
+  const {
+    apiKey,
+    defaultOpen,
+    embedded = false,
+    isLoggedIn,
+    loginUrl = DEFAULT_CONFIG.LOGIN_URL,
+    ringEffect = true,
+    welcome
+  } = props;
 
-  // Expose methods for controlling the bot
-  useImperativeHandle(ref, () => ({
-    toggle: () => {
-      if (embedded && embeddedContainerRef.current) {
-        return embeddedContainerRef.current.toggle();
-      }
-      return false;
-    },
-    open: () => {
-      if (embedded && embeddedContainerRef.current) {
-        embeddedContainerRef.current.open();
-      }
-    },
-    close: () => {
-      if (embedded && embeddedContainerRef.current) {
-        embeddedContainerRef.current.close();
-      }
-    },
-    isOpen: () => {
-      if (embedded && embeddedContainerRef.current) {
-        return embeddedContainerRef.current.isOpen();
-      }
-      return false;
-    }
-  }));
+  // API configuration
+  const finalApiKey = apiKey || process.env.REACT_APP_API_KEY;
 
-  let hasError = false;
+  // State management
+  const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
+  const [hasQueryError, setHasQueryError] = useState(false);
 
-  // Get theme colors from CSS variables if available
+  // Update internal state when isLoggedIn prop changes
   useEffect(() => {
-    if (containerRef.current && containerRef.current.parentElement) {
-      // If container's parent has CSS variables, they'll be picked up in getThemeColors
+    if (isLoggedIn !== undefined) {
+      setIsBotLoggedIn(isLoggedIn);
     }
-  }, []);
+  }, [isLoggedIn]);
 
-  const handleQuery = async (params) => {
-    // POST question to the QA API
-    try {
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': apiKey
-        },
-        body: JSON.stringify({ query: params.userInput })
-      };
+  // Derived values
+  const welcomeMessage = buildWelcomeMessage(isBotLoggedIn, welcome);
 
-      const response = await fetch(queryEndpoint, requestOptions);
-      const body = await response.json();
-      const text = body.response;
+  // Refs
+  const containerRef = useRef(null);
 
-      for (let i = 0; i < text.length; i++) {
-        await params.streamMessage(text.slice(0, i + 1));
-        await new Promise(resolve => setTimeout(resolve, 2));
-      }
-    } catch (error) {
-      await params.injectMessage("Unable to contact the Q&A Bot. Please try again later.");
-      hasError = true;
-    }
-  }
+  const themeColors = useThemeColors(containerRef);
+  const chatBotSettings = useChatBotSettings({
+    themeColors,
+    embedded,
+    defaultOpen: defaultOpen,
+    isLoggedIn: isBotLoggedIn
+  });
 
-  const flow = {
-    start: {
-      message: welcome,
-      path: 'loop'
-    },
-    loop: {
-      message: async (params) => {
-        await handleQuery(params);
-      },
-      path: () => {
-        if (hasError) {
-          return 'start'
-        }
-        return 'loop'
-      }
-    }
-  }
+  // Use the AI query handling hook
+  const handleQuery = useHandleAIQuery(finalApiKey, setHasQueryError);
 
-  const containerClassName = `access-qa-bot ${embedded ? "embedded-qa-bot" : ""} ${visible ? "" : "hidden"}`;
+  // Use the chat flow hook
+  const flow = useChatFlow({
+    welcomeMessage,
+    isBotLoggedIn,
+    loginUrl,
+    handleQuery,
+    hasQueryError
+  });
 
-  // Create a close button for embedded mode
-  const createCloseButton = (embeddedRef) => {
-    return (
-      <button
-        className="embedded-close-button"
-        onClick={() => embeddedRef.current && embeddedRef.current.close()}
-      >
-        ×
-      </button>
-    );
-  };
+  // Use custom hook to update header title dynamically
+  useUpdateHeader(isBotLoggedIn, containerRef);
 
-  const chatBot = (
-    <ChatBot
-      settings={{
-        general: {
-          ...getThemeColors(containerRef),
-          embedded: embedded
-        },
-        header: {
-          title: 'ACCESS Q&A Bot',
-          avatar: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
-          // Only override buttons in embedded mode, otherwise keep default
-          ...(embedded ? { buttons: [createCloseButton(embeddedContainerRef)] } : {})
-        },
-        chatWindow: {
-          defaultOpen: defaultOpen, // Will be ignored if embedded=true
-        },
-        chatInput: {
-          enabledPlaceholderText: prompt,
-          disabledPlaceholderText: 'Please log in to ask questions.',
-          disabled: disabled
-        },
-        chatHistory: { disabled: true },
-        botBubble: {
-          simulateStream: true,
-          dangerouslySetInnerHtml: true
-        },
-        chatButton: {
-          icon: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
-        },
-        tooltip: {
-          text: 'Ask me about ACCESS! 😊',
-        },
-        audio: {
-          disabled: true,
-        },
-        emoji: {
-          disabled: true,
-        },
-        fileAttachment: {
-          disabled: true,
-        },
-        notification: {
-          disabled: true,
-        },
-        footer: {
-          text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
-        },
-      }}
-      onClose={onClose}
-      flow={flow}
-    />
-  );
-
-  if (!visible) {
-    return null;
-  }
+  // Use custom hook to apply ring effect if enabled
+  useRingEffect(ringEffect, containerRef);
 
   return (
-    <div className={containerClassName} ref={containerRef}>
+    <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
       <ChatBotProvider>
-        {embedded ? (
-          <EmbeddedChatContainer
-            ref={embeddedContainerRef}
-            embeddedDefaultOpen={defaultOpen}
-          >
-            {chatBot}
-          </EmbeddedChatContainer>
-        ) : (
-          chatBot
-        )}
+        <BotController
+          ref={ref}
+          embedded={embedded}
+          setIsBotLoggedIn={setIsBotLoggedIn}
+          isBotLoggedIn={isBotLoggedIn}
+        />
+        <ChatBot
+          settings={chatBotSettings}
+          flow={flow}
+        />
       </ChatBotProvider>
     </div>
   );

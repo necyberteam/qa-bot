@@ -5,7 +5,7 @@ import QABot from './components/QABot';
 import './styles/index.css'; // Import all styles
 
 // Create a Web Component wrapper for the React component
-class AccessQABot extends HTMLElement {
+class QABotWebComponent extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -15,38 +15,54 @@ class AccessQABot extends HTMLElement {
     this.container.className = 'qa-bot-container';
     this.shadowRoot.appendChild(this.container);
 
+    // Internal refs
+    this._root = null;
+    this._qaRef = React.createRef();
+
     // Copy over CSS from main document to ensure all styles are available
     this.injectStyles();
-
-    // Store reference to QABot component
-    this.qaRef = React.createRef();
   }
 
-  // Methods for programmatic control
-  toggle() {
-    if (this.qaRef && this.qaRef.current) {
-      return this.qaRef.current.toggle();
-    }
-    return false;
-  }
-
-  open() {
-    if (this.qaRef && this.qaRef.current) {
-      this.qaRef.current.open();
+  // Public API method for adding messages
+  addMessage(message) {
+    if (this._qaRef.current) {
+      this._qaRef.current.addMessage(message);
     }
   }
 
-  close() {
-    if (this.qaRef && this.qaRef.current) {
-      this.qaRef.current.close();
+  // Public API method for setting login status
+  setBotIsLoggedIn(status) {
+    if (this._qaRef.current) {
+      this._qaRef.current.setBotIsLoggedIn(status);
+    } else {
+      // If not rendered yet, set attribute for when it renders
+      if (status) {
+        this.setAttribute('is-logged-in', '');
+      } else {
+        this.removeAttribute('is-logged-in');
+      }
     }
   }
 
-  isOpen() {
-    if (this.qaRef && this.qaRef.current) {
-      return this.qaRef.current.isOpen();
+  // Public API method for opening the chat window (floating mode only)
+  openChat() {
+    if (this._qaRef.current) {
+      this._qaRef.current.openChat();
     }
-    return false;
+  }
+
+  // Public API method for closing the chat window (floating mode only)
+  closeChat() {
+    if (this._qaRef.current) {
+      this._qaRef.current.closeChat();
+    }
+  }
+
+  // Public API method for toggling the chat window (floating mode only)
+  toggleChat() {
+    if (this._qaRef.current) {
+      this._qaRef.current.toggleChat();
+    }
   }
 
   // Inject CSS from document to shadow DOM to maintain consistent styling
@@ -98,6 +114,76 @@ class AccessQABot extends HTMLElement {
       .rcb-send-button {
         background-color: var(--primary-color) !important;
       }
+
+      /* Phone ring animation for tooltip */
+      .rcb-tooltip-show.phone-ring {
+        animation: phone-ring 3s ease-out !important;
+        z-index: 10000 !important;
+      }
+
+      @keyframes phone-ring {
+        0% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        /* First ring - quick shake */
+        2% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        4% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        6% {
+          transform: translateX(0) translateY(-8px) rotate(-1deg);
+        }
+        8% {
+          transform: translateX(0) translateY(-6px) rotate(1deg);
+        }
+        10% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        12% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        /* Settle down */
+        20% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        30% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        40% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        49% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        /* Second ring - quick shake */
+        50% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        52% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        54% {
+          transform: translateX(0) translateY(-8px) rotate(-1deg);
+        }
+        56% {
+          transform: translateX(0) translateY(-6px) rotate(1deg);
+        }
+        58% {
+          transform: translateX(0) translateY(-8px) rotate(-2deg);
+        }
+        60% {
+          transform: translateX(0) translateY(-6px) rotate(2deg);
+        }
+        /* Final settle */
+        70% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        100% {
+          transform: translateX(0) translateY(0) rotate(0deg);
+        }
+      }
     `;
     this.shadowRoot.appendChild(chatbotStyles);
 
@@ -122,8 +208,7 @@ class AccessQABot extends HTMLElement {
               // Include rules for chatbot, embedded chat, and related classes
               if (rules[j].selectorText &&
                   (rules[j].selectorText.includes('.rcb-') ||
-                   rules[j].selectorText.includes('.access-qa-bot') ||
-                   rules[j].selectorText.includes('.embedded-chat') ||
+                   rules[j].selectorText.includes('.qa-bot') ||
                    rules[j].selectorText.includes('.qa-bot-container'))) {
                 cssText += rules[j].cssText + '\n';
               }
@@ -147,38 +232,64 @@ class AccessQABot extends HTMLElement {
   // Observe these attributes for changes
   static get observedAttributes() {
     return [
-      'welcome',
-      'prompt',
+      'api-key',
+      'default-open',
       'embedded',
       'is-logged-in',
-      'is-anonymous',
-      'disabled',
-      'default-open',
-      'api-key'
+      'login-url',
+      'ring-effect',
+      'welcome'
     ];
   }
 
   // React to attribute changes
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue) {
-      this._render();
+      // Handle login state changes without re-rendering the entire component
+      if (name === 'is-logged-in' && this._qaRef.current) {
+        this._qaRef.current.setBotIsLoggedIn(newValue !== null);
+      } else {
+        // For other attribute changes, re-render the component
+        this._render();
+      }
     }
+  }
+
+  // Helper method to parse boolean attributes with default values
+  _getBooleanAttribute(name, defaultValue = false) {
+    if (!this.hasAttribute(name)) {
+      return defaultValue;
+    }
+
+    const value = this.getAttribute(name);
+    if (value === null || value === '') {
+      // Attribute present without value (e.g., <element attr>) means true
+      return true;
+    }
+
+    // Parse string values
+    const lowerValue = value.toLowerCase();
+    if (lowerValue === 'false' || lowerValue === '0') {
+      return false;
+    }
+    if (lowerValue === 'true' || lowerValue === '1') {
+      return true;
+    }
+
+    // For any other value, treat as true if attribute is present
+    return true;
   }
 
   // Convert attributes to props
   _getProps() {
     return {
-      welcome: this.getAttribute('welcome'),
-      prompt: this.getAttribute('prompt'),
-      embedded: this.hasAttribute('embedded'),
-      isLoggedIn: this.hasAttribute('is-logged-in'),
-      isAnonymous: this.hasAttribute('is-anonymous'),
-      disabled: this.hasAttribute('disabled'),
-      defaultOpen: this.hasAttribute('default-open'),
       apiKey: this.getAttribute('api-key') || 'demo-key',
-      onClose: () => {
-        this.dispatchEvent(new CustomEvent('qabot-close'));
-      }
+      defaultOpen: this._getBooleanAttribute('default-open', false),
+      embedded: this._getBooleanAttribute('embedded', false),
+      isLoggedIn: this._getBooleanAttribute('is-logged-in', false),
+      loginUrl: this.getAttribute('login-url'),
+      ringEffect: this._getBooleanAttribute('ring-effect', true),
+      welcome: this.getAttribute('welcome')
     };
   }
 
@@ -201,8 +312,8 @@ class AccessQABot extends HTMLElement {
       this.styleObserver.disconnect();
     }
 
-    if (this.root) {
-      this.root.unmount();
+    if (this._root) {
+      this._root.unmount();
     }
   }
 
@@ -225,78 +336,80 @@ class AccessQABot extends HTMLElement {
 
   // Render the React component
   _render() {
-    if (!this.root) {
-      this.root = ReactDOM.createRoot(this.container);
+    if (!this._root) {
+      this._root = ReactDOM.createRoot(this.container);
     }
 
     const props = this._getProps();
-    this.root.render(
+    this._root.render(
       <React.StrictMode>
-        <QABot {...props} ref={this.qaRef} />
+        <QABot ref={this._qaRef} {...props} />
       </React.StrictMode>
     );
   }
 }
 
 // Define the custom element
-customElements.define('access-qa-bot', AccessQABot);
+customElements.define('qa-bot', QABotWebComponent);
 
 // Export the web component reference
-export const WebComponentQABot = AccessQABot;
+export const WebComponentQABot = QABotWebComponent;
 
 // Create a function-based API for programmatic initialization
-export function webComponentQAndATool(config) {
-  const { target, returnRef, ...props } = config;
+export function webComponentQABot(config) {
+  const { target, ...props } = config;
 
   if (!target || !(target instanceof HTMLElement)) {
     console.error('QA Bot: A valid target DOM element is required');
     return;
   }
 
-  // Create and configure the element
-  const qaBot = document.createElement('access-qa-bot');
+  // Create a new QA bot web component instance
+  const qaBot = document.createElement('qa-bot');
 
   // Set attributes based on props
-  if (props.welcome) qaBot.setAttribute('welcome', props.welcome);
-  if (props.prompt) qaBot.setAttribute('prompt', props.prompt);
+  if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
+  if (props.defaultOpen) qaBot.setAttribute('default-open', '');
   if (props.embedded) qaBot.setAttribute('embedded', '');
   if (props.isLoggedIn) qaBot.setAttribute('is-logged-in', '');
-  if (props.isAnonymous) qaBot.setAttribute('is-anonymous', '');
-  if (props.defaultOpen) qaBot.setAttribute('default-open', '');
-  if (props.disabled) qaBot.setAttribute('disabled', '');
-  if (props.apiKey) qaBot.setAttribute('api-key', props.apiKey);
+  if (props.loginUrl) qaBot.setAttribute('login-url', props.loginUrl);
+  if (props.ringEffect !== undefined) {
+    qaBot.setAttribute('ring-effect', props.ringEffect.toString());
+  }
+  if (props.welcome) qaBot.setAttribute('welcome', props.welcome);
 
   // Set CSS custom properties if provided
-  if (props.styles) {
-    Object.entries(props.styles).forEach(([prop, value]) => {
-      if (prop.startsWith('--')) {
-        qaBot.style.setProperty(prop, value);
-      }
-    });
+  if (props.primaryColor) {
+    qaBot.style.setProperty('--primary-color', props.primaryColor);
   }
 
-  // Add event listener for close if provided
-  if (props.onClose) {
-    qaBot.addEventListener('qabot-close', props.onClose);
+  if (props.secondaryColor) {
+    qaBot.style.setProperty('--secondary-color', props.secondaryColor);
+  }
+
+  if (props.fontFamily) {
+    qaBot.style.setProperty('--font-family', props.fontFamily);
   }
 
   // Append to target
   target.appendChild(qaBot);
 
-  // If returnRef is true, return control methods for the web component
-  if (returnRef) {
-    // Return the control methods from the web component instance
-    return {
-      toggle: () => qaBot.toggle(),
-      open: () => qaBot.open(),
-      close: () => qaBot.close(),
-      isOpen: () => qaBot.isOpen()
-    };
-  }
-
-  // Return cleanup function
-  return () => {
-    target.removeChild(qaBot);
+  // Return controller object
+  return {
+    // Add a message to the chat
+    addMessage: (message) => qaBot.addMessage(message),
+    // Set login status
+    setBotIsLoggedIn: (status) => qaBot.setBotIsLoggedIn(status),
+    // Open the chat window (floating mode only)
+    openChat: () => qaBot.openChat(),
+    // Close the chat window (floating mode only)
+    closeChat: () => qaBot.closeChat(),
+    // Toggle the chat window (floating mode only)
+    toggleChat: () => qaBot.toggleChat(),
+    // Cleanup function (backward compatibility)
+    destroy: () => {
+      target.removeChild(qaBot);
+    }
   };
 }
 
@@ -305,8 +418,9 @@ if (typeof window !== 'undefined') {
   // Provide a global process.env for the standalone build
   window.process = { env: { REACT_APP_API_KEY: 'demo-key' } };
 
-  window.accessQABot = {
-    WebComponentQABot,
-    qAndATool: webComponentQAndATool
-  };
+  // Expose the function directly on window for clean script tag usage
+  window.qaBot = webComponentQABot;
+
+  // Note: The UMD build (rollup.config.mjs) is configured with name: 'qaBot'
+  // This automatically makes qaBot available as a global variable
 }

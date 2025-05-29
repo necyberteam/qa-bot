@@ -1,5 +1,5 @@
 /**
- * Main CSS entry point for the ACCESS QA Bot
+ * Main CSS entry point for the QA Bot
  *
  * This file imports all component-specific CSS files.
  * Maintaining this structure allows for better organization
@@ -8,6 +8,4 @@
 
 /* Import all component styles */
 @import './rcb-base.css';
-@import './embedded-container.css';
-@import './embedded-states.css';
 @import './responsive.css';

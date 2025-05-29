@@ -6,7 +6,8 @@ import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import postcss from 'rollup-plugin-postcss';
 import replace from '@rollup/plugin-replace';
 
-import pkg from './package.json' assert { type: 'json' };
+import { readFileSync } from 'fs';
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
 export default [
   // ESM and CJS builds for React usage
@@ -56,7 +57,7 @@ export default [
     output: {
       file: './dist/access-qa-bot.standalone.js',
       format: 'umd',
-      name: 'accessQABot',
+      name: 'qaBot',
       sourcemap: true,
       exports: 'named',
       globals: {

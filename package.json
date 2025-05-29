@@ -1,6 +1,6 @@
 {
   "name": "@snf/access-qa-bot",
-  "version": "1.0.0-beta.1",
+  "version": "2.0.0",
   "private": false,
   "homepage": ".",
   "description": "ACCESS Q&A Bot React Component and Web Component",
@@ -21,7 +21,7 @@
     "index.d.ts"
   ],
   "dependencies": {
-    "react-chatbotify": "^2.0.0-beta.35"
+    "react-chatbotify": "^2.0.0-beta.38"
   },
   "peerDependencies": {
     "preact": "^10.0.0",
@@ -61,7 +61,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "build:lib": "rollup -c",
-    "prepare": "npm run build:lib"
+    "prepublishOnly": "npm run build:lib"
   },
   "eslintConfig": {
     "extends": [
