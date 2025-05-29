@@ -1,6 +1,6 @@
 {
   "name": "@snf/access-qa-bot",
-  "version": "2.0.0-rc.2",
+  "version": "2.0.0",
   "private": false,
   "homepage": ".",
   "description": "ACCESS Q&A Bot React Component and Web Component",
