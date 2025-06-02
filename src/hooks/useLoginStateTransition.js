@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMessages } from 'react-chatbotify';
-import { DEFAULT_CONFIG } from '../config/constants';
+import { constants } from '../utils/strings';
 
 /**
  * Custom hook to handle login state transitions with automatic message injection
@@ -16,9 +16,9 @@ const useLoginStateTransition = (isBotLoggedIn) => {
 
     if (loginStateChanged) {
       if (justLoggedIn) {
-        injectMessage(DEFAULT_CONFIG.WELCOME_MESSAGE_LOGIN_TRANSITION, 'bot');
+        injectMessage(constants.WELCOME_MESSAGE_LOGIN_TRANSITION, 'bot');
       } else {
-        injectMessage(DEFAULT_CONFIG.WELCOME_MESSAGE_LOGOUT_TRANSITION, 'bot');
+        injectMessage(constants.WELCOME_MESSAGE_LOGOUT_TRANSITION, 'bot');
       }
     }
 
