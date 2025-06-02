@@ -1,7 +1,9 @@
 interface QABotProps {
   apiKey?: string;
-  /** Whether the chat window is open by default (floating mode only, ignored for embedded) */
-  defaultOpen?: boolean;
+  /** Whether the chat window is open (floating mode only, ignored for embedded) */
+  open?: boolean;
+  /** Callback when chat window open state changes */
+  onOpenChange?: (open: boolean) => void;
   /** Whether the bot is embedded in the page (always open when embedded) */
   embedded?: boolean;
   isLoggedIn?: boolean;
@@ -10,9 +12,14 @@ interface QABotProps {
   [key: string]: any; // Allow additional props
 }
 
-// Note: To control the chat window externally, use the useChatWindow hook from react-chatbotify:
-// import { useChatWindow } from 'react-chatbotify';
-// const { toggleChatWindow } = useChatWindow();
+// Note: The React component uses controlled mode - manage state in your parent component:
+//
+// const [isOpen, setIsOpen] = useState(false);
+// <QABot open={isOpen} onOpenChange={setIsOpen} />
+//
+// To control the chat window via imperative methods, use the ref:
+// const botRef = useRef();
+// botRef.current?.openChat();
 
 // React component
 export const QABot: React.ForwardRefExoticComponent<

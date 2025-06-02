@@ -192,6 +192,7 @@ import { QABot, qaBot } from '@snf/access-qa-bot';
 
 function MyApp() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [chatOpen, setChatOpen] = useState(false);
     const botRef = useRef();
 
     const handleAddMessage = () => {
@@ -207,6 +208,7 @@ function MyApp() {
                 embedded: true,
                 welcome: "Programmatically created bot!",
                 isLoggedIn: isLoggedIn,
+                defaultOpen: false, // defaultOpen works with programmatic API
             });
         }
     };
@@ -223,11 +225,13 @@ function MyApp() {
                 Create Programmatic Bot
             </button>
 
+            {/* React component uses controlled pattern */}
             <QABot
                 ref={botRef}
                 embedded={false}  // true for embedded, false for floating
                 isLoggedIn={isLoggedIn}
-                defaultOpen={false}
+                open={chatOpen}
+                onOpenChange={setChatOpen}
                 welcome="Welcome to the ACCESS Q&A Bot!"
                 apiKey={process.env.REACT_APP_API_KEY}
             />
@@ -238,17 +242,27 @@ function MyApp() {
 }
 ```
 
+**React Component Notes:**
+- Uses **controlled component pattern**: manage `open` state in your parent component
+- `onOpenChange` callback receives the new open state when user interacts with chat
+- For imperative control, use the ref: `botRef.current?.openChat()`
+- `defaultOpen` prop not available - use `open` prop with `useState` instead
+
 ## Configuration Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
 | `apiKey` / `api-key` | string | API key for authentication (defaults to demo key) |
-| `defaultOpen` / `default-open` | boolean | Whether floating chat opens initially (ignored in embedded mode) |
+| `defaultOpen` / `default-open` | boolean | Whether floating chat opens initially (ignored in embedded mode) **React Component: Use `open` prop instead** |
 | `embedded` | boolean | **false** = floating mode, **true** = embedded mode |
 | `isLoggedIn` / `is-logged-in` | boolean | Sets initial login state and reacts to changes |
 | `loginUrl` / `login-url` | string | URL to redirect for login (default: '/login') |
+| `open` | boolean | **React Component only**: Controls chat window open state (floating mode only) |
+| `onOpenChange` | function | **React Component only**: Callback when chat window open state changes |
 | `ringEffect` / `ring-effect` | boolean | Enable phone ring animation on tooltip (floating mode only) |
 | `welcome` | string | Welcome message shown to the user |
+
+**Note**: The React component uses a controlled component pattern with `open`/`onOpenChange`, while the JavaScript API and Web Component use `defaultOpen` for initial state.
 
 ### CSS Custom Properties (Theming)
 
