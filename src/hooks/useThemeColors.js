@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { DEFAULT_CONFIG } from '../config/constants';
+import { constants } from '../utils/strings';
 
 /**
  * Custom hook to get theme colors from CSS variables
@@ -32,9 +32,9 @@ const useThemeColors = (containerRef, defaultColors = {}) => {
     };
 
     return {
-      primaryColor: getCSSVariable('--primary-color', defaultColors.primaryColor || DEFAULT_CONFIG.THEME.PRIMARY_COLOR),
-      secondaryColor: getCSSVariable('--secondary-color', defaultColors.secondaryColor || DEFAULT_CONFIG.THEME.SECONDARY_COLOR),
-      fontFamily: getCSSVariable('--font-family', defaultColors.fontFamily || DEFAULT_CONFIG.THEME.FONT_FAMILY)
+      primaryColor: getCSSVariable('--primary-color', defaultColors.primaryColor || constants.THEME.PRIMARY_COLOR),
+      secondaryColor: getCSSVariable('--secondary-color', defaultColors.secondaryColor || constants.THEME.SECONDARY_COLOR),
+      fontFamily: getCSSVariable('--font-family', defaultColors.fontFamily || constants.THEME.FONT_FAMILY)
     };
   }, [containerRef, defaultColors]);
 

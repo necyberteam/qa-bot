@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { DEFAULT_CONFIG } from '../config/constants';
+import { constants } from '../utils/strings';
 
 /**
  * Custom hook to handle AI query processing
@@ -22,13 +22,13 @@ const useHandleAIQuery = (apiKey, setHasQueryError) => {
         body: JSON.stringify({ query: params.userInput })
       };
 
-      const response = await fetch(DEFAULT_CONFIG.API_ENDPOINT, requestOptions);
+      const response = await fetch(constants.API_ENDPOINT, requestOptions);
       const body = await response.json();
       const text = body.response;
 
       await params.streamMessage(text);
     } catch (error) {
-      await params.injectMessage(DEFAULT_CONFIG.ERRORS.API_UNAVAILABLE);
+      await params.injectMessage(constants.ERRORS.API_UNAVAILABLE);
       setHasQueryError(true);
     }
   }, [apiKey, setHasQueryError]);

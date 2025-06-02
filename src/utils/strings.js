@@ -1,5 +1,5 @@
 // Default configuration values for the QA Bot
-export const DEFAULT_CONFIG = {
+export const constants = {
   LOGIN_URL: '/login',
   PROMPT_TEXT: 'Questions should stand alone and not refer to previous ones.',
   WELCOME_MESSAGE: 'Hello! What can I help you with?',
@@ -25,5 +25,22 @@ export const DEFAULT_CONFIG = {
     TITLE: 'ACCESS Q&A Bot',
     AVATAR_URL: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
     TOOLTIP_TEXT: 'Ask me about ACCESS! 😊'
+  },
+
+  // Netlify function constants
+  netlifyBaseUrl: process.env.REACT_APP_NETLIFY_BASE_URL,
+  netlifyFunctionName: process.env.REACT_APP_NETLIFY_FUNCTION_NAME,
+};
+
+export const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
+  if (isLoggedIn) {
+    return welcomeMessage || constants.WELCOME_MESSAGE;
+  } else {
+    return constants.WELCOME_MESSAGE_LOGGED_OUT;
   }
+};
+
+export const getApiKey = (providedApiKey) => {
+  // Return provided API key if available, otherwise fall back to environment variable
+  return providedApiKey || process.env.REACT_APP_API_KEY;
 };
