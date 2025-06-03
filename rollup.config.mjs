@@ -51,28 +51,21 @@ export default [
     external: Object.keys(pkg.peerDependencies || {})
   },
 
-  // UMD build with React bundled for standalone use
+  // UMD build with React bundled for standalone use - now React-backed
   {
-    input: 'src/web-component.js',
+    input: 'src/standalone.js',
     output: {
       file: './dist/access-qa-bot.standalone.js',
       format: 'umd',
       name: 'qaBot',
       sourcemap: true,
-      exports: 'named',
-      globals: {
-        // We don't need globals since React is bundled
-      }
+      exports: 'default',
+      globals: {}
     },
     plugins: [
       postcss({
         extensions: ['.css'],
         minimize: true,
-        // For web components, extract the CSS to inject it in shadow DOM
-        extract: false,
-        modules: false,
-        autoModules: false,
-        // This ensures the CSS is injected into JS properly for shadow DOM
         inject: {
           insertAt: 'top',
         },

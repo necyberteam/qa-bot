@@ -14,7 +14,6 @@ import { useEffect } from 'react';
 const useRingEffect = (ringEffect, containerRef) => {
   useEffect(() => {
     if (!ringEffect || !containerRef.current) {
-      console.log('| useRingEffect | Ring effect disabled or no container ref');
       return;
     }
 

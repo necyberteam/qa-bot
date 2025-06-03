@@ -62,7 +62,6 @@ function setupLoginCheckbox() {
         loginCheckbox.addEventListener('change', (e) => {
             setAuthCookie(e.target.checked);
             updateBotLoginStatus(e.target.checked);
-            console.log('| user logged in:', e.target.checked);
         });
     }
 }

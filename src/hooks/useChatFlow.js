@@ -25,8 +25,6 @@ function calculateComponent(isBotLoggedIn, loginUrl){
 }
 
 const useChatFlow = ({ welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, hasQueryError }) => {
-  console.log('| calculating flow | isBotLoggedIn', isBotLoggedIn);
-
   const flow = useMemo(() => ({
     start: {
       message: calculateWelcomeMessage(isBotLoggedIn, welcomeMessage),

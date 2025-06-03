@@ -11,12 +11,13 @@ import { useEffect } from 'react';
 const useUpdateHeader = (isLoggedIn, containerRef) => {
   useEffect(() => {
     if (!containerRef.current) {
-      console.log('| useUpdateHeader | No container ref yet');
       return;
     }
     if (isLoggedIn) {
+      console.log('| useUpdateHeader | Adding bot-logged-in class');
       containerRef.current.classList.add('bot-logged-in');
     } else {
+      console.log('| useUpdateHeader | Removing bot-logged-in class');
       containerRef.current.classList.remove('bot-logged-in');
     }
   }, [isLoggedIn, containerRef]);

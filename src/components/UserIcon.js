@@ -3,7 +3,8 @@ import React from 'react';
 /**
  * UserIcon Component
  *
- * A standalone component for the user icon that can be styled independently
+ * A standalone component for the user icon that can be styled independently.
+ * Visibility controlled by CSS classes on the container.
  *
  * @returns {JSX.Element} Rendered user icon
  */
@@ -11,7 +12,6 @@ const UserIcon = () => (
   <div
     className="user-login-icon"
     style={{
-      display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       width: '30px',
@@ -21,7 +21,6 @@ const UserIcon = () => (
       marginRight: '5px'
     }}
     title="User logged in"
-    // onClick={() => console.log('UserIcon clicked')}
   >
     <svg
       width="18"

@@ -8,18 +8,17 @@ import useChatFlow from '../hooks/useChatFlow';
 import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import { DEFAULT_CONFIG } from '../config/constants';
-import '../styles/rcb-base.css';
 
 /**
- * Q&A Bot Component
+ * Q&A Bot Component (Controlled)
  *
  * @param {Object}    [props]
  * @param {string}    [props.apiKey] - API key for the Q&A endpoint
- * @param {boolean}   [props.defaultOpen=false] - Whether the chat window is open by default (floating mode only, ignored for embedded)
+ * @param {boolean}   [props.open] - Whether the chat window is open (floating mode only, ignored for embedded)
+ * @param {Function}  [props.onOpenChange] - Callback when chat window open state changes
  * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page (always open when embedded)
  * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
  * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
-
  * @param {boolean}   [props.ringEffect=true] - Whether to apply the phone ring animation effect to the tooltip
  * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
@@ -34,10 +33,10 @@ const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
 }
 
 const QABot = React.forwardRef((props, ref) => {
-  // Destructure props
   const {
     apiKey,
-    defaultOpen,
+    open = false,
+    onOpenChange,
     embedded = false,
     isLoggedIn,
     loginUrl = DEFAULT_CONFIG.LOGIN_URL,
@@ -45,10 +44,8 @@ const QABot = React.forwardRef((props, ref) => {
     welcome
   } = props;
 
-  // API configuration
   const finalApiKey = apiKey || process.env.REACT_APP_API_KEY;
 
-  // State management
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
   const [hasQueryError, setHasQueryError] = useState(false);
 
@@ -59,17 +56,32 @@ const QABot = React.forwardRef((props, ref) => {
     }
   }, [isLoggedIn]);
 
-  // Derived values
+  // Listen for chat window toggle events from react-chatbotify
+  useEffect(() => {
+    if (!embedded && onOpenChange) {
+      const handleChatWindowToggle = (event) => {
+        if (ref.current && ref.current._markAsUserInteraction) {
+          ref.current._markAsUserInteraction();
+        }
+        const newOpenState = event.data.newState;
+        onOpenChange(newOpenState);
+      };
+      window.addEventListener('rcb-toggle-chat-window', handleChatWindowToggle);
+
+      return () => {
+        window.removeEventListener('rcb-toggle-chat-window', handleChatWindowToggle);
+      };
+    }
+  }, [embedded, onOpenChange, ref]);
+
   const welcomeMessage = buildWelcomeMessage(isBotLoggedIn, welcome);
-
-  // Refs
   const containerRef = useRef(null);
-
   const themeColors = useThemeColors(containerRef);
+
   const chatBotSettings = useChatBotSettings({
     themeColors,
     embedded,
-    defaultOpen: defaultOpen,
+    defaultOpen: open,
     isLoggedIn: isBotLoggedIn
   });
 
@@ -85,10 +97,7 @@ const QABot = React.forwardRef((props, ref) => {
     hasQueryError
   });
 
-  // Use custom hook to update header title dynamically
   useUpdateHeader(isBotLoggedIn, containerRef);
-
-  // Use custom hook to apply ring effect if enabled
   useRingEffect(ringEffect, containerRef);
 
   return (
@@ -97,8 +106,8 @@ const QABot = React.forwardRef((props, ref) => {
         <BotController
           ref={ref}
           embedded={embedded}
-          setIsBotLoggedIn={setIsBotLoggedIn}
           isBotLoggedIn={isBotLoggedIn}
+          currentOpen={open}
         />
         <ChatBot
           settings={chatBotSettings}
