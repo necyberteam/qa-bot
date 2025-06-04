@@ -32,8 +32,10 @@ const BotController = React.forwardRef(({
   useEffect(() => {
     if (!embedded && chatWindow && chatWindow.toggleChatWindow) {
       if (lastOpenRef.current !== currentOpen && !fromEventRef.current) {
-        chatWindow.toggleChatWindow(currentOpen);
-        lastOpenRef.current = currentOpen;
+        if (chatWindow && chatWindow.toggleChatWindow) {
+          chatWindow.toggleChatWindow(currentOpen);
+          lastOpenRef.current = currentOpen;
+        }
       }
       fromEventRef.current = false;
     }
@@ -47,7 +49,9 @@ const BotController = React.forwardRef(({
 
     // Store the function on the ref so QABot can call it
     if (ref) {
-      ref.current = ref.current || {};
+      if (!ref.current) {
+        ref.current = {};
+      }
       ref.current._markAsUserInteraction = markAsUserInteraction;
     }
   });

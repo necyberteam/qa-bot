@@ -60,7 +60,7 @@ const QABot = React.forwardRef((props, ref) => {
   useEffect(() => {
     if (!embedded && onOpenChange) {
       const handleChatWindowToggle = (event) => {
-        if (ref.current && ref.current._markAsUserInteraction) {
+        if (ref && ref.current && ref.current._markAsUserInteraction) {
           ref.current._markAsUserInteraction();
         }
         const newOpenState = event.data.newState;
