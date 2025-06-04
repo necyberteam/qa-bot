@@ -23,17 +23,17 @@ const ProgrammaticQABot = React.forwardRef((props, ref) => {
       setBotIsLoggedIn(status);
     },
     openChat: () => {
-      if (!props.embedded) {
+      if (!props.embedded && qaRef.current) {
         setChatOpen(true);
       }
     },
     closeChat: () => {
-      if (!props.embedded) {
+      if (!props.embedded && qaRef.current) {
         setChatOpen(false);
       }
     },
     toggleChat: () => {
-      if (!props.embedded) {
+      if (!props.embedded && qaRef.current) {
         setChatOpen(prev => !prev);
       }
     }
@@ -62,13 +62,13 @@ export function qaBot(config) {
   }
 
   const root = ReactDOM.createRoot(config.target);
-  const wrapperRef = React.createRef();
+  let wrapperRef = { current: null };
 
   // Mount React component directly
   root.render(
     <React.StrictMode>
       <ProgrammaticQABot
-        ref={wrapperRef}
+        ref={(ref) => { wrapperRef.current = ref; }}
         apiKey={config.apiKey}
         defaultOpen={config.defaultOpen}
         embedded={config.embedded}
@@ -88,6 +88,7 @@ export function qaBot(config) {
     closeChat: () => wrapperRef.current?.closeChat(),
     toggleChat: () => wrapperRef.current?.toggleChat(),
     destroy: () => {
+      wrapperRef.current = null;
       root.unmount();
     }
   };
