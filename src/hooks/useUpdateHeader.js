@@ -14,10 +14,8 @@ const useUpdateHeader = (isLoggedIn, containerRef) => {
       return;
     }
     if (isLoggedIn) {
-      console.log('| useUpdateHeader | Adding bot-logged-in class');
       containerRef.current.classList.add('bot-logged-in');
     } else {
-      console.log('| useUpdateHeader | Removing bot-logged-in class');
       containerRef.current.classList.remove('bot-logged-in');
     }
   }, [isLoggedIn, containerRef]);
