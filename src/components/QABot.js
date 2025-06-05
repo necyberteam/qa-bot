@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import ChatBot, { ChatBotProvider } from "react-chatbotify";
+import ChatBot, { ChatBotProvider, useChatHistory } from "react-chatbotify";
+import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
 import useChatBotSettings from '../hooks/useChatBotSettings';
@@ -9,6 +10,35 @@ import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import { DEFAULT_CONFIG } from '../config/constants';
 
+/**
+ * Generate a unique session ID
+ * @returns {string} A unique session identifier
+ */
+const generateSessionId = () => {
+  return `qa_bot_session_${uuidv4()}`;
+};
+
+/**
+ * Get or create a session ID from localStorage
+ * @returns {string} A session identifier
+ */
+const getOrCreateSessionId = () => {
+  // Check if we already have a session ID in localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('qa_bot_session_')) {
+      const sessionId = localStorage.getItem(key);
+      if (sessionId) {
+        return sessionId;
+      }
+    }
+  }
+
+  // No existing session found, generate a new one
+  const newSessionId = generateSessionId();
+  localStorage.setItem(newSessionId, newSessionId);
+  return newSessionId;
+};
 /**
  * Q&A Bot Component (Controlled)
  *
@@ -32,7 +62,7 @@ const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
   }
 }
 
-const QABot = React.forwardRef((props, ref) => {
+const QABot = React.forwardRef((props, botRef) => {
   const {
     apiKey,
     open = false,
@@ -47,7 +77,9 @@ const QABot = React.forwardRef((props, ref) => {
   const finalApiKey = apiKey || process.env.REACT_APP_API_KEY;
 
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
-  const [hasQueryError, setHasQueryError] = useState(false);
+  const sessionIdRef = useRef(getOrCreateSessionId());
+  const sessionId = sessionIdRef.current;
+  const [currentQueryId, setCurrentQueryId] = useState(null);
 
   // Update internal state when isLoggedIn prop changes
   useEffect(() => {
@@ -56,12 +88,17 @@ const QABot = React.forwardRef((props, ref) => {
     }
   }, [isLoggedIn]);
 
+  // Hardcoded currentQueryId for testing
+  useEffect(() => {
+    setCurrentQueryId('test-query-id-123');
+  }, []);
+
   // Listen for chat window toggle events from react-chatbotify
   useEffect(() => {
     if (!embedded && onOpenChange) {
       const handleChatWindowToggle = (event) => {
-        if (ref && ref.current && ref.current._markAsUserInteraction) {
-          ref.current._markAsUserInteraction();
+        if (botRef && botRef.current && botRef.current._markAsUserInteraction) {
+          botRef.current._markAsUserInteraction();
         }
         const newOpenState = event.data.newState;
         onOpenChange(newOpenState);
@@ -72,7 +109,7 @@ const QABot = React.forwardRef((props, ref) => {
         window.removeEventListener('rcb-toggle-chat-window', handleChatWindowToggle);
       };
     }
-  }, [embedded, onOpenChange, ref]);
+  }, [embedded, onOpenChange, botRef]);
 
   const welcomeMessage = buildWelcomeMessage(isBotLoggedIn, welcome);
   const containerRef = useRef(null);
@@ -86,7 +123,7 @@ const QABot = React.forwardRef((props, ref) => {
   });
 
   // Use the AI query handling hook
-  const handleQuery = useHandleAIQuery(finalApiKey, setHasQueryError);
+  const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
   // Use the chat flow hook
   const flow = useChatFlow({
@@ -94,17 +131,18 @@ const QABot = React.forwardRef((props, ref) => {
     isBotLoggedIn,
     loginUrl,
     handleQuery,
-    hasQueryError
+    sessionId,
+    currentQueryId
   });
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
 
   return (
-    <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
+        <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
       <ChatBotProvider>
         <BotController
-          ref={ref}
+          ref={botRef}
           embedded={embedded}
           isBotLoggedIn={isBotLoggedIn}
           currentOpen={open}

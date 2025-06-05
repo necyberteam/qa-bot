@@ -1,37 +1,59 @@
 import { useCallback } from 'react';
 import { DEFAULT_CONFIG } from '../config/constants';
+import useGetLastUserQuery from './useGetLastUserQuery';
 
 /**
  * Custom hook to handle AI query processing
  * @param {string} apiKey - API key for the Q&A endpoint
- * @param {Function} setHasQueryError - Function to set query error state
- * @returns {Function} handleQuery function
+ * @param {string} sessionId - Session ID for tracking the conversation
+ * @param {Function} setCurrentQueryId - Function to update the current query ID state
+ * @returns {Function} handleQuery function that returns true for success, false for error
  */
-const useHandleAIQuery = (apiKey, setHasQueryError) => {
+const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
+  const getLastUserQueryId = useGetLastUserQuery();
+
   const handleQuery = useCallback(async (params) => {
-    // Reset error state before new query
-    setHasQueryError(false);
+    const { userInput } = params;
+
+    // Get the actual latest user query ID from localStorage
+    const actualQueryId = getLastUserQueryId();
+    console.log('| 🔍 Latest user query ID:', actualQueryId);
+
+    // Update the shared state with the latest query ID
+    if (actualQueryId) {
+      setCurrentQueryId(actualQueryId);
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-API-KEY': apiKey,
+      'X-Session-ID': sessionId,
+      'X-Query-ID': actualQueryId
+    };
+
+    console.log('| 📫 headers for AI query:', headers);
 
     try {
       const requestOptions = {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': apiKey
-        },
-        body: JSON.stringify({ query: params.userInput })
+        headers,
+        body: JSON.stringify({
+          query: userInput
+        })
       };
 
       const response = await fetch(DEFAULT_CONFIG.API_ENDPOINT, requestOptions);
       const body = await response.json();
       const text = body.response;
-
       await params.streamMessage(text);
-    } catch (error) {
-      await params.injectMessage(DEFAULT_CONFIG.ERRORS.API_UNAVAILABLE);
-      setHasQueryError(true);
+      return true; // Success
     }
-  }, [apiKey, setHasQueryError]);
+
+    catch (error) {
+      await params.injectMessage(DEFAULT_CONFIG.ERRORS.API_UNAVAILABLE);
+      return false; // Error
+    }
+  }, [apiKey, setCurrentQueryId]);
 
   return handleQuery;
 };

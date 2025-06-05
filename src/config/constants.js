@@ -13,6 +13,11 @@ export const DEFAULT_CONFIG = {
     API_UNAVAILABLE: 'Unable to contact the Q&A Bot. Please try again later.',
   },
 
+  // Behavior configuration
+  BEHAVIOR: {
+    SHOW_RATING_AFTER_FAILED_QUERY: true
+  },
+
   // Theme defaults
   THEME: {
     PRIMARY_COLOR: '#1a5b6e',
