@@ -15,23 +15,21 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
   const handleQuery = useCallback(async (params) => {
     const { userInput } = params;
 
-    // Get the actual latest user query ID from localStorage
     const actualQueryId = getLastUserQueryId();
-    console.log('| 🔍 Latest user query ID:', actualQueryId);
 
-    // Update the shared state with the latest query ID
     if (actualQueryId) {
       setCurrentQueryId(actualQueryId);
     }
 
     const headers = {
       'Content-Type': 'application/json',
+      'X-Origin': 'access',
       'X-API-KEY': apiKey,
       'X-Session-ID': sessionId,
       'X-Query-ID': actualQueryId
     };
 
-    console.log('| 📫 headers for AI query:', headers);
+    // console.log('| 📫 headers for AI query:', headers);
 
     try {
       const requestOptions = {
@@ -53,7 +51,7 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
       await params.injectMessage(DEFAULT_CONFIG.ERRORS.API_UNAVAILABLE);
       return false; // Error
     }
-  }, [apiKey, setCurrentQueryId]);
+  }, [apiKey, setCurrentQueryId, getLastUserQueryId, sessionId]);
 
   return handleQuery;
 };

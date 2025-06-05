@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import ChatBot, { ChatBotProvider, useChatHistory } from "react-chatbotify";
+import ChatBot, { ChatBotProvider } from "react-chatbotify";
 import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
@@ -88,10 +88,8 @@ const QABot = React.forwardRef((props, botRef) => {
     }
   }, [isLoggedIn]);
 
-  // Hardcoded currentQueryId for testing
-  useEffect(() => {
-    setCurrentQueryId('test-query-id-123');
-  }, []);
+  // Initialize currentQueryId as null - will be set by useHandleAIQuery
+  // when actual queries are processed
 
   // Listen for chat window toggle events from react-chatbotify
   useEffect(() => {

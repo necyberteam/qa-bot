@@ -1,3 +1,4 @@
+import React from 'react';
 import { DEFAULT_CONFIG } from '../config/constants';
 
 /**
@@ -57,13 +58,14 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style }
     }
     const headers = {
       'Content-Type': 'application/json',
+      'X-Origin': 'access',
       'X-API-KEY': apiKey,
       'X-Session-ID': sessionId,
       'X-Query-ID': currentQueryId,
       'X-Feedback': isPositive ? 1 : 0
     };
 
-    console.log('| 📫 headers for feedback:', headers);
+    // console.log('| 📫 headers for feedback:', headers);
 
     try {
       const requestOptions = {

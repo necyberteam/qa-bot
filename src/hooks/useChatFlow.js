@@ -67,7 +67,6 @@ const useChatFlow = ({
     loop: {
       message: async (params) => {
         const querySuccess = await handleQuery(params);
-        console.log('| querySuccess', querySuccess);
         const nextPath = determineNextPathAfterQuery(querySuccess);
         await params.goToPath(nextPath);
         return "";
