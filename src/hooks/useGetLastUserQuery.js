@@ -11,7 +11,6 @@ const useGetLastUserQuery = () => {
       const history = JSON.parse(historyString);
       if (!Array.isArray(history)) return null;
 
-      // Find the most recent USER message (latest timestamp)
       let latestUserMessage = null;
       let latestTimestamp = null;
 

@@ -64,7 +64,6 @@ export function qaBot(config) {
   const root = ReactDOM.createRoot(config.target);
   let wrapperRef = { current: null };
 
-  // Mount React component directly
   root.render(
     <React.StrictMode>
       <ProgrammaticQABot
@@ -80,7 +79,6 @@ export function qaBot(config) {
     </React.StrictMode>
   );
 
-  // Return controller object that delegates to the wrapper
   return {
     addMessage: (message) => wrapperRef.current?.addMessage(message),
     setBotIsLoggedIn: (status) => wrapperRef.current?.setBotIsLoggedIn(status),
@@ -93,6 +91,4 @@ export function qaBot(config) {
     }
   };
 }
-
-// Default export - prioritize qaBot function for standalone usage
 export default qaBot;

@@ -10,18 +10,11 @@ import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import { DEFAULT_CONFIG } from '../config/constants';
 
-/**
- * Generate a unique session ID
- * @returns {string} A unique session identifier
- */
+
 const generateSessionId = () => {
   return `qa_bot_session_${uuidv4()}`;
 };
 
-/**
- * Get or create a session ID from localStorage
- * @returns {string} A session identifier
- */
 const getOrCreateSessionId = () => {
   // Check if we already have a session ID in localStorage
   for (let i = 0; i < localStorage.length; i++) {
@@ -33,12 +26,19 @@ const getOrCreateSessionId = () => {
       }
     }
   }
-
-  // No existing session found, generate a new one
   const newSessionId = generateSessionId();
   localStorage.setItem(newSessionId, newSessionId);
   return newSessionId;
 };
+
+const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
+  if (isLoggedIn) {
+    return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
+  } else {
+    return DEFAULT_CONFIG.WELCOME_MESSAGE_LOGGED_OUT;
+  }
+}
+
 /**
  * Q&A Bot Component (Controlled)
  *
@@ -53,15 +53,6 @@ const getOrCreateSessionId = () => {
  * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @returns {JSX.Element}
  */
-
-const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
-  if (isLoggedIn) {
-    return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
-  } else {
-    return DEFAULT_CONFIG.WELCOME_MESSAGE_LOGGED_OUT;
-  }
-}
-
 const QABot = React.forwardRef((props, botRef) => {
   const {
     apiKey,
@@ -120,10 +111,8 @@ const QABot = React.forwardRef((props, botRef) => {
     isLoggedIn: isBotLoggedIn
   });
 
-  // Use the AI query handling hook
   const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
-  // Use the chat flow hook
   const flow = useChatFlow({
     welcomeMessage,
     isBotLoggedIn,

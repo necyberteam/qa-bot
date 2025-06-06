@@ -56,7 +56,6 @@ function updateBotLoginStatus(isLoggedIn) {
 function setupLoginCheckbox() {
     const loginCheckbox = document.getElementById('user-logged-in');
     if (loginCheckbox) {
-        // Initialize checkbox state based on current cookie
         loginCheckbox.checked = isUserLoggedIn();
 
         loginCheckbox.addEventListener('change', (e) => {

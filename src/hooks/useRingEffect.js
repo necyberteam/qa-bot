@@ -24,11 +24,10 @@ const useRingEffect = (ringEffect, containerRef) => {
       }
     }, 500); // 500ms delay to make sure its rendered and gain user attention
 
-    // Cleanup function
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [ringEffect, containerRef]); // Only run when ringEffect or containerRef changes
+  }, [ringEffect, containerRef]);
 };
 
 export default useRingEffect;

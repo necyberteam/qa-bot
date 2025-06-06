@@ -29,8 +29,6 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
       'X-Query-ID': actualQueryId
     };
 
-    // console.log('| 📫 headers for AI query:', headers);
-
     try {
       const requestOptions = {
         method: 'POST',

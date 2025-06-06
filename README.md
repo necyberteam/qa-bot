@@ -107,17 +107,12 @@ When using the JavaScript API in plain HTML/JS (requires standalone bundle), you
 ```javascript
 const botController = qaBot({...});
 
-// Add a message to the chat
 botController.addMessage("Hello World!");
-
-// Set user login status
 botController.setBotIsLoggedIn(true);
-
-// Control chat window (floating mode only)
+// (floating mode only)
 botController.openChat();
 botController.closeChat();
 botController.toggleChat();
-
 // Cleanup
 botController.destroy();
 ```

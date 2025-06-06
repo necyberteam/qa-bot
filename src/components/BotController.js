@@ -56,7 +56,8 @@ const BotController = React.forwardRef(({
     }
   });
 
-  // Set up the simplified imperative API (only addMessage)
+  // An imperative method to add a message to bot
+  // wrapping react-chatbotify `insertMessage`
   useImperativeHandle(ref, () => ({
     // Add a message to the chat
     addMessage: (message) => {
@@ -65,8 +66,6 @@ const BotController = React.forwardRef(({
       }
     }
   }), [messages]);
-
-  // This component doesn't render anything
   return null;
 });
 
