@@ -126,7 +126,7 @@ const QABot = React.forwardRef((props, botRef) => {
   useRingEffect(ringEffect, containerRef);
 
   return (
-        <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
+    <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
       <ChatBotProvider>
         <BotController
           ref={botRef}

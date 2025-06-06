@@ -65,8 +65,6 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style }
       'X-Feedback': isPositive ? 1 : 0
     };
 
-    // console.log('| 📫 headers for feedback:', headers);
-
     try {
       const requestOptions = {
         method: 'POST',
