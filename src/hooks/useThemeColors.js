@@ -19,7 +19,7 @@ const useThemeColors = (containerRef, defaultColors = {}) => {
           return containerValue.trim();
         }
 
-        // Then check parent (useful for web component shadow DOM)
+        // Then check parent
         if (containerRef.current.parentElement) {
           const parentStyle = getComputedStyle(containerRef.current.parentElement);
           const parentValue = parentStyle.getPropertyValue(name);

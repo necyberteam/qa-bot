@@ -1,6 +1,6 @@
 # Q&A Bot
 
-A React component and Web Component for integrating the Q&A Bot into your application. The bot can operate in two modes: **floating** (chat button that opens/closes a window) or **embedded** (always visible inline).
+A React component for integrating the Q&A Bot into your application.  Also includes a standalone bundle for plain HTML/JS usage.
 
 ## Installation
 
@@ -17,14 +17,13 @@ npm run start
 
 ## Running the Demo
 
-This will serve the index.html file in the root directory, which demonsrates two different ways to integrate the bot.
+This will serve the index.html file in the root directory, which demonstrates different ways to integrate the bot.
 
 ```bash
 npm run build:lib
 npm run build
 npx serve
 ```
-
 
 ### Floating vs Embedded Modes
 
@@ -33,182 +32,36 @@ The Q&A Bot supports two display modes:
 - **Floating Mode** (default): Shows a chat button that opens/closes a floating chat window
 - **Embedded Mode**: Always visible, embedded directly in the page content
 
-**All integration methods support both modes**, but have different defaults:
-
-| Method | Default Mode | Override |
-|--------|--------------|----------|
-| Element ID (`#qa-bot`) | Floating | Set `embedded: true` |
-| CSS Class (`.embedded-qa-bot`) | Embedded | n/a |
-| JavaScript API | Floating | Set `embedded: true` |
-| Custom Element (`<qa-bot>`) | Floating | Add `embedded` attribute |
-
 ## Integration Methods
 
-### Method 1: Auto-Detection by Element ID (Floating by Default)
+The QABot can be integrated using a standalone javascript function, or as a react/preact component.
 
-Simply add a div with id `qa-bot` to your HTML:
+### React Component
 
-```html
-<script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
-
-<!-- Automatically creates a floating chat button -->
-<div id="qa-bot"></div>
-```
-
-### Method 2: Auto-Detection by CSS Class (Embedded by Default)
-
-Use the `embedded-qa-bot` class with optional data attributes:
-
-```html
-<script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
-
-<!-- Automatically creates an embedded chat widget -->
-<div class="embedded-qa-bot"
-     data-welcome="Hello!"></div>
-```
-
-### Method 3: Programmatic JavaScript API (Floating by Default)
-
-Call the `qaBot()` function with full control:
-
-```html
-<script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
-
-<div id="my-bot-container"></div>
-
-<script>
-// Check if user is logged in by looking for auth cookie
-function isUserLoggedIn() {
-    return document.cookie.split(';').some(cookie => {
-        return cookie.trim().startsWith('SESSaccesscisso=');
-    });
-}
-
-window.addEventListener('load', function() {
-    const botController = qaBot({
-        target: document.getElementById('my-bot-container'),
-        embedded: false,  // false = floating (default), true = embedded
-        welcome: "Custom welcome message!",
-        isLoggedIn: isUserLoggedIn(),
-        defaultOpen: false,
-    });
-
-    // Use the controller to interact with the bot
-    botController.addMessage("Hello from JavaScript!");
-    botController.openChat();  // Only works in floating mode
-});
-</script>
-```
-
-### Method 4: Custom Web Component Element (Floating by Default)
-
-Use the `<qa-bot>` custom element directly in your HTML:
-
-```html
-<script src="https://unpkg.com/@snf/access-qa-bot@0.2.0/dist/access-qa-bot.standalone.js"></script>
-
-<script>
-// Check if user is logged in by looking for auth cookie
-function isUserLoggedIn() {
-    return document.cookie.split(';').some(cookie => {
-        return cookie.trim().startsWith('SESSaccesscisso=');
-    });
-}
-
-// Set login status dynamically when page loads
-window.addEventListener('load', function() {
-    const botElement = document.querySelector('qa-bot');
-    if (botElement && isUserLoggedIn()) {
-        botElement.setAttribute('is-logged-in', '');
-    }
-});
-</script>
-
-<!-- Floating mode (default) -->
-<qa-bot
-    welcome="Welcome to the Q&A Bot!"
-    default-open
-    ring-effect>
-</qa-bot>
-
-<!-- Embedded mode -->
-<qa-bot
-    embedded
-    welcome="This is an embedded bot!">
-</qa-bot>
-```
-
-**Custom Element Attributes:**
-- `api-key` - API key for authentication
-- `default-open` - Initially open floating chat (boolean attribute)
-- `embedded` - Use embedded mode (boolean attribute)
-- `is-logged-in` - User is logged in (boolean attribute)
-- `login-url` - URL for login redirect
-- `ring-effect` - Enable phone ring animation on tooltip (boolean attribute)
-- `welcome` - Welcome message
-
-**Accessing the Custom Element Programmatically:**
-```javascript
-// Get reference to the custom element
-const botElement = document.querySelector('qa-bot');
-
-// Call methods directly on the element
-botElement.addMessage("Hello World!");
-botElement.setBotIsLoggedIn(true);
-botElement.openChat();  // Floating mode only
-botElement.closeChat(); // Floating mode only
-botElement.toggleChat(); // Floating mode only
-```
-
-## Programmatic Control
-
-When using the JavaScript API, you get a controller object with these methods:
-
-```javascript
-const botController = qaBot({...});
-
-// Add a message to the chat
-botController.addMessage("Hello World!");
-
-// Set user login status
-botController.setBotIsLoggedIn(true);
-
-// Control chat window (floating mode only)
-botController.openChat();
-botController.closeChat();
-botController.toggleChat();
-
-// Cleanup
-botController.destroy();
-```
-
-## As a React Component
-
-For React applications, import and use the component directly:
+For React applications, import and use the component directly.
+- To control the chat programmatically, manage `open` and `isLoggedIn` state in your parent component.
+- Use `onOpenChange` to keep your state in sync with user interactions.
+- You can imperatively add a message to the bot using the `addMessage` function
 
 ```jsx
 import React, { useRef, useState } from 'react';
-import { QABot, qaBot } from '@snf/access-qa-bot';
+import { QABot } from '@snf/access-qa-bot';
 
 function MyApp() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [chatOpen, setChatOpen] = useState(false);
     const botRef = useRef();
 
     const handleAddMessage = () => {
         botRef.current?.addMessage("Hello from React!");
     };
 
-    // You can also use the programmatic API in React if needed
-    const handleCreateProgrammaticBot = () => {
-        const container = document.getElementById('programmatic-bot');
-        if (container) {
-            qaBot({
-                target: container,
-                embedded: true,
-                welcome: "Programmatically created bot!",
-                isLoggedIn: isLoggedIn,
-            });
-        }
+    const handleOpenChat = () => {
+        setChatOpen(true);
+    };
+
+    const handleToggleLogin = () => {
+        setIsLoggedIn(!isLoggedIn);
     };
 
     return (
@@ -219,36 +72,94 @@ function MyApp() {
                 Send Message to Bot
             </button>
 
-            <button onClick={handleCreateProgrammaticBot}>
-                Create Programmatic Bot
+            <button onClick={handleOpenChat}>
+                Open Chat (Controlled)
+            </button>
+
+            <button onClick={handleToggleLogin}>
+                Toggle Login State
             </button>
 
             <QABot
-                ref={botRef}
-                embedded={false}  // true for embedded, false for floating
+                ref={botRef} // only needed if you want use the addMessage function
+                embedded={false}
                 isLoggedIn={isLoggedIn}
-                defaultOpen={false}
+                open={chatOpen}
+                onOpenChange={setChatOpen}
                 welcome="Welcome to the ACCESS Q&A Bot!"
                 apiKey={process.env.REACT_APP_API_KEY}
             />
-
-            <div id="programmatic-bot"></div>
         </div>
     );
 }
 ```
 
-## Configuration Properties
+#### React Component Props
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `apiKey` / `api-key` | string | API key for authentication (defaults to demo key) |
-| `defaultOpen` / `default-open` | boolean | Whether floating chat opens initially (ignored in embedded mode) |
-| `embedded` | boolean | **false** = floating mode, **true** = embedded mode |
-| `isLoggedIn` / `is-logged-in` | boolean | Sets initial login state and reacts to changes |
-| `loginUrl` / `login-url` | string | URL to redirect for login (default: '/login') |
-| `ringEffect` / `ring-effect` | boolean | Enable phone ring animation on tooltip (floating mode only) |
-| `welcome` | string | Welcome message shown to the user |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `apiKey` | string | `"demo-key"` | API key for authentication |
+| `embedded` | boolean | `false` | Floating or embedded mode |
+| `isLoggedIn` | boolean | `false` | User login state |
+| `loginUrl` | string | `"/login"` | Login redirect URL |
+| `open` | boolean | - | Controls chat window (floating mode only) |
+| `onOpenChange` | function | - | Chat window state change callback |
+| `ringEffect` | boolean | `true` | Phone ring animation on tooltip |
+| `welcome` | string | - | Welcome message |
+
+### Standalone Javascript
+
+```html
+<script src="https://unpkg.com/@snf/access-qa-bot@2.1.0/dist/access-qa-bot.standalone.js"></script>
+
+<div id="qa-bot"></div>
+
+<script>
+qaBot({
+    target: document.getElementById('qa-bot'),
+    embedded: false,
+    welcome: "Custom welcome message!",
+    defaultOpen: false,
+});
+</script>
+```
+
+#### Programmatic Control
+
+When using the JavaScript API in plain HTML/JS (requires standalone bundle), you get a controller object with imperative methods:
+
+```javascript
+const botController = qaBot({
+    target: document.getElementById('qa-bot'),
+    embedded: false,
+    welcome: "Custom welcome message!",
+    defaultOpen: false,
+});
+
+botController.addMessage("Hello World!");
+botController.setBotIsLoggedIn(true);
+// (floating mode only)
+botController.openChat();
+botController.closeChat();
+botController.toggleChat();
+// Cleanup
+botController.destroy();
+```
+
+#### JavaScript API Configuration
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `target` | HTMLElement | - | **Required**: DOM element to render into |
+| `apiKey` | string | `"demo-key"` | API key for authentication |
+| `defaultOpen` | boolean | `false` | Initial chat window state |
+| `embedded` | boolean | `false` | Floating or embedded mode |
+| `isLoggedIn` | boolean | `false` | User login state |
+| `loginUrl` | string | `"/login"` | Login redirect URL |
+| `ringEffect` | boolean | `true` | Phone ring animation on tooltip |
+| `welcome` | string | - | Welcome message |
+
+> **More Examples**: See `index.html` in this repository for examples including login state management, embedded mode, and programmatic control. Run the react app to see the same in a react context.
 
 ### CSS Custom Properties (Theming)
 
@@ -261,76 +172,3 @@ Customize the appearance by setting CSS custom properties on the container:
     --font-family: 'Arial', sans-serif;
 "></div>
 ```
-
-## Direct CDN Deployment
-
-For websites that don't use npm, include directly via CDN:
-
-```html
-<!-- CSS (optional, for embedded styling) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/build/static/css/main.css">
-
-<!-- JavaScript -->
-<script src="https://cdn.jsdelivr.net/gh/necyberteam/qa-bot@v0.2.0/dist/access-qa-bot.standalone.js"></script>
-
-<!-- Your content -->
-<div id="qa-bot"></div>
-```
-
-## Development and Testing
-
-### Development Server (React Implementation)
-```bash
-npm start
-# Opens http://localhost:3000 with React dev server
-```
-
-### Testing Standalone Integration
-```bash
-# Build the library and project
-npm run build:lib
-npm run build
-
-# Serve the standalone demo files
-npx serve
-
-# Then visit:
-# http://localhost:3000/index.html (integration demos)
-# http://localhost:3000/web-component-demo.html (web component demos)
-```
-
-## File Structure Guide
-
-- **`index.html`** - Main demo showing all integration methods
-- **`web-component-demo.html`** - Web Component specific demos
-- **`public/index.html`** - React app template (Create React App)
-- **`build/index.html`** - Built React app
-- **`src/`** - Source code
-  - **`components/QABot.js`** - Main React component
-  - **`web-component.js`** - Web Component implementation
-  - **`lib.js`** - JavaScript API
-
-## Important Notes
-
-1. **Embedded vs Floating**:
-   - Embedded mode is always visible and ignores `defaultOpen`
-   - Floating mode shows a chat button; `defaultOpen` controls initial state
-   - Chat window controls (`openChat`, `closeChat`, `toggleChat`) only work in floating mode
-
-2. **Ring Effect**:
-   - Only works in floating mode when the tooltip is visible
-   - Triggers a phone-like ring animation to draw attention
-   - Activates once when the bot is first loaded (500ms delay)
-   - Won't repeat if user has already interacted with the chat
-
-3. **Auto-Detection**: The standalone script automatically detects and initializes:
-   - `#qa-bot` → Floating mode
-   - `.embedded-qa-bot` → Embedded mode
-
-4. **API Key**: Defaults to demo key if not provided
-
-5. **Browser Support**: Uses modern browser features; consider polyfills for older browsers
-
-## Examples Repository
-
-See the demo files in this repository for complete working examples of all integration methods.

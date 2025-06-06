@@ -1,9 +1,0 @@
-/**
- * ACCESS QA Bot Styles
- *
- * This file now imports modular CSS files from the styles directory
- * while maintaining backward compatibility with existing builds.
- */
-
-/* Import modular styles */
-@import './styles/index.css';

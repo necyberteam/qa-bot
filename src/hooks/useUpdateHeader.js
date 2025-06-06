@@ -11,7 +11,6 @@ import { useEffect } from 'react';
 const useUpdateHeader = (isLoggedIn, containerRef) => {
   useEffect(() => {
     if (!containerRef.current) {
-      console.log('| useUpdateHeader | No container ref yet');
       return;
     }
     if (isLoggedIn) {

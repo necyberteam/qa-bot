@@ -1,5 +1,5 @@
-import React, { useImperativeHandle } from 'react';
-import { useFlow, useMessages, useChatWindow } from "react-chatbotify";
+import React, { useImperativeHandle, useEffect, useRef } from 'react';
+import { useMessages, useChatWindow } from "react-chatbotify";
 import useLoginStateTransition from '../hooks/useLoginStateTransition';
 
 /**
@@ -10,53 +10,62 @@ import useLoginStateTransition from '../hooks/useLoginStateTransition';
  *
  * @param {Object} props - Component props
  * @param {boolean} props.embedded - Whether the bot is embedded (affects chat window controls)
- * @param {Function} props.setIsBotLoggedIn - Function to update login state
  * @param {boolean} props.isBotLoggedIn - Current login state
+ * @param {boolean} props.currentOpen - Current open state
  * @param {React.Ref} ref - The forwarded ref for the imperative API
  */
-const BotController = React.forwardRef(({ embedded, setIsBotLoggedIn, isBotLoggedIn }, ref) => {
+const BotController = React.forwardRef(({
+  embedded,
+  isBotLoggedIn,
+  currentOpen
+}, ref) => {
   // Get the chatbot hooks (must be inside ChatBotProvider)
   const messages = useMessages();
-  const flow = useFlow();
   const chatWindow = useChatWindow();
 
-  // Handle login state transitions with automatic message injection
+  const lastOpenRef = useRef(currentOpen);
+  const fromEventRef = useRef(false);
+
   useLoginStateTransition(isBotLoggedIn);
 
-  // Set up the imperative API methods
+  // Sync open state with chat window when it changes (but not when change came from event)
+  useEffect(() => {
+    if (!embedded && chatWindow && chatWindow.toggleChatWindow) {
+      if (lastOpenRef.current !== currentOpen && !fromEventRef.current) {
+        if (chatWindow && chatWindow.toggleChatWindow) {
+          chatWindow.toggleChatWindow(currentOpen);
+          lastOpenRef.current = currentOpen;
+        }
+      }
+      fromEventRef.current = false;
+    }
+  }, [currentOpen, embedded, chatWindow]);
+
+  // Expose a method to mark that the next state change came from user interaction
+  useEffect(() => {
+    const markAsUserInteraction = () => {
+      fromEventRef.current = true;
+    };
+
+    // Store the function on the ref so QABot can call it
+    if (ref) {
+      if (!ref.current) {
+        ref.current = {};
+      }
+      ref.current._markAsUserInteraction = markAsUserInteraction;
+    }
+  });
+
+  // An imperative method to add a message to bot
+  // wrapping react-chatbotify `insertMessage`
   useImperativeHandle(ref, () => ({
     // Add a message to the chat
     addMessage: (message) => {
       if (messages && messages.injectMessage) {
         messages.injectMessage(message);
       }
-    },
-    // Set login status
-    setBotIsLoggedIn: (status) => {
-      setIsBotLoggedIn(status);
-      // Don't restart flow - let the flow's path functions handle the login state change
-    },
-    // Open the chat window (floating mode only)
-    openChat: () => {
-      if (!embedded && chatWindow && chatWindow.toggleChatWindow) {
-        chatWindow.toggleChatWindow(true);
-      }
-    },
-    // Close the chat window (floating mode only)
-    closeChat: () => {
-      if (!embedded && chatWindow && chatWindow.toggleChatWindow) {
-        chatWindow.toggleChatWindow(false);
-      }
-    },
-    // Toggle the chat window (floating mode only)
-    toggleChat: () => {
-      if (!embedded && chatWindow && chatWindow.toggleChatWindow) {
-        chatWindow.toggleChatWindow();
-      }
     }
-  }), [messages, chatWindow, embedded, setIsBotLoggedIn]);
-
-  // This component doesn't render anything
+  }), [messages]);
   return null;
 });
 

@@ -1,9 +1,9 @@
 {
   "name": "@snf/access-qa-bot",
-  "version": "2.0.0",
+  "version": "2.1.0-rc.7",
   "private": false,
   "homepage": ".",
-  "description": "ACCESS Q&A Bot React Component and Web Component",
+  "description": "ACCESS Q&A Bot React Component",
   "main": "./dist/access-qa-bot.umd.cjs",
   "module": "./dist/access-qa-bot.js",
   "exports": {
@@ -21,7 +21,8 @@
     "index.d.ts"
   ],
   "dependencies": {
-    "react-chatbotify": "^2.0.0-beta.38"
+    "react-chatbotify": "^2.0.0-beta.38",
+    "uuid": "^11.1.0"
   },
   "peerDependencies": {
     "preact": "^10.0.0",

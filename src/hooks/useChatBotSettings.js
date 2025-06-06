@@ -9,7 +9,7 @@ import { Button } from "react-chatbotify"
  * @param {Object} params.themeColors - Theme colors from useThemeColors
  * @param {boolean} params.embedded - Whether the bot is embedded
  * @param {boolean} params.defaultOpen - Default open state (floating mode only)
- * @param {boolean} params.isLoggedIn - Whether user is logged in
+ * @param {boolean} params.isLoggedIn - Whether user is logged in (passed to UserIcon)
  * @returns {Object} ChatBot settings object
  */
 const useChatBotSettings = ({
@@ -18,7 +18,6 @@ const useChatBotSettings = ({
   defaultOpen,
   isLoggedIn
 }) => {
-  // console.log('| useChatBotSettings | isLoggedIn', isLoggedIn);
   const settings = useMemo(() => {
     return {
       general: {
@@ -70,8 +69,11 @@ const useChatBotSettings = ({
       footer: {
         text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
       },
+      event: {
+        rcbToggleChatWindow: true, // Enable chat window toggle event
+      },
     };
-  }, [themeColors, embedded, defaultOpen, isLoggedIn]);
+  }, [themeColors, embedded, defaultOpen]);
 
   return settings;
 };

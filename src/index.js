@@ -1,49 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import QABot from './components/QABot';
-import { qaBot } from './lib';
 import reportWebVitals from './reportWebVitals';
 
-// Expose qaBot globally so it can be called directly from HTML files like index.html
-// This enables the non-React integration methods demonstrated in the top-level index.html
-window.qaBot = qaBot;
-
-// Example app component with interactive controls
 function ExampleApp() {
   const [userLoggedIn, setUserLoggedIn] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
+  const botRef = useRef();
+
+  const handleSendHelloWorld = () => {
+    if (botRef.current) {
+      botRef.current.addMessage("Hello World!");
+    }
+  };
 
   return (
     <div>
-      {/* Development controls */}
-      <div style={{
-        padding: '20px',
-        backgroundColor: '#f5f5f5',
-        borderBottom: '1px solid #ddd',
-        marginBottom: '20px'
-      }}>
-        <div style={{ marginBottom: '10px', fontSize: '1.5em' }}>
-          <label>
-            <input
-              type="checkbox"
-              style={{ height: '1.5em', width: '1.5em' }}
-              checked={userLoggedIn}
-              onChange={(e) => setUserLoggedIn(e.target.checked)}
-            />
-            {' '}User logged in
-          </label>
+      <div className="demo-container">
+        <div className="demo-title">
+          QA Bot React Component Demo
         </div>
-        <div style={{ marginTop: '10px', fontSize: '0.9em', color: '#666' }}>
-          <em>Toggle to test login state changes</em>
+
+        <div className="demo-controls">
+          <div className="demo-section">
+            <h3>User Settings</h3>
+
+            <label className="demo-checkbox">
+              <input
+                type="checkbox"
+                checked={userLoggedIn}
+                onChange={(e) => setUserLoggedIn(e.target.checked)}
+              />
+              User is logged in
+            </label>
+
+            <label className="demo-checkbox">
+              <input
+                type="checkbox"
+                checked={chatOpen}
+                onChange={(e) => setChatOpen(e.target.checked)}
+              />
+              Chat window open
+            </label>
+          </div>
+
+          <div className="demo-message-section">
+            <h3>Send Message</h3>
+
+            <button
+              onClick={handleSendHelloWorld}
+              className="demo-send-button"
+            >
+              Send Hello World (Imperative)
+            </button>
+          </div>
         </div>
       </div>
 
       <QABot
+        ref={botRef}
         isLoggedIn={userLoggedIn}
         embedded={false}
-        defaultOpen={false}
+        open={chatOpen}
+        onOpenChange={setChatOpen}
         loginUrl="/login"
         apiKey={process.env.REACT_APP_API_KEY}
+        welcome="Hello! I'm the ACCESS Q&A Bot. How can I help you today?"
       />
     </div>
   );

@@ -56,13 +56,11 @@ function updateBotLoginStatus(isLoggedIn) {
 function setupLoginCheckbox() {
     const loginCheckbox = document.getElementById('user-logged-in');
     if (loginCheckbox) {
-        // Initialize checkbox state based on current cookie
         loginCheckbox.checked = isUserLoggedIn();
 
         loginCheckbox.addEventListener('change', (e) => {
             setAuthCookie(e.target.checked);
             updateBotLoginStatus(e.target.checked);
-            console.log('| user logged in:', e.target.checked);
         });
     }
 }
