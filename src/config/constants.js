@@ -7,6 +7,9 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
   API_ENDPOINT: 'https://access-ai.ccs.uky.edu/api/query',
 
+  // Netlify function URL
+  netlifyBaseUrl: process.env.REACT_APP_NETLIFY_BASE_URL,
+
   ERRORS: {
     API_UNAVAILABLE: 'Unable to contact the Q&A Bot. Please try again later.',
   },
@@ -26,4 +29,18 @@ export const DEFAULT_CONFIG = {
     AVATAR_URL: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
     TOOLTIP_TEXT: 'Ask me about ACCESS! 😊'
   }
+};
+
+// Helper functions from strings.js
+export const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
+  if (isLoggedIn) {
+    return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
+  } else {
+    return DEFAULT_CONFIG.WELCOME_MESSAGE_LOGGED_OUT;
+  }
+};
+
+export const getApiKey = (providedApiKey) => {
+  // Return provided API key if available, otherwise fall back to environment variable
+  return providedApiKey || process.env.REACT_APP_API_KEY;
 };

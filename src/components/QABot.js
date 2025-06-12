@@ -1,14 +1,14 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
 import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
 import useChatBotSettings from '../hooks/useChatBotSettings';
 import useHandleAIQuery from '../hooks/useHandleAIQuery';
-import useChatFlow from '../hooks/useChatFlow';
 import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
-import { DEFAULT_CONFIG } from '../config/constants';
+import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
+import { createBotFlow } from '../utils/create-bot-flow';
 
 
 const generateSessionId = () => {
@@ -30,14 +30,6 @@ const getOrCreateSessionId = () => {
   localStorage.setItem(newSessionId, newSessionId);
   return newSessionId;
 };
-
-const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
-  if (isLoggedIn) {
-    return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
-  } else {
-    return DEFAULT_CONFIG.WELCOME_MESSAGE_LOGGED_OUT;
-  }
-}
 
 /**
  * Q&A Bot Component (Controlled)
@@ -113,14 +105,14 @@ const QABot = React.forwardRef((props, botRef) => {
 
   const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
-  const flow = useChatFlow({
+  const flow = useMemo(() => createBotFlow({
     welcomeMessage,
     isBotLoggedIn,
     loginUrl,
     handleQuery,
     sessionId,
     currentQueryId
-  });
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);

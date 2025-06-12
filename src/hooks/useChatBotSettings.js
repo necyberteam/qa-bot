@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { DEFAULT_CONFIG } from '../config/constants';
+import NewChatButton from '../components/NewChatButton';
 import UserIcon from '../components/UserIcon';
 import { Button } from "react-chatbotify"
 
@@ -45,7 +46,8 @@ const useChatBotSettings = ({
       },
       botBubble: {
         simulateStream: true,
-        dangerouslySetInnerHtml: true
+        dangerouslySetInnerHtml: true,
+        streamSpeed: 22,
       },
       chatButton: {
         icon: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
@@ -68,6 +70,9 @@ const useChatBotSettings = ({
       },
       footer: {
         text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
+        buttons: [
+          <NewChatButton key="new-chat-button" />
+        ]
       },
       event: {
         rcbToggleChatWindow: true, // Enable chat window toggle event
