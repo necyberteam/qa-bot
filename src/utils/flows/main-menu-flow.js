@@ -20,7 +20,7 @@ export const createMainMenuFlow = ({
         "Open a Help Ticket", // Jira Ticket
         "Provide feedback to ACCESS", // Feedback
         "Report a security issue", // Security
-        // "Open Dev Ticket" // Dev Ticket Example
+        "Open Dev Ticket" // Dev Ticket Example
       ],
       chatDisabled: true,
       path: (chatState) => {

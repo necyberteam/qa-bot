@@ -63,6 +63,7 @@ const QABot = React.forwardRef((props, botRef) => {
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
   const [currentQueryId, setCurrentQueryId] = useState(null);
+  const [ticketForm, setTicketForm] = useState({});
 
   // Update internal state when isLoggedIn prop changes
   useEffect(() => {
@@ -111,8 +112,10 @@ const QABot = React.forwardRef((props, botRef) => {
     loginUrl,
     handleQuery,
     sessionId,
-    currentQueryId
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId]);
+    currentQueryId,
+    ticketForm,
+    setTicketForm
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);

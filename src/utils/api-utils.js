@@ -8,7 +8,7 @@ import { DEFAULT_CONFIG } from '../config/constants';
  * @returns {Promise<Object>} Formatted data for API submission
  */
 export const prepareApiSubmission = async (formData, ticketType = 'support', uploadedFiles = []) => {
-  console.log("| 2 🌎 prepareApiSubmission preparing data...");
+  console.log("| 2 🌎 prepareApiSubmission preparing data...", formData, ticketType, uploadedFiles);
   // Map ticket types to their requestTypeId values
   const requestTypeIds = {
     support: 17,

@@ -30,35 +30,25 @@ export const createDevTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} 
 
   return {
     dev_ticket: {
-      message: "What type of development ticket would you like to create?",
-      options: [
-        "Bug Report",
-        "Feature Request",
-        "Other Development Issue"
-      ],
-      chatDisabled: true,
-      function: (chatState) => {
-        setTicketForm({...ticketForm, ticketType: chatState.userInput});
-      },
-      path: (chatState) => {
-        if (chatState.userInput === "Bug Report") {
-          return "dev_ticket_summary";
-        } else if (chatState.userInput === "Feature Request") {
-          return "dev_ticket_summary";
-        } else if (chatState.userInput === "Other Development Issue") {
-          return "dev_ticket_summary";
-        }
-        return "dev_ticket";
-      }
+      message: "copy this email address so you don't have to type it later:   fake@test.com ",
+      path: "dev_ticket_summary"
     },
     dev_ticket_summary: {
       message: "Please provide a summary of your issue.",
-      function: (chatState) => setTicketForm({...ticketForm, summary: chatState.userInput}),
+      function: (chatState) => {
+        console.log("| 🔍 Debug: Setting summary:", chatState.userInput);
+        setTicketForm({...ticketForm, summary: chatState.userInput});
+        console.log("| 🔍 Debug: Current ticketForm after summary:", {...ticketForm, summary: chatState.userInput});
+      },
       path: "dev_ticket_description"
     },
     dev_ticket_description: {
       message: "Please describe your issue in detail.",
-      function: (chatState) => setTicketForm({...ticketForm, description: chatState.userInput}),
+      function: (chatState) => {
+        console.log("| 🔍 Debug: Setting description:", chatState.userInput);
+        setTicketForm({...ticketForm, description: chatState.userInput});
+        console.log("| 🔍 Debug: Current ticketForm after description:", {...ticketForm, description: chatState.userInput});
+      },
       path: "dev_ticket_attachment"
     },
     dev_ticket_attachment: {
@@ -136,23 +126,27 @@ export const createDevTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} 
     },
     dev_ticket_grand_summary: {
       message: (chatState) => {
-        // TODO: Right now we have to handle ACCESS ID specially using chatState.userInput because of React state timing issues,
-        // and this only works because ACCESS ID is the last field collected before the summary.
-        // Instead we should either: 1) fix the fundamental closure issue so message functions can access current state,
-        // or 2) implement a more robust state management approach that doesn't depend on field collection order.
+        // Get the most recent state, including the last input if it was ACCESS ID
         const currentAccessId = chatState.prevPath === 'dev_ticket_accessid' ? chatState.userInput : (ticketForm.accessId || 'Not provided');
+        const currentEmail = chatState.prevPath === 'dev_ticket_email' ? chatState.userInput : (ticketForm.email || 'Not provided');
+        const currentSummary = chatState.prevPath === 'dev_ticket_summary' ? chatState.userInput : (ticketForm.summary || 'Not provided');
+        const currentDescription = chatState.prevPath === 'dev_ticket_description' ? chatState.userInput : (ticketForm.description || 'Not provided');
+        const currentKeywords = chatState.prevPath === 'dev_ticket_keywords' ? chatState.userInput : (ticketForm.keywords || 'Not provided');
 
         let fileInfo = '';
         if (ticketForm.uploadedFiles && ticketForm.uploadedFiles.length > 0) {
           fileInfo = `\nAttachments: ${ticketForm.uploadedFiles.length} file(s) attached`;
         }
 
+        console.log("| 🔍 Debug: Current ticketForm state:", ticketForm);
+        console.log("| 🔍 Debug: Current chatState:", chatState);
+
         return `Thank you for providing your issue details. Here's a summary:\n\n` +
-               `Email: ${ticketForm.email || 'Not provided'}\n` +
+               `Email: ${currentEmail}\n` +
                `ACCESS ID: ${currentAccessId}\n` +
-               `Summary: ${ticketForm.summary || 'Not provided'}\n` +
-               `Keywords: ${ticketForm.keywords || 'Not provided'}\n` +
-               `Description: ${ticketForm.description || 'Not provided'}${fileInfo}\n\n` +
+               `Summary: ${currentSummary}\n` +
+               `Keywords: ${currentKeywords}\n` +
+               `Description: ${currentDescription}${fileInfo}\n\n` +
                `Would you like to submit this ticket?`;
       },
       options: ["Submit Ticket", "Back to Main Menu"],
@@ -175,8 +169,10 @@ export const createDevTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} 
           keywords: ticketForm.keywords || ""
         };
 
+        console.log("| 🔍 Debug: Form data being submitted:", formData);
+
         try {
-          // Prepare API submission data - now awaiting the async function
+          // Prepare API submission data
           const apiData = await prepareApiSubmission(
             formData,
             'dev',
