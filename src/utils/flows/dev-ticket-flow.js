@@ -128,25 +128,18 @@ export const createDevTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} 
       message: (chatState) => {
         // Get the most recent state, including the last input if it was ACCESS ID
         const currentAccessId = chatState.prevPath === 'dev_ticket_accessid' ? chatState.userInput : (ticketForm.accessId || 'Not provided');
-        const currentEmail = chatState.prevPath === 'dev_ticket_email' ? chatState.userInput : (ticketForm.email || 'Not provided');
-        const currentSummary = chatState.prevPath === 'dev_ticket_summary' ? chatState.userInput : (ticketForm.summary || 'Not provided');
-        const currentDescription = chatState.prevPath === 'dev_ticket_description' ? chatState.userInput : (ticketForm.description || 'Not provided');
-        const currentKeywords = chatState.prevPath === 'dev_ticket_keywords' ? chatState.userInput : (ticketForm.keywords || 'Not provided');
 
         let fileInfo = '';
         if (ticketForm.uploadedFiles && ticketForm.uploadedFiles.length > 0) {
           fileInfo = `\nAttachments: ${ticketForm.uploadedFiles.length} file(s) attached`;
         }
 
-        console.log("| 🔍 Debug: Current ticketForm state:", ticketForm);
-        console.log("| 🔍 Debug: Current chatState:", chatState);
-
         return `Thank you for providing your issue details. Here's a summary:\n\n` +
-               `Email: ${currentEmail}\n` +
+               `Email: ${ticketForm.email || 'Not provided'}\n` +
                `ACCESS ID: ${currentAccessId}\n` +
-               `Summary: ${currentSummary}\n` +
-               `Keywords: ${currentKeywords}\n` +
-               `Description: ${currentDescription}${fileInfo}\n\n` +
+               `Summary: ${ticketForm.summary || 'Not provided'}\n` +
+               `Keywords: ${ticketForm.keywords || 'Not provided'}\n` +
+               `Description: ${ticketForm.description || 'Not provided'}${fileInfo}\n\n` +
                `Would you like to submit this ticket?`;
       },
       options: ["Submit Ticket", "Back to Main Menu"],
@@ -168,8 +161,6 @@ export const createDevTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} 
           accessId: ticketForm.accessId || "",
           keywords: ticketForm.keywords || ""
         };
-
-        console.log("| 🔍 Debug: Form data being submitted:", formData);
 
         try {
           // Prepare API submission data
