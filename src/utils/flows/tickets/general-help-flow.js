@@ -2,13 +2,14 @@ import React from 'react';
 import FileUploadComponent from '../../../components/FileUploadComponent';
 import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
 
+console.log("| 😱 Creating general help flow - we need to handle errors - this can fail silently");
 /**
- * Creates the general help ticket flow
+ * Creates the enhanced general help ticket flow with ProForma field support
  *
  * @param {Object} params Configuration
  * @param {Object} params.ticketForm Form state for help tickets
  * @param {Function} params.setTicketForm Function to update ticket form
- * @returns {Object} General help flow configuration
+ * @returns {Object} Enhanced general help flow configuration
  */
 export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
   const fileUploadElement = (
@@ -23,7 +24,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
   );
 
   return {
-    // FORM flow - General Help Ticket Form Flow
+    // FORM flow - Enhanced General Help Ticket Form Flow
     general_help_summary_subject: {
       message: "Provide a short title for your ticket.",
       function: (chatState) => setTicketForm({...ticketForm, summary: chatState.userInput}),
@@ -106,11 +107,35 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       },
       chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, resourceDetails: chatState.userInput}),
+      path: "general_help_user_id_at_resource"
+    },
+    // NEW: Collect User ID at Resource (ProForma field)
+    general_help_user_id_at_resource: {
+      message: "What is your User ID at the selected resource(s)? (Optional - leave blank if not applicable)",
+      function: (chatState) => setTicketForm({...ticketForm, userIdAtResource: chatState.userInput}),
       path: "general_help_keywords"
     },
     general_help_keywords: {
       message: "Please add up to 5 keywords to help route your ticket.",
-      checkboxes: { items: ["C, C++", "Abaqus", "Algorithms", "API", "Bash", "CloudLab", "Docker", "Hadoop", "Jupyter", "MatLab", "VPN", "XML", "Other"], min: 0, max: 5 },
+      checkboxes: {
+        items: [
+          "C, C++",
+          "Abaqus",
+          "Algorithms",
+          "API",
+          "Bash",
+          "CloudLab",
+          "Docker",
+          "Hadoop",
+          "Jupyter",
+          "MatLab",
+          "VPN",
+          "XML",
+          "Other"
+        ],
+        min: 0,
+        max: 5
+      },
       chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, keywords: chatState.userInput}),
       path: (chatState) => {
@@ -136,14 +161,15 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         // Filter out "Other" from the keywords
         const filteredKeywords = keywordsArray.filter(k => k !== "Other");
 
-        // Add the additional keywords
+        // Add the additional keywords - this will map to suggestedKeyword ProForma field
         const formattedKeywords = Array.isArray(filteredKeywords) && filteredKeywords.length > 0
           ? [...filteredKeywords, additionalKeywords].join(", ")
           : additionalKeywords;
 
         setTicketForm({
           ...ticketForm,
-          keywords: formattedKeywords
+          keywords: formattedKeywords,
+          suggestedKeyword: additionalKeywords // NEW: Store separately for ProForma mapping
         });
       },
       path: "general_help_priority"
@@ -189,6 +215,14 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
           fileInfo = `\nAttachments: ${ticketForm.uploadedFiles.length} file(s) attached`;
         }
 
+        let resourceInfo = '';
+        if (ticketForm.involvesResource === 'yes') {
+          resourceInfo = `\nResource(s): ${Array.isArray(ticketForm.resourceDetails) ? ticketForm.resourceDetails.join(', ') : ticketForm.resourceDetails || 'Not specified'}`;
+          if (ticketForm.userIdAtResource) {
+            resourceInfo += `\nUser ID at Resource: ${ticketForm.userIdAtResource}`;
+          }
+        }
+
         return `Thank you for providing your issue details. Here's a summary:\n\n` +
                `Name: ${ticketForm.name || 'Not provided'}\n` +
                `Email: ${ticketForm.email || 'Not provided'}\n` +
@@ -197,24 +231,31 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
                `Category: ${ticketForm.category || 'Not provided'}\n` +
                `Priority: ${ticketForm.priority || 'Not provided'}\n` +
                `Keywords: ${ticketForm.keywords || 'Not provided'}\n` +
-               `Issue Description: ${ticketForm.description || 'Not provided'}${fileInfo}\n\n` +
+               `Issue Description: ${ticketForm.description || 'Not provided'}${resourceInfo}${fileInfo}\n\n` +
                `Would you like to submit this ticket?`;
       },
       options: ["Submit Ticket", "Back to Main Menu"],
       chatDisabled: true,
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          // Prepare form data
+          // Enhanced form data with ProForma field mappings
           const formData = {
+            // Regular JSM fields
             email: ticketForm.email || "",
-            customfield_10103: ticketForm.accessId || "",
-            customfield_10108: ticketForm.name || "",
             summary: ticketForm.summary || "General Support Ticket",
-            customfield_10111: ticketForm.category || "",
             description: ticketForm.description || "",
             priority: ticketForm.priority || "medium",
-            access_resource: ticketForm.involvesResource || "no",
-            direct_ticket: ticketForm.keywords === "None of the above" ? "" : ticketForm.keywords || ""
+            accessId: ticketForm.accessId || "",        // Maps to customfield_10103
+            userName: ticketForm.name || "",             // Maps to customfield_10108
+            issueType: ticketForm.category || "",        // Maps to customfield_10111
+
+            // NEW: ProForma-linked fields
+            userIdAtResource: ticketForm.userIdAtResource || "",     // Maps to customfield_10112
+            resourceName: Array.isArray(ticketForm.resourceDetails)  // Maps to customfield_10110
+              ? ticketForm.resourceDetails.join(', ')
+              : ticketForm.resourceDetails || "",
+            keywords: ticketForm.keywords || "",                     // Maps to customfield_10113
+            suggestedKeyword: ticketForm.suggestedKeyword || ""       // Maps to customfield_10115
           };
 
           try {
@@ -224,12 +265,13 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
               'support',
               ticketForm.uploadedFiles || []
             );
-            console.log("| 🌎 API submission data for general ticket:", apiData);
+            console.log("| 🌎 Enhanced API submission data for general ticket:", apiData);
 
-            // const proxyResponse = await sendPreparedDataToProxy(apiData, 'create-support-ticket');
-            // console.log("| 🌎 General ticket proxy response:", proxyResponse.data.jsmResponse);
+            // UNCOMMENT WHEN READY TO TEST:
+            const proxyResponse = await sendPreparedDataToProxy(apiData, 'create-support-ticket');
+            console.log("| 🌎 Enhanced general ticket proxy response:", proxyResponse.data.jsmResponse);
           } catch (error) {
-            console.error("| ❌ Error sending general ticket data to proxy:", error);
+            console.error("| ❌ Error sending enhanced general ticket data to proxy:", error);
           }
         }
       },
