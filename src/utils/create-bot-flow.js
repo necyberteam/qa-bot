@@ -5,7 +5,6 @@ import { createMainMenuFlow } from './flows/main-menu-flow';
 import { createQAFlow } from './flows/qa-flow';
 import { createTicketFlow } from './flows/ticket-flow';
 import { createFeedbackFlow } from './flows/feedback-flow';
-import { createDevTicketFlow } from './flows/dev-ticket-flow';
 
 function createBotFlow({
   welcomeMessage,
@@ -18,28 +17,34 @@ function createBotFlow({
   feedbackForm = {},
   setFeedbackForm = () => {}
 }) {
-  // If not logged in, show simple login flow
-  if (!isBotLoggedIn) {
-    return {
-      start: {
-        message: buildWelcomeMessage(isBotLoggedIn, welcomeMessage),
-        component: <LoginButton loginUrl={loginUrl} />,
-        path: 'start'
-      }
-    };
-  }
-
-  // If logged in, create the full complex flow
+  // Always create the main menu flow (available to everyone)
   const mainMenuFlow = createMainMenuFlow({
-    welcome: buildWelcomeMessage(isBotLoggedIn, welcomeMessage),
+    welcome: buildWelcomeMessage(true, welcomeMessage), // Always use logged-in style welcome
     setTicketForm,
     setFeedbackForm
   });
 
-  const qaFlow = createQAFlow({
-    fetchAndStreamResponse: handleQuery // Adapting the old name to new function
-  });
+  // Create Q&A flow (requires login)
+  const qaFlow = isBotLoggedIn 
+    ? createQAFlow({
+        fetchAndStreamResponse: handleQuery
+      })
+    : {
+        go_ahead_and_ask: {
+          message: "To ask questions, you need to log in first.",
+          component: <LoginButton loginUrl={loginUrl} />,
+          options: ["Back to Main Menu"],
+          chatDisabled: true,
+          path: (chatState) => {
+            if (chatState.userInput === "Back to Main Menu") {
+              return "start";
+            }
+            return "go_ahead_and_ask";
+          }
+        }
+      };
 
+  // Create ticket and feedback flows (available to everyone)
   const ticketFlow = createTicketFlow({
     ticketForm,
     setTicketForm
@@ -50,25 +55,21 @@ function createBotFlow({
     setFeedbackForm
   });
 
-  const devTicketFlow = createDevTicketFlow({
-    ticketForm,
-    setTicketForm
-  });
-
   // Combine all flows
   const flow = {
     ...mainMenuFlow,
     ...qaFlow,
     ...ticketFlow,
     ...feedbackFlow,
-    ...devTicketFlow,
-    // Add fallback loop for errors
-    loop: {
-      message: async (params) => {
-        await handleQuery(params);
-      },
-      path: () => hasQueryError ? 'start' : 'loop'
-    }
+    // Add fallback loop for errors (only if logged in)
+    ...(isBotLoggedIn && {
+      loop: {
+        message: async (params) => {
+          await handleQuery(params);
+        },
+        path: () => hasQueryError ? 'start' : 'loop'
+      }
+    })
   };
 
   return flow;

@@ -1,8 +1,11 @@
-import React from 'react';
-import FileUploadComponent from '../../../components/FileUploadComponent';
-import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
+import { 
+  createFileUploadComponent, 
+  createSubmissionHandler, 
+  generateSuccessMessage,
+  getCurrentAccessId,
+  getFileInfo
+} from './ticket-flow-utils';
 
-console.log("| 😱 Creating general help flow - we need to handle errors - this can fail silently");
 /**
  * Creates the enhanced general help ticket flow with ProForma field support
  *
@@ -12,16 +15,8 @@ console.log("| 😱 Creating general help flow - we need to handle errors - this
  * @returns {Object} Enhanced general help flow configuration
  */
 export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
-  const fileUploadElement = (
-    <FileUploadComponent
-      onFileUpload={(files) =>
-        setTicketForm({
-          ...ticketForm,
-          uploadedFiles: files
-        })
-      }
-    />
-  );
+  const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
+  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
 
   return {
     // FORM flow - Enhanced General Help Ticket Form Flow
@@ -41,7 +36,8 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         "Metrics Question",
         "OnDemand Question",
         "Pegasus Question",
-        "XDMOD Question"
+        "XDMoD Question",
+        "Some Other Question"
       ],
       chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, category: chatState.userInput}),
@@ -79,32 +75,28 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         : "general_help_keywords"
     },
     general_help_resource_details: {
-      message: "Please select the ACCESS Resource(s) involved with your issue. Click the 'Continue' button when done.",
-      checkboxes: {
-        items: [
-          "ACES",
-          "Anvil",
-          "Bridges-2",
-          "DARWIN",
-          "Delta",
-          "DeltaAI",
-          "Derecho",
-          "Expanse",
-          "FASTER",
-          "Granite",
-          "Jetstream2",
-          "KyRIC",
-          "Launch",
-          "Neocortex",
-          "Ookami",
-          "Open Science Grid",
-          "Open Storage Network",
-          "Ranch",
-          "Stampede3"
-        ],
-        min: 1,
-        max: 19
-      },
+      message: "Please select the ACCESS Resource involved with your issue:",
+      options: [
+        "ACES",
+        "Anvil",
+        "Bridges-2",
+        "DARWIN",
+        "Delta",
+        "DeltaAI",
+        "Derecho",
+        "Expanse",
+        "FASTER",
+        "Granite",
+        "Jetstream2",
+        "KyRIC",
+        "Launch",
+        "Neocortex",
+        "Ookami",
+        "Open Science Grid",
+        "Open Storage Network",
+        "Ranch",
+        "Stampede3"
+      ],
       chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, resourceDetails: chatState.userInput}),
       path: "general_help_user_id_at_resource"
@@ -119,19 +111,302 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       message: "Please add up to 5 keywords to help route your ticket.",
       checkboxes: {
         items: [
-          "C, C++",
+          " C, C++",
           "Abaqus",
+          "ACCESS",
+          "ACCESS-credits",
+          "ACCESS-website",
+          "Accounts",
+          "ACLS",
+          "Adding users",
+          "Affiliations",
+          "Affinity Groups",
+          "AI",
           "Algorithms",
+          "Allocation extension",
+          "Allocation Management",
+          "Allocation proposal",
+          "Allocation Time",
+          "Allocation users",
+          "AMBER",
+          "AMIE",
+          "Anaconda",
+          "Analysis",
           "API",
-          "Bash",
-          "CloudLab",
+          "Application Status",
+          "ARCGIS",
+          "Architecture",
+          "Archiving",
+          "Astrophysics",
+          "ATLAS",
+          "Authentication",
+          "AWS",
+          "AZURE",
+          "Backup",
+          "BASH",
+          "Batch Jobs",
+          "Benchmarking",
+          "Big Data",
+          "Bioinformatics",
+          "Biology",
+          "Ceph",
+          "CFD",
+          "cgroups",
+          "CHARMM",
+          "Checkpoint",
+          "cilogon",
+          "citation",
+          "Cloud",
+          "Cloud Computing",
+          "Cloud Lab",
+          "Cloud Storage",
+          "Cluster Management",
+          "Cluster Support",
+          "CMMC",
+          "Community Outreach",
+          "Compiling",
+          "Composible Systems",
+          "Computataional Chemistry",
+          "COMSOL",
+          "Conda",
+          "Condo",
+          "Containers",
+          "Core dump",
+          "Core hours",
+          "CP2K",
+          "CPU architecture",
+          "CPU bound",
+          "CUDA",
+          "Cybersecurity",
+          "CYVERSE",
+          "Data",
+          "Data Storage",
+          "Data-access-protocols",
+          "Data-analysis",
+          "Data-compliance",
+          "Data-lifecycle",
+          "Data-management",
+          "Data-management-software",
+          "Data-provenance",
+          "Data-reproducibility",
+          "Data-retention",
+          "Data-science",
+          "Data-sharing",
+          "Data-transfer",
+          "Data-wrangling",
+          "Database-update",
+          "Debugging",
+          "Debugging, Optimizatio and Profiling",
+          "Deep-learning",
+          "Dependencies",
+          "Deployment",
+          "DFT",
+          "Distributed-computing",
+          "DNS",
           "Docker",
+          "Documentation",
+          "DOI",
+          "DTN",
+          "Easybuild",
+          "Email",
+          "Encryption",
+          "Environment-modules",
+          "Errors",
+          "Extension",
+          "FastX",
+          "Federated-authentication",
+          "File transfers",
+          "File-formats",
+          "File-limits",
+          "File-systems",
+          "File-transfer",
+          "Finite-element-analysis",
+          "Firewall",
+          "Fortran",
+          "Frameworks and IDE's",
+          "GAMESS",
+          "Gateways",
+          "GATK",
+          "Gaussian",
+          "GCC",
+          "Genomics",
+          "GIS",
+          "Git",
+          "Globus",
+          "GPFS",
+          "GPU",
+          "Gravitational-waves",
+          "Gridengine",
+          "GROMACS",
           "Hadoop",
-          "Jupyter",
-          "MatLab",
+          "Hardware",
+          "Image-processing",
+          "Infiniband",
+          "Interactive-mode",
+          "Interconnect",
+          "IO-Issue",
+          "ISILON",
+          "Java",
+          "Jekyll",
+          "Jetstream",
+          "Job-accounting",
+          "Job-array",
+          "Job-charging",
+          "Job-failure",
+          "Job-sizing",
+          "Job-submission",
+          "Julia",
+          "Jupyterhub",
+          "Key-management",
+          "Kubernetes",
+          "KyRIC",
+          "LAMMPS",
+          "Library-paths",
+          "License",
+          "Linear-programming",
+          "Linux",
+          "LMOD",
+          "login",
+          "LSF",
+          "Lustre",
+          "Machine-learning",
+          "Management",
+          "Materials-science",
+          "Mathematica",
+          "MATLAB",
+          "Memory",
+          "Metadata",
+          "Modules",
+          "Molecular-dynamics",
+          "Monte-carlo",
+          "MPI",
+          "NAMD",
+          "NetCDF",
+          "Networking",
+          "Neural-networks",
+          "NFS",
+          "NLP",
+          "NoMachine",
+          "Nvidia",
+          "Oceanography",
+          "OnDemnad",
+          "Open-science-grid",
+          "Open-storage-network",
+          "OpenCV",
+          "Openfoam",
+          "OpenMP",
+          "OpenMPI",
+          "OpenSHIFT",
+          "Openstack",
+          "Optimization",
+          "OS",
+          "OSG",
+          "Parallelization",
+          "Parameter-sweeps",
+          "Paraview",
+          "Particle-physics",
+          "password",
+          "PBS",
+          "Pegasus",
+          "Pending-jobs",
+          "Performance-tuning",
+          "Permissions",
+          "Physiology",
+          "PIP",
+          "PODMAN",
+          "Portals",
+          "Pre-emption",
+          "Professional and Workforce Development",
+          "Professional-development",
+          "Profile",
+          "Profiling",
+          "Programming",
+          "Programming Languages",
+          "Programming-best-practices",
+          "Project-management",
+          "Project-renewal",
+          "Provisioning",
+          "Pthreads",
+          "Publication-database",
+          "Putty",
+          "Python",
+          "Pytorch",
+          "Quantum-computing",
+          "Quantum-mechanics",
+          "Quota",
+          "R",
+          "RDP",
+          "React",
+          "Reporting",
+          "Research-facilitation",
+          "Research-grants",
+          "Resources",
+          "Rstudio-server",
+          "S3",
+          "Samba",
+          "SAS",
+          "Scaling",
+          "Schedulers",
+          "Scheduling",
+          "Science DMZ",
+          "Science Gateways",
+          "Scikit-learn",
+          "Scratch",
+          "screen",
+          "scripting",
+          "SDN",
+          "Secure Computing and Data",
+          "Secure-data-architecture",
+          "Serverless-hpc",
+          "setup",
+          "sftp",
+          "SGE",
+          "Shell Scripting",
+          "Shifter",
+          "Singularity",
+          "SLURM",
+          "SMB",
+          "Smrtanalysis",
+          "Software Installations",
+          "Software-carpentry",
+          "SPACK",
+          "SPARK",
+          "Spectrum-scale",
+          "SPSS",
+          "SQL",
+          "SSH",
+          "Stampede2",
+          "STATA",
+          "Storage",
+          "Supplement",
+          "Support",
+          "TCP",
+          "Technical-training-for-hpc",
+          "Tensorflow",
+          "Terminal-emulation-and-window-management",
+          "Tickets",
+          "Timing-issue",
+          "TMUX",
+          "Tools",
+          "Training",
+          "Transfer SUs",
+          "Trinity",
+          "Tuning",
+          "Unix-environment",
+          "Upgrading",
+          "Vectorization",
+          "Version-control",
+          "vim",
+          "VNC",
           "VPN",
+          "Workflow",
+          "Workforce-development",
+          "X11",
+          "Xalt",
+          "XDMoD",
           "XML",
-          "Other"
+          "XSEDE",
+          "I don't see a relevant keyword"
         ],
         min: 0,
         max: 5
@@ -139,7 +414,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, keywords: chatState.userInput}),
       path: (chatState) => {
-        if (chatState.userInput && chatState.userInput.includes("Other")) {
+        if (chatState.userInput && chatState.userInput.includes("I don't see a relevant keyword")) {
           return "general_help_additional_keywords";
         } else {
           return "general_help_priority";
@@ -158,8 +433,8 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
           ? [...currentKeywords]
           : currentKeywords.split(',').map(k => k.trim());
 
-        // Filter out "Other" from the keywords
-        const filteredKeywords = keywordsArray.filter(k => k !== "Other");
+        // Filter out "I don't see a relevant keyword" from the keywords
+        const filteredKeywords = keywordsArray.filter(k => k !== "I don't see a relevant keyword");
 
         // Add the additional keywords - this will map to suggestedKeyword ProForma field
         const formattedKeywords = Array.isArray(filteredKeywords) && filteredKeywords.length > 0
@@ -204,20 +479,12 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     general_help_ticket_summary: {
       message: (chatState) => {
-        // TODO: Right now we have to handle ACCESS ID specially using chatState.userInput because of React state timing issues,
-        // and this only works because ACCESS ID is the last field collected before the summary.
-        // Instead we should either: 1) fix the fundamental closure issue so message functions can access current state,
-        // or 2) implement a more robust state management approach that doesn't depend on field collection order.
-        const currentAccessId = chatState.prevPath === 'general_help_accessid' ? chatState.userInput : (ticketForm.accessId || 'Not provided');
-
-        let fileInfo = '';
-        if (ticketForm.uploadedFiles && ticketForm.uploadedFiles.length > 0) {
-          fileInfo = `\nAttachments: ${ticketForm.uploadedFiles.length} file(s) attached`;
-        }
+        const currentAccessId = getCurrentAccessId(chatState, ticketForm, 'general_help_accessid');
+        const fileInfo = getFileInfo(ticketForm.uploadedFiles);
 
         let resourceInfo = '';
         if (ticketForm.involvesResource === 'yes') {
-          resourceInfo = `\nResource(s): ${Array.isArray(ticketForm.resourceDetails) ? ticketForm.resourceDetails.join(', ') : ticketForm.resourceDetails || 'Not specified'}`;
+          resourceInfo = `\nResource: ${ticketForm.resourceDetails || 'Not specified'}`;
           if (ticketForm.userIdAtResource) {
             resourceInfo += `\nUser ID at Resource: ${ticketForm.userIdAtResource}`;
           }
@@ -238,50 +505,36 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       chatDisabled: true,
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          // Enhanced form data with ProForma field mappings
           const formData = {
             // Regular JSM fields
             email: ticketForm.email || "",
             summary: ticketForm.summary || "General Support Ticket",
             description: ticketForm.description || "",
             priority: ticketForm.priority || "medium",
-            accessId: ticketForm.accessId || "",        // Maps to customfield_10103
-            userName: ticketForm.name || "",             // Maps to customfield_10108
-            issueType: ticketForm.category || "",        // Maps to customfield_10111
-
-            // NEW: ProForma-linked fields
-            userIdAtResource: ticketForm.userIdAtResource || "",     // Maps to customfield_10112
-            resourceName: Array.isArray(ticketForm.resourceDetails)  // Maps to customfield_10110
-              ? ticketForm.resourceDetails.join(', ')
-              : ticketForm.resourceDetails || "",
-            keywords: ticketForm.keywords || "",                     // Maps to customfield_10113
-            suggestedKeyword: ticketForm.suggestedKeyword || ""       // Maps to customfield_10115
+            accessId: ticketForm.accessId || "",
+            userName: ticketForm.name || "",
+            issueType: ticketForm.category || "",
+            // ProForma fields for request type 17
+            hasResourceProblem: ticketForm.involvesResource === 'yes' ? 'Yes' : 'No',
+            userIdAtResource: ticketForm.userIdAtResource || "",
+            resourceName: ticketForm.resourceDetails || "",
+            keywords: ticketForm.keywords || "",
+            noRelevantKeyword: ticketForm.suggestedKeyword ? 'checked' : '',
+            suggestedKeyword: ticketForm.suggestedKeyword || ""
           };
 
-          try {
-            // Prepare API submission data - now awaiting the async function
-            const apiData = await prepareApiSubmission(
-              formData,
-              'support',
-              ticketForm.uploadedFiles || []
-            );
-            console.log("| 🌎 Enhanced API submission data for general ticket:", apiData);
-
-            // UNCOMMENT WHEN READY TO TEST:
-            const proxyResponse = await sendPreparedDataToProxy(apiData, 'create-support-ticket');
-            console.log("| 🌎 Enhanced general ticket proxy response:", proxyResponse.data.jsmResponse);
-          } catch (error) {
-            console.error("| ❌ Error sending enhanced general ticket data to proxy:", error);
-          }
+          await submitTicket(formData, 'support', ticketForm.uploadedFiles || []);
         }
       },
       path: "general_help_success"
     },
-
     general_help_success: {
-      message: "Thank you for submitting your ticket. We will follow up with you shortly.",
+      message: () => {
+        return generateSuccessMessage(getSubmissionResult(), 'support ticket');
+      },
       options: ["Back to Main Menu"],
       chatDisabled: true,
+      renderHtml: ["BOT"],
       path: "start"
     }
   };

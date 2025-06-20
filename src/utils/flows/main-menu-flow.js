@@ -19,8 +19,7 @@ export const createMainMenuFlow = ({
         "Ask a question about ACCESS", // AI loop
         "Open a Help Ticket", // Jira Ticket
         "Provide feedback to ACCESS", // Feedback
-        "Report a security issue", // Security
-        "Open Dev Ticket" // Dev Ticket Example
+        "Report a security issue" // Security
       ],
       chatDisabled: true,
       path: (chatState) => {
@@ -34,10 +33,6 @@ export const createMainMenuFlow = ({
           // Reset form data
           setFeedbackForm({});
           return "feedback";
-        } else if (chatState.userInput === "Open Dev Ticket") {
-          // Reset form data
-          setTicketForm({});
-          return "dev_ticket";
         } else if (chatState.userInput === "Report a security issue") {
           // Reset form data
           setTicketForm({});

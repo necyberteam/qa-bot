@@ -12,26 +12,27 @@ const NewChatButton = () => {
   return (
     <button
       onClick={handleNewChat}
+      tabIndex={0}
+      aria-label="Start a new chat conversation"
       style={{
-        backgroundColor: 'transparent',
+        backgroundColor: '#107180',
         border: 'none',
-        color: '#666',
+        color: '#ffffff',
         fontSize: '14px',
         cursor: 'pointer',
-        padding: '4px 8px',
+        padding: '8px 12px',
         borderRadius: '4px',
         transition: 'all 0.2s ease',
         display: 'flex',
         alignItems: 'center',
-        gap: '4px',
+        gap: '6px',
+        fontWeight: '500',
       }}
       onMouseEnter={(e) => {
-        e.target.style.backgroundColor = '#f0f0f0';
-        e.target.style.color = '#333';
+        e.target.style.backgroundColor = '#0d5f6b';
       }}
       onMouseLeave={(e) => {
-        e.target.style.backgroundColor = 'transparent';
-        e.target.style.color = '#666';
+        e.target.style.backgroundColor = '#107180';
       }}
     >
       <RefreshIcon width={16} height={16} />

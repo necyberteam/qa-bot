@@ -1,6 +1,11 @@
 import React from 'react';
-import FileUploadComponent from '../../../components/FileUploadComponent';
-import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
+import { 
+  createFileUploadComponent, 
+  createSubmissionHandler, 
+  generateSuccessMessage,
+  getCurrentAccessId,
+  getFileInfo
+} from './ticket-flow-utils';
 
 /**
  * Creates the ACCESS login help ticket flow
@@ -11,16 +16,8 @@ import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
  * @returns {Object} ACCESS login flow configuration
  */
 export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
-  const fileUploadElement = (
-    <FileUploadComponent
-      onFileUpload={(files) =>
-        setTicketForm({
-          ...ticketForm,
-          uploadedFiles: files
-        })
-      }
-    />
-  );
+  const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
+  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
 
   return {
     // PATH: ACCESS Login Help Path
@@ -45,12 +42,16 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
       path: "access_login_identity"
     },
     access_login_identity: {
-      message: "Which identity provider were you using? (e.g., InCommon, Google, ORCID)",
+      message: "Which identity provider were you using?",
+      options: ["ACCESS", "Github", "Google", "Institution", "Microsoft", "ORCID", "Other"],
+      chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, identityProvider: chatState.userInput}),
       path: "access_login_browser"
     },
     access_login_browser: {
       message: "Which browser were you using?",
+      options: ["Chrome", "Firefox", "Edge", "Safari", "Other"],
+      chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, browser: chatState.userInput}),
       path: "access_login_attachment"
     },
@@ -88,16 +89,8 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     access_login_summary: {
       message: (chatState) => {
-        // TODO: Right now we have to handle ACCESS ID specially using chatState.userInput because of React state timing issues,
-        // and this only works because ACCESS ID is the last field collected before the summary.
-        // Instead we should either: 1) fix the fundamental closure issue so message functions can access current state,
-        // or 2) implement a more robust state management approach that doesn't depend on field collection order.
-        const currentAccessId = chatState.prevPath === 'access_login_accessid' ? chatState.userInput : (ticketForm.accessId || 'Not provided');
-
-        let fileInfo = '';
-        if (ticketForm.uploadedFiles && ticketForm.uploadedFiles.length > 0) {
-          fileInfo = `\nAttachments: ${ticketForm.uploadedFiles.length} file(s) attached`;
-        }
+        const currentAccessId = getCurrentAccessId(chatState, ticketForm, 'access_login_accessid');
+        const fileInfo = getFileInfo(ticketForm.uploadedFiles);
 
         return `Thank you for providing your ACCESS login issue details. Here's a summary:\n\n` +
                `Name: ${ticketForm.name || 'Not provided'}\n` +
@@ -110,43 +103,34 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
       },
       options: ["Submit Ticket", "Back to Main Menu"],
       chatDisabled: true,
+      renderHtml: ["BOT", "USER"],
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          // OJO: we know how to do this better now, see dev example
           const formData = {
             email: ticketForm.email || "",
-            customfield_10108: ticketForm.name || "",
-            customfield_10103: ticketForm.accessId || "",
+            userName: ticketForm.name || "",
+            accessId: ticketForm.accessId || "",
             description: ticketForm.description || "",
-            summary: "ACCESS Login Issue",
-            // Add proforma fields if they exist
-            identity_provider: ticketForm.identityProvider || "",
+            // ProForma fields for request type 30
+            identityProvider: ticketForm.identityProvider || "",
             browser: ticketForm.browser || ""
           };
 
-          // Also prepare API submission data for future implementation
-          const apiData = await prepareApiSubmission(
-            formData,
-            'loginAccess',
-            ticketForm.uploadedFiles || []
-          );
-          console.log("| 🌎 API submission for access login:", apiData);
-
-          // NOTE: we are skipping the jira call for now
-          // try {
-          //   const proxyResponse = await sendPreparedDataToProxy(apiData, 'create-access-login-ticket');
-          //   console.log("| 🌎 Access login proxy response:", proxyResponse);
-          // } catch (error) {
-          //   console.error("| ❌ Error sending access login data to proxy:", error);
-          // }
+          await submitTicket(formData, 'loginAccess', ticketForm.uploadedFiles || []);
         }
       },
-      path: "access_login_success"
+      path: (chatState) => {
+        // Always go to success page after submission attempt
+        return "access_login_success";
+      }
     },
     access_login_success: {
-      message: "Thank you for submitting your ticket. We will follow up with you shortly.",
+      message: () => {
+        return generateSuccessMessage(getSubmissionResult(), 'ACCESS login ticket');
+      },
       options: ["Back to Main Menu"],
       chatDisabled: true,
+      renderHtml: ["BOT"],
       path: "start"
     }
   };

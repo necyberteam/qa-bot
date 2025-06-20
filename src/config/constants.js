@@ -1,6 +1,5 @@
 export const DEFAULT_CONFIG = {
   LOGIN_URL: '/login',
-  PROMPT_TEXT: 'Questions should stand alone and not refer to previous ones.',
   WELCOME_MESSAGE: 'Hello! What can I help you with?',
   WELCOME_MESSAGE_LOGGED_OUT: 'To ask questions, please log in.',
   WELCOME_MESSAGE_LOGIN_TRANSITION: 'Welcome! You are now logged in. How can I help you today?',
@@ -36,7 +35,8 @@ export const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
   if (isLoggedIn) {
     return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
   } else {
-    return DEFAULT_CONFIG.WELCOME_MESSAGE_LOGGED_OUT;
+    // Since tickets and feedback are available to everyone, use the normal welcome
+    return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
   }
 };
 

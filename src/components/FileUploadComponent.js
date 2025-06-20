@@ -16,10 +16,26 @@ const FileUploadComponent = ({ onFileUpload }) => {
   const fileInputRef = useRef(null);
   const { captureScreenshot, isCapturing } = useScreenshotCapture();
 
+  // Helper function to announce messages to screen readers
+  const announceToScreenReader = (message) => {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'assertive');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    document.body.appendChild(announcement);
+    setTimeout(() => document.body.removeChild(announcement), 1000);
+  };
+
   const handleFiles = (files) => {
     const newFileArray = Array.from(files);
     const updatedFiles = [...selectedFiles, ...newFileArray];
     setSelectedFiles(updatedFiles);
+
+    // Announce file selection to screen readers
+    const fileCount = newFileArray.length;
+    const fileNames = newFileArray.map(f => f.name).join(', ');
+    announceToScreenReader(`${fileCount} file${fileCount > 1 ? 's' : ''} selected: ${fileNames}`);
 
     // Programmatically scroll chat to bottom after file selection to keep Continue button in view
     setTimeout(() => {
@@ -77,8 +93,9 @@ const FileUploadComponent = ({ onFileUpload }) => {
     try {
       const file = await captureScreenshot();
       handleFiles([file]);
+      announceToScreenReader('Screenshot captured successfully');
     } catch (error) {
-      // Error is already logged in the hook
+      announceToScreenReader('Error capturing screenshot. Please try again.');
     }
   };
 
@@ -184,7 +201,7 @@ const FileUploadComponent = ({ onFileUpload }) => {
   };
 
   return (
-    <div className="file-upload-container">
+    <div className="file-upload-container" style={{ padding: '16px', margin: '8px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
         <button
           onClick={(e) => {
@@ -192,6 +209,8 @@ const FileUploadComponent = ({ onFileUpload }) => {
             handleScreenshotCapture();
           }}
           disabled={isCapturing}
+          aria-describedby="screenshot-help"
+          aria-label={isCapturing ? 'Taking screenshot, please wait' : 'Take a screenshot to attach'}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -223,6 +242,9 @@ const FileUploadComponent = ({ onFileUpload }) => {
           </svg>
           {isCapturing ? 'Taking screenshot...' : 'Take screenshot...'}
         </button>
+        <span id="screenshot-help" className="sr-only">
+          Captures the current screen and adds it as an attachment
+        </span>
       </div>
 
       <div
@@ -231,6 +253,23 @@ const FileUploadComponent = ({ onFileUpload }) => {
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
+        role="button"
+        tabIndex={0}
+        aria-label="File upload area. Click to select files or drag and drop files here."
+        aria-describedby="upload-instructions"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleButtonClick();
+          }
+        }}
+        style={{
+          padding: '20px',
+          border: '2px dashed #ccc',
+          borderRadius: '8px',
+          backgroundColor: dragActive ? '#f0f8ff' : '#fafafa',
+          transition: 'all 0.3s ease'
+        }}
       >
         <input
           ref={fileInputRef}
@@ -239,11 +278,18 @@ const FileUploadComponent = ({ onFileUpload }) => {
           onChange={handleFileSelect}
           multiple
           style={{ display: "none" }}
+          aria-label="Select files to upload"
+          accept="image/*,application/pdf,text/*,.doc,.docx"
         />
-        <div className="upload-content" onClick={handleButtonClick} style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
-            <UploadIcon />
-            <p style={{ margin: 0 }}>Drag and drop files here or click to select files</p>
+        <div className="upload-content" onClick={handleButtonClick} style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'center', display: 'flex', textAlign: 'center', padding: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+              <UploadIcon />
+              <p style={{ margin: 0, fontWeight: 'bold' }}>Upload Files</p>
+            </div>
+            <p id="upload-instructions" style={{ margin: 0, fontSize: '14px', color: '#666' }}>
+              Drag and drop files here or click to select. Accepted: Images, PDFs, Text files (Max 10MB each)
+            </p>
           </div>
           {selectedFiles.length > 0 && (
             <div className="selected-files" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', alignItems: 'center' }}>

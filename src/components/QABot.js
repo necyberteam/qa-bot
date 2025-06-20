@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
+import HtmlRenderer from "@rcb-plugins/html-renderer";
 import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
@@ -7,6 +8,7 @@ import useChatBotSettings from '../hooks/useChatBotSettings';
 import useHandleAIQuery from '../hooks/useHandleAIQuery';
 import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
+import useFocusableSendButton from '../hooks/useFocusableSendButton';
 import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
 import { createBotFlow } from '../utils/create-bot-flow';
 
@@ -115,24 +117,41 @@ const QABot = React.forwardRef((props, botRef) => {
     currentQueryId,
     ticketForm,
     setTicketForm
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
+  useFocusableSendButton();
 
   return (
-    <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
+    <div 
+      className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} 
+      ref={containerRef}
+      role="region"
+      aria-label="Ask ACCESS tool"
+    >
       <ChatBotProvider>
-        <BotController
-          ref={botRef}
-          embedded={embedded}
-          isBotLoggedIn={isBotLoggedIn}
-          currentOpen={open}
-        />
-        <ChatBot
-          settings={chatBotSettings}
-          flow={flow}
-        />
+        <main role="main" aria-label="Chat interface">
+          <BotController
+            ref={botRef}
+            embedded={embedded}
+            isBotLoggedIn={isBotLoggedIn}
+            currentOpen={open}
+          />
+          <ChatBot
+            key={`chatbot-${sessionId}-${isBotLoggedIn}`}
+            settings={chatBotSettings}
+            flow={flow}
+            plugins={[HtmlRenderer()]}
+          />
+          {/* Live region for screen reader announcements */}
+          <div 
+            aria-live="polite" 
+            aria-label="Bot response updates"
+            className="sr-only"
+            id="bot-live-region"
+          />
+        </main>
       </ChatBotProvider>
     </div>
   );

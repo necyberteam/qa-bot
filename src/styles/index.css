@@ -185,3 +185,163 @@
     height: 350px;
   }
 }
+
+/* Enhanced inline checkbox styling */
+.rcb-checkbox-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin-left: 16px !important;
+  padding-top: 12px !important;
+  max-width: 100% !important;
+}
+
+.rcb-checkbox-row-container {
+  display: flex !important;
+  align-items: center !important;
+  background-color: #f5f5f5 !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  padding: 6px 10px !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  max-height: auto !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  transition: all 0.2s ease !important;
+  font-size: 13px !important;
+}
+
+.rcb-checkbox-row-container:hover {
+  background-color: #e8f4f8 !important;
+  border-color: #107180 !important;
+}
+
+.rcb-checkbox-row-container[data-checked="true"] {
+  background-color: #107180 !important;
+  border-color: #107180 !important;
+  color: white !important;
+}
+
+.rcb-checkbox-row {
+  margin-left: 0px !important;
+}
+
+.rcb-checkbox-mark {
+  width: 14px !important;
+  height: 14px !important;
+  margin-right: 6px !important;
+}
+
+.rcb-checkbox-label {
+  font-size: 13px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+.rcb-checkbox-next-button {
+  line-height: 24px !important;
+}
+
+/* Screen reader only class for accessibility */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Focus styles for better accessibility */
+.rcb-chat-input-textarea:focus {
+  outline: 2px solid #107180 !important;
+  outline-offset: 2px !important;
+}
+
+.rcb-chat-input-send-button:focus {
+  outline: 2px solid #107180 !important;
+  outline-offset: 2px !important;
+}
+
+/* Enhanced accessibility styles */
+*:focus-visible {
+  outline: 2px solid #107180 !important;
+  outline-offset: 2px !important;
+}
+
+/* Make send button div focusable and accessible */
+.rcb-chat-input-send-button {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  cursor: pointer !important;
+}
+
+/* Force tabindex on send button using CSS */
+.rcb-chat-input-send-button:not([tabindex]) {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* Target any clickable element in the input container that might be the send button */
+.rcb-chat-input-container [onclick],
+.rcb-chat-input-container [role="button"],
+.rcb-chat-input-container div[style*="cursor"],
+.rcb-chat-input-container svg:last-child,
+.rcb-chat-input-container > div:last-child {
+  tabindex: 0 !important;
+  cursor: pointer !important;
+}
+
+/* Move New Chat button closer to input area */
+.rcb-chat-footer {
+  margin-top: 4px !important;
+  padding-top: 0px !important;
+}
+
+.rcb-chat-footer-container {
+  margin-top: 4px !important;
+  padding-top: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Tab order for footer elements */
+.rcb-chat-footer-container button {
+  order: 1 !important;
+}
+
+.rcb-chat-footer-container a[href*="access-qa-tool"] {
+  order: 2 !important;
+  tab-index: 0 !important;
+}
+
+.rcb-chat-footer-container a[href*="feedback"] {
+  order: 3 !important;
+  tab-index: 0 !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .rcb-chat-window a {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #000000 !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

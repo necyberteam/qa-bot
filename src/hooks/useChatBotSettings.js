@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { DEFAULT_CONFIG } from '../config/constants';
 import NewChatButton from '../components/NewChatButton';
 import UserIcon from '../components/UserIcon';
+import LoginButton from '../components/LoginButton';
 import { Button } from "react-chatbotify"
 
 /**
@@ -19,6 +20,7 @@ const useChatBotSettings = ({
   defaultOpen,
   isLoggedIn
 }) => {
+  const isBotLoggedIn = isLoggedIn;
   const settings = useMemo(() => {
     return {
       general: {
@@ -26,28 +28,40 @@ const useChatBotSettings = ({
         embedded: embedded
       },
       header: {
-        title: DEFAULT_CONFIG.CHATBOT.TITLE,
+        title: (
+          <div key="header-title">
+            <h1 className="sr-only">{DEFAULT_CONFIG.CHATBOT.TITLE}</h1>
+            <span aria-hidden="true">{DEFAULT_CONFIG.CHATBOT.TITLE}</span>
+          </div>
+        ),
         avatar: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
         buttons: [
-          <UserIcon key="user-icon" />,
-          Button.CLOSE_CHAT_BUTTON
+          isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl="/login" />,
+          <Button.CLOSE_CHAT_BUTTON key="close-button" />
         ]
       },
       chatWindow: {
         defaultOpen: embedded ? true : defaultOpen,
       },
       chatInput: {
-        enabledPlaceholderText: DEFAULT_CONFIG.PROMPT_TEXT,
-        disabledPlaceholderText: 'Please log in to ask questions.',
-        disabled: false
+        enabledPlaceholderText: '',
+        disabledPlaceholderText: '',
+        disabled: false,
+        allowNewline: true,
+        sendButtonStyle: { display: 'flex' },
+        characterLimit: 1000,
+        sendButtonAriaLabel: 'Send message',
+        showCharacterCount: false
       },
       chatHistory: {
         disabled: false
       },
       botBubble: {
         simulateStream: true,
-        dangerouslySetInnerHtml: true,
-        streamSpeed: 22,
+        streamSpeed: 10,
+        allowNewline: true,
+        dangerouslySetInnerHTML: true,
+        renderHtml: true
       },
       chatButton: {
         icon: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
@@ -69,14 +83,14 @@ const useChatBotSettings = ({
         disabled: true,
       },
       footer: {
-        text: (<div>Find out more <a href="https://support.access-ci.org/tools/access-qa-tool">about this tool</a> or <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWnE1r738GU1u_ri3TRpw9dItn6JNPi7-FH7QFB9bAHSVN0w/viewform">give us feedback</a>.</div>),
+        text: (<div key="footer-text"><a href="https://support.access-ci.org/tools/access-qa-tool">About this tool</a>.</div>),
         buttons: [
           <NewChatButton key="new-chat-button" />
         ]
       },
       event: {
         rcbToggleChatWindow: true, // Enable chat window toggle event
-      },
+      }
     };
   }, [themeColors, embedded, defaultOpen]);
 

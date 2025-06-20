@@ -1,6 +1,11 @@
 import React from 'react';
-import FileUploadComponent from '../../../components/FileUploadComponent';
-import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
+import { 
+  createFileUploadComponent, 
+  createSubmissionHandler, 
+  generateSuccessMessage,
+  getCurrentAccessId,
+  getFileInfo
+} from './ticket-flow-utils';
 
 /**
  * Creates the affiliated/resource provider login help ticket flow
@@ -11,16 +16,8 @@ import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
  * @returns {Object} Affiliated login flow configuration
  */
 export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
-  const fileUploadElement = (
-    <FileUploadComponent
-      onFileUpload={(files) =>
-        setTicketForm({
-          ...ticketForm,
-          uploadedFiles: files
-        })
-      }
-    />
-  );
+  const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
+  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
 
   return {
     // PATH: Affiliated/Resource Provider Login Help Path
@@ -40,32 +37,28 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
 
     // FORM flow - Affiliated/Resource Login
     affiliated_login_resource: {
-      message: "Please select the ACCESS Resource you are trying to access. Click the 'Continue' button when done.",
-      checkboxes: {
-        items: [
-          "ACES",
-          "Anvil",
-          "Bridges-2",
-          "DARWIN",
-          "Delta",
-          "DeltaAI",
-          "Derecho",
-          "Expanse",
-          "FASTER",
-          "Granite",
-          "Jetstream2",
-          "KyRIC",
-          "Launch",
-          "Neocortex",
-          "Ookami",
-          "Open Science Grid",
-          "Open Storage Network",
-          "Ranch",
-          "Stampede3"
-        ],
-        min: 1,
-        max: 19
-      },
+      message: "Which ACCESS Resource are you trying to access?",
+      options: [
+        "ACES",
+        "Anvil", 
+        "Bridges-2",
+        "DARWIN",
+        "Delta",
+        "DeltaAI",
+        "Derecho",
+        "Expanse",
+        "FASTER",
+        "Granite",
+        "Jetstream2",
+        "KyRIC",
+        "Launch",
+        "Neocortex",
+        "Ookami",
+        "Open Science Grid",
+        "Open Storage Network",
+        "Ranch",
+        "Stampede3"
+      ],
       chatDisabled: true,
       function: (chatState) => setTicketForm({...ticketForm, resource: chatState.userInput}),
       path: "affiliated_login_userid"
@@ -114,18 +107,8 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
     },
         affiliated_login_summary: {
       message: (chatState) => {
-        // TODO: Right now we have to handle ACCESS ID specially using chatState.userInput because of React state timing issues,
-        // and this only works because ACCESS ID is the last field collected before the summary.
-        // Instead we should either: 1) fix the fundamental closure issue so message functions can access current state,
-        // or 2) implement a more robust state management approach that doesn't depend on field collection order.
-        const currentAccessId = chatState.prevPath === 'affiliated_login_accessid' ? chatState.userInput : (ticketForm.accessId || 'Not provided');
-
-        let fileInfo = '';
-        if (ticketForm.uploadedFiles && ticketForm.uploadedFiles.length > 0) {
-          fileInfo = `\nAttachments: ${ticketForm.uploadedFiles.length} file(s) attached`;
-        }
-
-        console.log("| 🔍 Debug: Using ACCESS ID from chatState.userInput:", currentAccessId);
+        const currentAccessId = getCurrentAccessId(chatState, ticketForm, 'affiliated_login_accessid');
+        const fileInfo = getFileInfo(ticketForm.uploadedFiles);
 
         return `Thank you for providing your resource login issue details. Here's a summary:\n\n` +
                `Name: ${ticketForm.name || 'Not provided'}\n` +
@@ -140,41 +123,28 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
       chatDisabled: true,
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          // Prepare form data
           const formData = {
             email: ticketForm.email || "",
-            customfield_10108: ticketForm.name || "",
-            customfield_10103: ticketForm.accessId || "",
-            customfield_10110: ticketForm.resource || "",
+            userName: ticketForm.name || "",
+            accessId: ticketForm.accessId || "",
+            accessResource: ticketForm.resource || "",
             description: ticketForm.description || "",
-            summary: "Resource Provider Login Issue",
-            // Add proforma fields if they exist
-            user_id_resource: ticketForm.userIdResource || ""
+            // ProForma field for request type 31
+            userIdAtResource: ticketForm.userIdResource || ""
           };
 
-          // Also prepare API submission data for future implementation
-          const apiData = await prepareApiSubmission(
-            formData,
-            'loginProvider',
-            ticketForm.uploadedFiles || []
-          );
-          console.log("| 🌎 API submission data for affiliated login:", apiData);
-
-          // NOTE: we are skipping the jira call for now for demo
-          // try {
-          //   const proxyResponse = await sendPreparedDataToProxy(apiData, 'create-affiliated-login-ticket');
-          //   console.log("| 🌎 Resource login proxy response:", proxyResponse);
-          // } catch (error) {
-          //   console.error("| ❌ Error sending resource login data to proxy:", error);
-          // }
+          await submitTicket(formData, 'loginProvider', ticketForm.uploadedFiles || []);
         }
       },
       path: "affiliated_login_success"
     },
     affiliated_login_success: {
-      message: "Thank you for submitting your ticket. We will follow up with you shortly.",
+      message: () => {
+        return generateSuccessMessage(getSubmissionResult(), 'resource login ticket');
+      },
       options: ["Back to Main Menu"],
       chatDisabled: true,
+      renderHtml: ["BOT"],
       path: "start"
     }
   };

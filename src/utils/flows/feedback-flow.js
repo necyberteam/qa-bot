@@ -81,7 +81,7 @@ export const createFeedbackFlow = ({
     },
     feedback_summary: {
       message: (chatState) => {
-        // TODO: Right now we have to handle ACCESS ID specially using chatState.userInput because of React state timing issues,
+        // Handle ACCESS ID using chatState.userInput due to React state timing
         // and this only works because ACCESS ID is the last field collected before the summary.
         // Instead we should either: 1) fix the fundamental closure issue so message functions can access current state,
         // or 2) implement a more robust state management approach that doesn't depend on field collection order.
@@ -127,8 +127,6 @@ export const createFeedbackFlow = ({
               'support',
               feedbackForm.uploadedFiles || []
             );
-            console.log("| 🌎 API submission data:", apiData);
-            // TODO: Send API data to API
 
           } catch (error) {
             console.error("| ❌ Error preparing feedback data:", error);

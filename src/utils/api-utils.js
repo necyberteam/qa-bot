@@ -1,6 +1,18 @@
 import { DEFAULT_CONFIG } from '../config/constants';
 
 /**
+ * Legacy function - ProForma mapping is now handled by the API
+ * @param {Object} formData Form data 
+ * @param {number} requestTypeId The JSM request type ID
+ * @returns {Object} Form data (unchanged - API handles ProForma mapping)
+ */
+const mapProFormaFields = (formData, requestTypeId) => {
+  // ProForma field mapping is now handled by the API
+  // This function is kept for backward compatibility but does no transformation
+  return formData;
+};
+
+/**
  * Prepares data for future API submission
  * @param {Object} formData Form data for the ticket
  * @param {string} ticketType Type of ticket to create
@@ -8,21 +20,32 @@ import { DEFAULT_CONFIG } from '../config/constants';
  * @returns {Promise<Object>} Formatted data for API submission
  */
 export const prepareApiSubmission = async (formData, ticketType = 'support', uploadedFiles = []) => {
-  console.log("| 2 🌎 prepareApiSubmission preparing data...", formData, ticketType, uploadedFiles);
   // Map ticket types to their requestTypeId values
+  const REQUEST_TYPE_IDS = {
+    SUPPORT: 17,
+    LOGIN_ACCESS: 30,
+    LOGIN_PROVIDER: 31
+  };
+  
   const requestTypeIds = {
-    support: 17,
-    loginAccess: 30,
-    loginProvider: 31,
-    dev: 10006  // Added dev ticket type
+    support: REQUEST_TYPE_IDS.SUPPORT,
+    general_help: REQUEST_TYPE_IDS.SUPPORT,
+    feedback: REQUEST_TYPE_IDS.SUPPORT,
+    loginAccess: REQUEST_TYPE_IDS.LOGIN_ACCESS,
+    loginProvider: REQUEST_TYPE_IDS.LOGIN_PROVIDER
   };
 
-  // Basic submission data
+  const requestTypeId = requestTypeIds[ticketType] || requestTypeIds.support;
+  
+  // Map ProForma fields to JSM custom field IDs (now handled by API)
+  const mappedFormData = mapProFormaFields(formData, requestTypeId);
+
+  // Basic submission data (API handles ProForma form mapping automatically)
   const submissionData = {
-    serviceDeskId: ticketType === 'dev' ? 1 : 2,
-    requestTypeId: requestTypeIds[ticketType] || requestTypeIds.support,
+    serviceDeskId: 2,
+    requestTypeId: requestTypeId,
     requestFieldValues: {
-      ...formData
+      ...mappedFormData
     }
   };
 
@@ -51,7 +74,6 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
 
     submissionData.attachments = processedFiles;
   }
-  console.log("| 🌎 Submission data:", submissionData);
   return submissionData;
 };
 
@@ -62,9 +84,13 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
  * @returns {Promise<Object>} The response from the proxy
  */
 export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
-  console.log("| 🌎 endpointName parameter:", endpointName);
-  const proxyEndpoint = `${DEFAULT_CONFIG.netlifyBaseUrl}${endpointName}`;
-  console.log(`| 4 🌎 Sending prepared data (${proxyEndpoint}):`, submissionData);
+  
+  // Use versioned API endpoints (these get redirected by netlify.toml)
+  const serverBaseUrl = DEFAULT_CONFIG.netlifyBaseUrl.replace('/.netlify/functions/', ''); // Get base server URL
+  const proxyEndpoint = endpointName === 'create-support-ticket' 
+    ? `${serverBaseUrl}/api/v1/tickets`
+    : `${DEFAULT_CONFIG.netlifyBaseUrl}/${endpointName}`;
+    
 
   try {
     const response = await fetch(proxyEndpoint, {
@@ -86,7 +112,6 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
     }
 
     const data = await response.json();
-    console.log('| ✅ Post data to proxy successful:', data);
     return {
       success: true,
       data
