@@ -49,6 +49,10 @@ The bot supports several conversation flows:
 ### 🤖 Q&A Flow
 - Ask questions about ACCESS resources, services, and documentation
 - Receive AI-powered responses with HTML and Markdown formatting
+- Built-in feedback system with thumbs up/down options after each response
+- Automatic feedback tracking and analytics
+- Users can provide feedback or continue asking questions immediately
+- Negative feedback offers direct path to support ticket creation
 - Requires user to be logged in
 
 ### 🎫 Support Ticket Flows
@@ -232,6 +236,21 @@ The bot integrates with the ACCESS Q&A API and JSM (Jira Service Management) for
 - User authentication and session management
 
 ## Changelog
+
+### Version 2.2.0
+
+#### ✨ New Features
+- **Integrated Feedback System**: Added thumbs up/down feedback collection after each Q&A response
+- **Seamless User Experience**: Users can provide feedback or continue asking questions without interruption
+- **Smart Flow Routing**: Negative feedback automatically offers direct path to support ticket creation
+- **Feedback Analytics**: Automatic tracking of user satisfaction with API endpoint integration
+- **Responsive Design**: Optimized feedback UI with hover effects and accessibility features
+
+#### 🎨 UI/UX Improvements
+- Streamlined Q&A conversation flow with optional feedback prompts
+- Enhanced button styling with smooth animations and brand color consistency
+- Improved input field placeholder text for better user guidance
+- Fixed horizontal scroll bar issues in user message bubbles
 
 ### Version 2.1.0
 

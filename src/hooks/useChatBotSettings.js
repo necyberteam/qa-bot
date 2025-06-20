@@ -44,7 +44,7 @@ const useChatBotSettings = ({
         defaultOpen: embedded ? true : defaultOpen,
       },
       chatInput: {
-        enabledPlaceholderText: '',
+        enabledPlaceholderText: 'Type your question here...',
         disabledPlaceholderText: '',
         disabled: false,
         allowNewline: true,

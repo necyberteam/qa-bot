@@ -13,6 +13,8 @@ function createBotFlow({
   loginUrl,
   handleQuery,
   hasQueryError,
+  sessionId,
+  currentQueryId,
   ticketForm = {},
   setTicketForm = () => {},
   feedbackForm = {},
@@ -34,7 +36,9 @@ function createBotFlow({
   // Create Q&A flow (requires login)
   const qaFlow = isBotLoggedIn 
     ? createQAFlow({
-        fetchAndStreamResponse: handleQuery
+        fetchAndStreamResponse: handleQuery,
+        sessionId,
+        currentQueryId
       })
     : {
         go_ahead_and_ask: {
