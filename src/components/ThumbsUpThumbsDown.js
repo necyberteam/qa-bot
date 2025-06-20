@@ -74,7 +74,7 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style }
       const response = await fetch(`${DEFAULT_CONFIG.API_ENDPOINT}/rating`, requestOptions);
 
       if (response.ok) {
-        console.log(`Feedback sent successfully: ${isPositive ? '1' : '0'}`);
+        // Feedback sent successfully
       } else {
         console.error('Failed to send feedback:', response.status);
       }
@@ -84,12 +84,10 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style }
   };
 
   const handleThumbsUp = async () => {
-    console.log('Thumbs up clicked for session:', sessionId);
     await sendFeedback(true);
   };
 
   const handleThumbsDown = async () => {
-    console.log('Thumbs down clicked for session:', sessionId);
     await sendFeedback(false);
   };
 

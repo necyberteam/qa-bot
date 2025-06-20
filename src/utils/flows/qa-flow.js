@@ -29,6 +29,7 @@ export const createQAFlow = ({ fetchAndStreamResponse }) => {
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
+      renderHtml: ["BOT"],
       path: "start"
     }
   };

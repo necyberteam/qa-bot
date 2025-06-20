@@ -92,7 +92,7 @@ const useChatBotSettings = ({
         rcbToggleChatWindow: true, // Enable chat window toggle event
       }
     };
-  }, [themeColors, embedded, defaultOpen]);
+  }, [themeColors, embedded, defaultOpen, isLoggedIn]);
 
   return settings;
 };

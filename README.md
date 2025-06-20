@@ -1,6 +1,6 @@
-# Q&A Bot
+# ACCESS Q&A Bot
 
-A React component for integrating the Q&A Bot into your application.  Also includes a standalone bundle for plain HTML/JS usage.
+A React component for integrating the ACCESS Q&A Bot into your application. Features intelligent Q&A responses, support ticket creation with ProForma integration, and user feedback collection. Also includes a standalone bundle for plain HTML/JS usage.
 
 ## Installation
 
@@ -25,12 +25,45 @@ npm run build
 npx serve
 ```
 
-### Floating vs Embedded Modes
+## Features
+
+- **🤖 Intelligent Q&A**: AI-powered responses to user questions about ACCESS
+- **🎫 Support Tickets**: Create help tickets for general support, ACCESS login issues, and resource provider login problems
+- **📝 Feedback Collection**: Gather user feedback and suggestions  
+- **👤 User Pre-population**: Auto-fill forms with user info when logged in
+- **🎨 Rich Formatting**: Support for HTML and Markdown in responses
+- **♿ Accessibility**: Full screen reader support and keyboard navigation
+- **📱 Responsive**: Works on desktop and mobile devices
+
+### Display Modes
 
 The Q&A Bot supports two display modes:
 
 - **Floating Mode** (default): Shows a chat button that opens/closes a floating chat window
 - **Embedded Mode**: Always visible, embedded directly in the page content
+
+## Available Flows
+
+The bot supports several conversation flows:
+
+### 🤖 Q&A Flow
+- Ask questions about ACCESS resources, services, and documentation
+- Receive AI-powered responses with HTML and Markdown formatting
+- Requires user to be logged in
+
+### 🎫 Support Ticket Flows
+- **General Help**: Create support tickets for any ACCESS-related issues
+- **ACCESS Login**: Get help with ACCESS website login problems  
+- **Resource Login**: Get help with resource provider login issues
+- All flows support file attachments and are integrated with JSM ProForma
+
+### 📝 Feedback Flow
+- Collect user feedback and suggestions
+- Optional file attachments for screenshots or documents
+
+### 🔒 Security Flow
+- Report security issues and vulnerabilities
+- Direct integration with security team
 
 ## Integration Methods
 
@@ -106,11 +139,14 @@ function MyApp() {
 | `onOpenChange` | function | - | Chat window state change callback |
 | `ringEffect` | boolean | `true` | Phone ring animation on tooltip |
 | `welcome` | string | - | Welcome message |
+| `userEmail` | string | - | User's email (pre-populates ticket forms when logged in) |
+| `userName` | string | - | User's display name (pre-populates ticket forms when logged in) |
+| `username` | string | - | User's username/ACCESS ID (pre-populates ticket forms when logged in) |
 
 ### Standalone Javascript
 
 ```html
-<script src="https://unpkg.com/@snf/access-qa-bot@2.1.0/dist/access-qa-bot.standalone.js"></script>
+<script src="https://unpkg.com/@snf/access-qa-bot@2.x/dist/access-qa-bot.standalone.js"></script>
 
 <div id="qa-bot"></div>
 
@@ -158,6 +194,9 @@ botController.destroy();
 | `loginUrl` | string | `"/login"` | Login redirect URL |
 | `ringEffect` | boolean | `true` | Phone ring animation on tooltip |
 | `welcome` | string | - | Welcome message |
+| `userEmail` | string | - | User's email (pre-populates ticket forms when logged in) |
+| `userName` | string | - | User's display name (pre-populates ticket forms when logged in) |
+| `username` | string | - | User's username/ACCESS ID (pre-populates ticket forms when logged in) |
 
 > **More Examples**: See `index.html` in this repository for examples including login state management, embedded mode, and programmatic control. Run the react app to see the same in a react context.
 
@@ -172,3 +211,54 @@ Customize the appearance by setting CSS custom properties on the container:
     --font-family: 'Arial', sans-serif;
 "></div>
 ```
+
+## Configuration
+
+### Environment Variables
+
+For React applications, you can set these environment variables:
+
+```bash
+REACT_APP_API_KEY=your-api-key-here
+```
+
+### API Integration
+
+The bot integrates with the ACCESS Q&A API and JSM (Jira Service Management) for ticket creation. Configure your backend endpoints to handle:
+
+- Q&A queries with streaming responses
+- Support ticket creation with ProForma field mapping
+- File upload processing
+- User authentication and session management
+
+## Changelog
+
+### Version 2.1.0
+
+#### ✨ New Features
+- **Form Context System**: Implemented React Context to solve closure issues and ensure fresh form state
+- **User Info Pre-population**: Added support for pre-filling ticket forms with user email, name, and username when logged in
+- **HTML & Markdown Rendering**: Added support for rich text formatting in Q&A responses
+- **Enhanced Ticket Flows**: Improved all support ticket flows with better user experience
+
+#### 🐛 Bug Fixes
+- Fixed React closure issues causing stale form data in ticket summaries
+- Resolved priority and ACCESS ID display issues in ticket forms
+- Fixed form state management across all ticket flows
+
+#### 🎨 UI/UX Improvements
+- Updated button text: "Create XXX Ticket" → "Yes, let's create a ticket"
+- Changed "New Chat" button to "Restart" for clarity
+- Improved accessibility with better ARIA labels
+- Enhanced responsive design for mobile devices
+
+#### 🔧 Technical Improvements
+- Removed unused helper functions (`getCurrentPriority`, `getCurrentAccessId`)
+- Cleaned up debug console statements for production
+- Added markdown renderer plugin alongside HTML renderer
+- Improved build configuration and excluded build directory from version control
+
+#### 📚 Documentation
+- Updated README with comprehensive feature list and integration examples
+- Added detailed API documentation and configuration options
+- Included changelog for version tracking

@@ -1,11 +1,10 @@
-import React from 'react';
 import { 
   createFileUploadComponent, 
   createSubmissionHandler, 
   generateSuccessMessage,
-  getCurrentAccessId,
   getFileInfo
 } from './ticket-flow-utils';
+import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 
 /**
  * Creates the affiliated/resource provider login help ticket flow
@@ -15,9 +14,10 @@ import {
  * @param {Function} params.setTicketForm Function to update ticket form
  * @returns {Object} Affiliated login flow configuration
  */
-export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
+export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
   const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
+
 
   return {
     // PATH: Affiliated/Resource Provider Login Help Path
@@ -27,10 +27,10 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
                "• Confirm you have the correct username for that resource\n" +
                "• Check if the resource is undergoing maintenance\n\n" +
                "Would you like to submit a help ticket for resource provider login issues?",
-      options: ["Create Resource Login Ticket", "Back to Main Menu"],
+      options: ["Yes, let's create a ticket", "Back to Main Menu"],
       chatDisabled: true,
       path: (chatState) =>
-        chatState.userInput === "Create Resource Login Ticket"
+        chatState.userInput === "Yes, let's create a ticket"
           ? "affiliated_login_resource"
           : "start"
     },
@@ -60,83 +60,146 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
         "Stampede3"
       ],
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, resource: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, resource: chatState.userInput});
+      },
       path: "affiliated_login_userid"
     },
     affiliated_login_userid: {
       message: "What is your user ID at the resource?",
-      function: (chatState) => setTicketForm({...ticketForm, userIdResource: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, userIdResource: chatState.userInput});
+      },
       path: "affiliated_login_description"
     },
     affiliated_login_description: {
       message: "Please describe the issue you're having logging in.",
-      function: (chatState) => setTicketForm({...ticketForm, description: chatState.userInput}),
+      function: (chatState) => {
+        // Pre-populate form with user info on first step
+        const currentForm = getCurrentTicketForm();
+        const updatedForm = {
+          ...currentForm,
+          description: chatState.userInput,
+          email: userInfo.email || currentForm.email,
+          name: userInfo.name || currentForm.name,
+          accessId: userInfo.username || currentForm.accessId
+        };
+        setTicketForm(updatedForm);
+      },
       path: "affiliated_login_attachment"
     },
     affiliated_login_attachment: {
       message: "Would you like to attach a screenshot?",
       options: ["Yes", "No"],
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, wantsAttachment: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, wantsAttachment: chatState.userInput});
+      },
       path: (chatState) => chatState.userInput === "Yes"
         ? "affiliated_login_upload"
-        : "affiliated_login_email"
+        : ((chatState) => {
+            const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
+            if (!formWithUserInfo.email) return "affiliated_login_email";
+            if (!formWithUserInfo.name) return "affiliated_login_name";
+            if (!formWithUserInfo.accessId) return "affiliated_login_accessid";
+            return "affiliated_login_summary";
+          })()
     },
     affiliated_login_upload: {
       message: "Please upload your screenshot.",
       component: fileUploadElement,
       options: ["Continue"],
       chatDisabled: true,
-      function: () => setTicketForm({...ticketForm, uploadConfirmed: true}),
-      path: "affiliated_login_email"
+      function: () => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, uploadConfirmed: true});
+      },
+      path: (chatState) => {
+        const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
+        if (!formWithUserInfo.email) return "affiliated_login_email";
+        if (!formWithUserInfo.name) return "affiliated_login_name";
+        if (!formWithUserInfo.accessId) return "affiliated_login_accessid";
+        return "affiliated_login_summary";
+      }
     },
     affiliated_login_email: {
       message: "What is your email?",
-      function: (chatState) => setTicketForm({...ticketForm, email: chatState.userInput}),
-      path: "affiliated_login_name"
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, email: chatState.userInput});
+      },
+      path: (chatState) => {
+        const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
+        if (!formWithUserInfo.name) return "affiliated_login_name";
+        if (!formWithUserInfo.accessId) return "affiliated_login_accessid";
+        return "affiliated_login_summary";
+      }
     },
     affiliated_login_name: {
       message: "What is your name?",
-      function: (chatState) => setTicketForm({...ticketForm, name: chatState.userInput}),
-      path: "affiliated_login_accessid"
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, name: chatState.userInput});
+      },
+      path: (chatState) => {
+        const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
+        if (!formWithUserInfo.accessId) return "affiliated_login_accessid";
+        return "affiliated_login_summary";
+      }
     },
     affiliated_login_accessid: {
       message: "What is your ACCESS ID?",
-      function: (chatState) => setTicketForm({...ticketForm, accessId: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, accessId: chatState.userInput});
+      },
       path: "affiliated_login_summary"
     },
         affiliated_login_summary: {
       message: (chatState) => {
-        const currentAccessId = getCurrentAccessId(chatState, ticketForm, 'affiliated_login_accessid');
-        const fileInfo = getFileInfo(ticketForm.uploadedFiles);
+        const currentForm = getCurrentTicketForm();
+        const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
+        // Use current form state directly since Form Context always has fresh data
+        const fileInfo = getFileInfo(currentForm.uploadedFiles);
 
         return `Thank you for providing your resource login issue details. Here's a summary:\n\n` +
-               `Name: ${ticketForm.name || 'Not provided'}\n` +
-               `Email: ${ticketForm.email || 'Not provided'}\n` +
-               `ACCESS ID: ${currentAccessId}\n` +
-               `Resource: ${ticketForm.resource || 'Not provided'}\n` +
-               `Resource User ID: ${ticketForm.userIdResource || 'Not provided'}\n` +
-               `Issue Description: ${ticketForm.description || 'Not provided'}${fileInfo}\n\n` +
+               `Name: ${formWithUserInfo.name || 'Not provided'}\n` +
+               `Email: ${formWithUserInfo.email || 'Not provided'}\n` +
+               `ACCESS ID: ${formWithUserInfo.accessId || 'Not provided'}\n` +
+               `Resource: ${currentForm.resource || 'Not provided'}\n` +
+               `Resource User ID: ${currentForm.userIdResource || 'Not provided'}\n` +
+               `Issue Description: ${currentForm.description || 'Not provided'}${fileInfo}\n\n` +
                `Would you like to submit this ticket?`;
       },
       options: ["Submit Ticket", "Back to Main Menu"],
       chatDisabled: true,
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
+          const currentForm = getCurrentTicketForm();
+          const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
           const formData = {
-            email: ticketForm.email || "",
-            userName: ticketForm.name || "",
-            accessId: ticketForm.accessId || "",
-            accessResource: ticketForm.resource || "",
-            description: ticketForm.description || "",
+            email: formWithUserInfo.email || "",
+            userName: formWithUserInfo.name || "",
+            accessId: formWithUserInfo.accessId || "",
+            accessResource: currentForm.resource || "",
+            description: currentForm.description || "",
             // ProForma field for request type 31
-            userIdAtResource: ticketForm.userIdResource || ""
+            userIdAtResource: currentForm.userIdResource || ""
           };
 
-          await submitTicket(formData, 'loginProvider', ticketForm.uploadedFiles || []);
+          await submitTicket(formData, 'loginProvider', currentForm.uploadedFiles || []);
         }
       },
-      path: "affiliated_login_success"
+      path: (chatState) => {
+        if (chatState.userInput === "Submit Ticket") {
+          return "affiliated_login_success";
+        } else {
+          return "start";
+        }
+      }
     },
     affiliated_login_success: {
       message: () => {

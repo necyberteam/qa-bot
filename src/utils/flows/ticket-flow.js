@@ -10,11 +10,11 @@ import { createAccessLoginFlow } from './tickets/access-login-flow';
 import { createAffiliatedLoginFlow } from './tickets/affiliated-login-flow';
 import { createGeneralHelpFlow } from './tickets/general-help-flow';
 
-export const createTicketFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
+export const createTicketFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   // Import flows from modular ticket files
-  const accessLoginFlow = createAccessLoginFlow({ ticketForm, setTicketForm });
-  const affiliatedLoginFlow = createAffiliatedLoginFlow({ ticketForm, setTicketForm });
-  const generalHelpFlow = createGeneralHelpFlow({ ticketForm, setTicketForm });
+  const accessLoginFlow = createAccessLoginFlow({ ticketForm, setTicketForm, userInfo });
+  const affiliatedLoginFlow = createAffiliatedLoginFlow({ ticketForm, setTicketForm, userInfo });
+  const generalHelpFlow = createGeneralHelpFlow({ ticketForm, setTicketForm, userInfo });
 
   return {
     // Main ticket type selection

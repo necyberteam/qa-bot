@@ -2,9 +2,9 @@ import {
   createFileUploadComponent, 
   createSubmissionHandler, 
   generateSuccessMessage,
-  getCurrentAccessId,
   getFileInfo
 } from './ticket-flow-utils';
+import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 
 /**
  * Creates the enhanced general help ticket flow with ProForma field support
@@ -14,15 +14,27 @@ import {
  * @param {Function} params.setTicketForm Function to update ticket form
  * @returns {Object} Enhanced general help flow configuration
  */
-export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {} }) => {
+export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
   const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
+
 
   return {
     // FORM flow - Enhanced General Help Ticket Form Flow
     general_help_summary_subject: {
       message: "Provide a short title for your ticket.",
-      function: (chatState) => setTicketForm({...ticketForm, summary: chatState.userInput}),
+      function: (chatState) => {
+        // Pre-populate form with user info on first step
+        const currentForm = getCurrentTicketForm();
+        const updatedForm = {
+          ...currentForm,
+          summary: chatState.userInput,
+          email: userInfo.email || currentForm.email,
+          name: userInfo.name || currentForm.name,
+          accessId: userInfo.username || currentForm.accessId
+        };
+        setTicketForm(updatedForm);
+      },
       path: "general_help_category"
     },
     general_help_category: {
@@ -40,19 +52,28 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         "Some Other Question"
       ],
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, category: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, category: chatState.userInput});
+      },
       path: "general_help_description"
     },
     general_help_description: {
       message: "Please describe your issue.",
-      function: (chatState) => setTicketForm({...ticketForm, description: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, description: chatState.userInput});
+      },
       path: "general_help_attachment"
     },
     general_help_attachment: {
       message: "Would you like to attach a file to your ticket?",
       options: ["Yes", "No"],
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, wantsAttachment: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, wantsAttachment: chatState.userInput});
+      },
       path: (chatState) => chatState.userInput === "Yes"
         ? "general_help_upload"
         : "general_help_resource"
@@ -62,14 +83,20 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       component: fileUploadElement,
       options: ["Continue"],
       chatDisabled: true,
-      function: () => setTicketForm({...ticketForm, uploadConfirmed: true}),
+      function: () => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, uploadConfirmed: true});
+      },
       path: "general_help_resource"
     },
     general_help_resource: {
       message: "Does your problem involve an ACCESS Resource?",
       options: ["Yes", "No"],
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, involvesResource: chatState.userInput.toLowerCase()}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, involvesResource: chatState.userInput.toLowerCase()});
+      },
       path: (chatState) => chatState.userInput === "Yes"
         ? "general_help_resource_details"
         : "general_help_keywords"
@@ -98,13 +125,19 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         "Stampede3"
       ],
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, resourceDetails: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, resourceDetails: chatState.userInput});
+      },
       path: "general_help_user_id_at_resource"
     },
     // NEW: Collect User ID at Resource (ProForma field)
     general_help_user_id_at_resource: {
       message: "What is your User ID at the selected resource(s)? (Optional - leave blank if not applicable)",
-      function: (chatState) => setTicketForm({...ticketForm, userIdAtResource: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, userIdAtResource: chatState.userInput});
+      },
       path: "general_help_keywords"
     },
     general_help_keywords: {
@@ -412,7 +445,10 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         max: 5
       },
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, keywords: chatState.userInput}),
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, keywords: chatState.userInput});
+      },
       path: (chatState) => {
         if (chatState.userInput && chatState.userInput.includes("I don't see a relevant keyword")) {
           return "general_help_additional_keywords";
@@ -425,7 +461,8 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       message: "Please enter additional keywords, separated by commas:",
       function: (chatState) => {
         // Get the current keywords selected from checkboxes
-        const currentKeywords = ticketForm.keywords || [];
+        const currentForm = getCurrentTicketForm();
+        const currentKeywords = currentForm.keywords || [];
         const additionalKeywords = chatState.userInput;
 
         // Ensure we're working with arrays for consistency
@@ -442,7 +479,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
           : additionalKeywords;
 
         setTicketForm({
-          ...ticketForm,
+          ...currentForm,
           keywords: formattedKeywords,
           suggestedKeyword: additionalKeywords // NEW: Store separately for ProForma mapping
         });
@@ -453,23 +490,45 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       message: "Please select a priority for your issue:",
       options: ["Lowest", "Low", "Medium", "High", "Highest"],
       chatDisabled: true,
-      function: (chatState) => setTicketForm({...ticketForm, priority: chatState.userInput.toLowerCase()}),
-      path: "general_help_email"
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, priority: chatState.userInput.toLowerCase()});
+      },
+      path: (chatState) => {
+        if (!userInfo.email) return "general_help_email";
+        if (!userInfo.name) return "general_help_name";
+        if (!userInfo.username) return "general_help_accessid";
+        return "general_help_ticket_summary";
+      }
     },
     general_help_email: {
       message: "What is your email address?",
-      function: (chatState) => setTicketForm({...ticketForm, email: chatState.userInput}),
-      path: "general_help_name"
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, email: chatState.userInput});
+      },
+      path: (chatState) => {
+        if (!userInfo.name) return "general_help_name";
+        if (!userInfo.username) return "general_help_accessid";
+        return "general_help_ticket_summary";
+      }
     },
     general_help_name: {
       message: "What is your name?",
-      function: (chatState) => setTicketForm({...ticketForm, name: chatState.userInput}),
-      path: "general_help_accessid"
+      function: (chatState) => {
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, name: chatState.userInput});
+      },
+      path: (chatState) => {
+        if (!userInfo.username) return "general_help_accessid";
+        return "general_help_ticket_summary";
+      }
     },
     general_help_accessid: {
       message: "What is your ACCESS ID?",
       function: (chatState) => {
-        setTicketForm({...ticketForm, accessId: chatState.userInput});
+        const currentForm = getCurrentTicketForm();
+        setTicketForm({...currentForm, accessId: chatState.userInput});
       },
       path: (chatState) => {
         // Add small delay to let React update state
@@ -479,54 +538,66 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     general_help_ticket_summary: {
       message: (chatState) => {
-        const currentAccessId = getCurrentAccessId(chatState, ticketForm, 'general_help_accessid');
-        const fileInfo = getFileInfo(ticketForm.uploadedFiles);
+        // Get current form state from context (always up-to-date)
+        const currentForm = getCurrentTicketForm();
+        const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
+        
+        // Use current form state directly since Form Context always has fresh data
+        const fileInfo = getFileInfo(currentForm.uploadedFiles);
 
         let resourceInfo = '';
-        if (ticketForm.involvesResource === 'yes') {
-          resourceInfo = `\nResource: ${ticketForm.resourceDetails || 'Not specified'}`;
-          if (ticketForm.userIdAtResource) {
-            resourceInfo += `\nUser ID at Resource: ${ticketForm.userIdAtResource}`;
+        if (currentForm.involvesResource === 'yes') {
+          resourceInfo = `\nResource: ${currentForm.resourceDetails || 'Not specified'}`;
+          if (currentForm.userIdAtResource) {
+            resourceInfo += `\nUser ID at Resource: ${currentForm.userIdAtResource}`;
           }
         }
 
         return `Thank you for providing your issue details. Here's a summary:\n\n` +
-               `Name: ${ticketForm.name || 'Not provided'}\n` +
-               `Email: ${ticketForm.email || 'Not provided'}\n` +
-               `ACCESS ID: ${currentAccessId}\n` +
-               `Issue Summary: ${ticketForm.summary || 'Not provided'}\n` +
-               `Category: ${ticketForm.category || 'Not provided'}\n` +
-               `Priority: ${ticketForm.priority || 'Not provided'}\n` +
-               `Keywords: ${ticketForm.keywords || 'Not provided'}\n` +
-               `Issue Description: ${ticketForm.description || 'Not provided'}${resourceInfo}${fileInfo}\n\n` +
+               `Name: ${formWithUserInfo.name || 'Not provided'}\n` +
+               `Email: ${formWithUserInfo.email || 'Not provided'}\n` +
+               `ACCESS ID: ${formWithUserInfo.accessId || 'Not provided'}\n` +
+               `Issue Summary: ${currentForm.summary || 'Not provided'}\n` +
+               `Category: ${currentForm.category || 'Not provided'}\n` +
+               `Priority: ${currentForm.priority || 'Not provided'}\n` +
+               `Keywords: ${currentForm.keywords || 'Not provided'}\n` +
+               `Issue Description: ${currentForm.description || 'Not provided'}${resourceInfo}${fileInfo}\n\n` +
                `Would you like to submit this ticket?`;
       },
       options: ["Submit Ticket", "Back to Main Menu"],
       chatDisabled: true,
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
+          const currentForm = getCurrentTicketForm();
+          const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
           const formData = {
             // Regular JSM fields
-            email: ticketForm.email || "",
-            summary: ticketForm.summary || "General Support Ticket",
-            description: ticketForm.description || "",
-            priority: ticketForm.priority || "medium",
-            accessId: ticketForm.accessId || "",
-            userName: ticketForm.name || "",
-            issueType: ticketForm.category || "",
+            email: formWithUserInfo.email || "",
+            summary: currentForm.summary || "General Support Ticket",
+            description: currentForm.description || "",
+            priority: currentForm.priority || "medium",
+            accessId: formWithUserInfo.accessId || "",
+            userName: formWithUserInfo.name || "",
+            issueType: currentForm.category || "",
             // ProForma fields for request type 17
-            hasResourceProblem: ticketForm.involvesResource === 'yes' ? 'Yes' : 'No',
-            userIdAtResource: ticketForm.userIdAtResource || "",
-            resourceName: ticketForm.resourceDetails || "",
-            keywords: ticketForm.keywords || "",
-            noRelevantKeyword: ticketForm.suggestedKeyword ? 'checked' : '',
-            suggestedKeyword: ticketForm.suggestedKeyword || ""
+            hasResourceProblem: currentForm.involvesResource === 'yes' ? 'Yes' : 'No',
+            userIdAtResource: currentForm.userIdAtResource || "",
+            resourceName: currentForm.resourceDetails || "",
+            keywords: currentForm.keywords || "",
+            noRelevantKeyword: currentForm.suggestedKeyword ? 'checked' : '',
+            suggestedKeyword: currentForm.suggestedKeyword || ""
           };
 
-          await submitTicket(formData, 'support', ticketForm.uploadedFiles || []);
+          await submitTicket(formData, 'support', currentForm.uploadedFiles || []);
         }
       },
-      path: "general_help_success"
+      path: (chatState) => {
+        if (chatState.userInput === "Submit Ticket") {
+          return "general_help_success";
+        } else {
+          return "start";
+        }
+      }
     },
     general_help_success: {
       message: () => {

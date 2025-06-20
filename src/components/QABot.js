@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
 import HtmlRenderer from "@rcb-plugins/html-renderer";
+import MarkdownRenderer from "@rcb-plugins/markdown-renderer";
 import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
@@ -11,6 +12,7 @@ import useRingEffect from '../hooks/useRingEffect';
 import useFocusableSendButton from '../hooks/useFocusableSendButton';
 import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
 import { createBotFlow } from '../utils/create-bot-flow';
+import { FormProvider, useFormContext } from '../contexts/FormContext';
 
 
 const generateSessionId = () => {
@@ -34,20 +36,9 @@ const getOrCreateSessionId = () => {
 };
 
 /**
- * Q&A Bot Component (Controlled)
- *
- * @param {Object}    [props]
- * @param {string}    [props.apiKey] - API key for the Q&A endpoint
- * @param {boolean}   [props.open] - Whether the chat window is open (floating mode only, ignored for embedded)
- * @param {Function}  [props.onOpenChange] - Callback when chat window open state changes
- * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page (always open when embedded)
- * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
- * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
- * @param {boolean}   [props.ringEffect=true] - Whether to apply the phone ring animation effect to the tooltip
- * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
- * @returns {JSX.Element}
+ * Internal QABot component that uses Form Context
  */
-const QABot = React.forwardRef((props, botRef) => {
+const QABotInternal = React.forwardRef((props, botRef) => {
   const {
     apiKey,
     open = false,
@@ -56,7 +47,10 @@ const QABot = React.forwardRef((props, botRef) => {
     isLoggedIn,
     loginUrl = DEFAULT_CONFIG.LOGIN_URL,
     ringEffect = true,
-    welcome
+    welcome,
+    userEmail,
+    userName,
+    username
   } = props;
 
   const finalApiKey = apiKey || process.env.REACT_APP_API_KEY;
@@ -65,7 +59,9 @@ const QABot = React.forwardRef((props, botRef) => {
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
   const [currentQueryId, setCurrentQueryId] = useState(null);
-  const [ticketForm, setTicketForm] = useState({});
+  
+  // Use Form Context instead of local state
+  const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
 
   // Update internal state when isLoggedIn prop changes
   useEffect(() => {
@@ -108,6 +104,8 @@ const QABot = React.forwardRef((props, botRef) => {
 
   const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
+  const formContext = { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm };
+  
   const flow = useMemo(() => createBotFlow({
     welcomeMessage,
     isBotLoggedIn,
@@ -116,8 +114,16 @@ const QABot = React.forwardRef((props, botRef) => {
     sessionId,
     currentQueryId,
     ticketForm,
-    setTicketForm
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId]);
+    setTicketForm: updateTicketForm,
+    feedbackForm,
+    setFeedbackForm: updateFeedbackForm,
+    formContext,
+    userInfo: {
+      email: userEmail,
+      name: userName,
+      username: username
+    }
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, userEmail, userName, username]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
@@ -142,7 +148,7 @@ const QABot = React.forwardRef((props, botRef) => {
             key={`chatbot-${sessionId}-${isBotLoggedIn}`}
             settings={chatBotSettings}
             flow={flow}
-            plugins={[HtmlRenderer()]}
+            plugins={[HtmlRenderer(), MarkdownRenderer()]}
           />
           {/* Live region for screen reader announcements */}
           <div 
@@ -154,6 +160,31 @@ const QABot = React.forwardRef((props, botRef) => {
         </main>
       </ChatBotProvider>
     </div>
+  );
+});
+
+/**
+ * Q&A Bot Component (Controlled)
+ *
+ * @param {Object}    [props]
+ * @param {string}    [props.apiKey] - API key for the Q&A endpoint
+ * @param {boolean}   [props.open] - Whether the chat window is open (floating mode only, ignored for embedded)
+ * @param {Function}  [props.onOpenChange] - Callback when chat window open state changes
+ * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page (always open when embedded)
+ * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
+ * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
+ * @param {boolean}   [props.ringEffect=true] - Whether to apply the phone ring animation effect to the tooltip
+ * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
+ * @param {string}    [props.userEmail] - User's email address (when logged in)
+ * @param {string}    [props.userName] - User's display name (when logged in)
+ * @param {string}    [props.username] - User's username/ID (when logged in)
+ * @returns {JSX.Element}
+ */
+const QABot = React.forwardRef((props, ref) => {
+  return (
+    <FormProvider>
+      <QABotInternal {...props} ref={ref} />
+    </FormProvider>
   );
 });
 

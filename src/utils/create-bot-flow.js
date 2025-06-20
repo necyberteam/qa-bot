@@ -5,6 +5,7 @@ import { createMainMenuFlow } from './flows/main-menu-flow';
 import { createQAFlow } from './flows/qa-flow';
 import { createTicketFlow } from './flows/ticket-flow';
 import { createFeedbackFlow } from './flows/feedback-flow';
+import { setCurrentFormContext } from './flow-context-utils';
 
 function createBotFlow({
   welcomeMessage,
@@ -15,8 +16,14 @@ function createBotFlow({
   ticketForm = {},
   setTicketForm = () => {},
   feedbackForm = {},
-  setFeedbackForm = () => {}
+  setFeedbackForm = () => {},
+  formContext,
+  userInfo = {}
 }) {
+  // Set the current form context for use in flow functions
+  if (formContext) {
+    setCurrentFormContext(formContext);
+  }
   // Always create the main menu flow (available to everyone)
   const mainMenuFlow = createMainMenuFlow({
     welcome: buildWelcomeMessage(true, welcomeMessage), // Always use logged-in style welcome
@@ -47,12 +54,14 @@ function createBotFlow({
   // Create ticket and feedback flows (available to everyone)
   const ticketFlow = createTicketFlow({
     ticketForm,
-    setTicketForm
+    setTicketForm,
+    userInfo
   });
 
   const feedbackFlow = createFeedbackFlow({
     feedbackForm,
-    setFeedbackForm
+    setFeedbackForm,
+    userInfo
   });
 
   // Combine all flows

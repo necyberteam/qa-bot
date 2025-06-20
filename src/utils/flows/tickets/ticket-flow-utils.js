@@ -88,17 +88,6 @@ export const generateSuccessMessage = (submissionResult, ticketType = 'ticket') 
 };
 
 /**
- * Common pattern for handling ACCESS ID in summary messages due to React closure issues
- * @param {Object} chatState - Current chat state
- * @param {Object} ticketForm - Current ticket form state
- * @param {string} accessIdPath - The path name where ACCESS ID was collected
- * @returns {string} The current ACCESS ID value
- */
-export const getCurrentAccessId = (chatState, ticketForm, accessIdPath) => {
-  return chatState.prevPath === accessIdPath ? chatState.userInput : (ticketForm.accessId || 'Not provided');
-};
-
-/**
  * Generates file info string for summaries
  * @param {Array} uploadedFiles - Array of uploaded files
  * @returns {string} File information string
