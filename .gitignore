@@ -27,5 +27,6 @@ yarn-error.log*
 *.diff
 *.patch
 
-# Library build output
+# Build output
+/build
 /dist
