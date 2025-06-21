@@ -1,6 +1,5 @@
 import React from 'react';
 import FileUploadComponent from '../../components/FileUploadComponent';
-import { prepareApiSubmission } from '../api-utils';
 import { getCurrentFeedbackForm } from '../flow-context-utils';
 
 /**
@@ -21,7 +20,7 @@ export const createFeedbackFlow = ({
     <FileUploadComponent
       onFileUpload={(files) =>
         setFeedbackForm({
-          ...feedbackForm,
+          ...(feedbackForm || {}),
           uploadedFiles: files
         })
       }
@@ -36,7 +35,7 @@ export const createFeedbackFlow = ({
       function: (chatState) => {
         const wantsContact = chatState.userInput === "Include my contact info";
         setFeedbackForm({
-          ...feedbackForm,
+          ...(feedbackForm || {}),
           wantsContact: wantsContact ? "Yes" : "No",
           // Clear any contact info flags for fresh start
           useCustomContactInfo: false
@@ -52,20 +51,20 @@ export const createFeedbackFlow = ({
     },
     feedback_please_tell_us_more: {
       message: "Please provide your detailed feedback.",
-      function: (chatState) => setFeedbackForm({...feedbackForm, feedback: chatState.userInput}),
+      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), feedback: chatState.userInput}),
       path: "feedback_upload"
     },
     feedback_upload: {
       message: "Would you like to upload a screenshot or file to help us better understand your feedback?",
       options: ["Yes", "No"],
       chatDisabled: true,
-      function: (chatState) => setFeedbackForm({...feedbackForm, upload: chatState.userInput}),
+      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), upload: chatState.userInput}),
       path: (chatState) => {
         if (chatState.userInput === "Yes") {
           return "feedback_upload_yes";
         } else {
           // Add contact choice to form state for path decisions
-          setFeedbackForm({...feedbackForm, pathDecision: feedbackForm.wantsContact});
+          setFeedbackForm({...(feedbackForm || {}), pathDecision: (feedbackForm || {}).wantsContact});
           // Check if they want contact info and handle accordingly
           if (feedbackForm.wantsContact === "Yes") {
             // If we have complete user info, go to confirmation step
@@ -89,7 +88,7 @@ export const createFeedbackFlow = ({
       component: fileUploadElement,
       options: ["Continue"],
       chatDisabled: true,
-      function: (chatState) => setFeedbackForm({...feedbackForm, uploadConfirmed: true}),
+      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
       path: (chatState) => {
         // Check if they want contact info and handle accordingly
         if (feedbackForm.wantsContact === "Yes") {
@@ -121,7 +120,7 @@ export const createFeedbackFlow = ({
       function: (chatState) => {
         // Set a flag to indicate whether to use pre-populated data or collect new data
         setFeedbackForm({
-          ...feedbackForm,
+          ...(feedbackForm || {}),
           useCustomContactInfo: chatState.userInput === "I'll provide different details"
         });
       },
@@ -202,48 +201,6 @@ export const createFeedbackFlow = ({
       },
       options: ["Submit Feedback", "Back to Main Menu"],
       chatDisabled: true,
-      function: async (chatState) => {
-        if (chatState.userInput === "Submit Feedback") {
-          const currentForm = getCurrentFeedbackForm();
-          let finalName, finalEmail, finalAccessId;
-          
-          if (currentForm.wantsContact === "No") {
-            // Anonymous submission - no contact info sent
-            finalName = finalEmail = finalAccessId = "";
-          } else if (currentForm.useCustomContactInfo) {
-            // Use custom contact info
-            finalName = currentForm.customName || "";
-            finalEmail = currentForm.customEmail || "";
-            finalAccessId = currentForm.customAccessId || "";
-          } else {
-            // Use pre-populated userInfo
-            finalName = userInfo.name || "";
-            finalEmail = userInfo.email || "";
-            finalAccessId = userInfo.username || "";
-          }
-
-          // Prepare form data from feedback inputs
-          const formData = {
-            summary: "Feedback from ACCESS Help",
-            description: currentForm.feedback || "",
-            customfield_10103: finalAccessId,
-            email: finalEmail,
-            customfield_10108: finalName
-          };
-
-          try {
-            // Also prepare API data for future use
-            const apiData = await prepareApiSubmission(
-              formData,
-              'support',
-              currentForm.uploadedFiles || []
-            );
-
-          } catch (error) {
-            console.error("| ❌ Error preparing feedback data:", error);
-          }
-        }
-      },
       path: (chatState) => {
         if (chatState.userInput === "Submit Feedback") {
           return "feedback_success";

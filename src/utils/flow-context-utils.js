@@ -23,7 +23,8 @@ export const getCurrentTicketForm = () => {
     console.warn('Form context not available, returning empty form');
     return {};
   }
-  return currentFormContext.ticketForm;
+  const ticketForm = currentFormContext.ticketForm;
+  return (ticketForm && typeof ticketForm === 'object') ? ticketForm : {};
 };
 
 /**
@@ -35,7 +36,8 @@ export const getCurrentFeedbackForm = () => {
     console.warn('Form context not available, returning empty form');
     return {};
   }
-  return currentFormContext.feedbackForm;
+  const feedbackForm = currentFormContext.feedbackForm;
+  return (feedbackForm && typeof feedbackForm === 'object') ? feedbackForm : {};
 };
 
 /**
@@ -65,18 +67,20 @@ export const updateCurrentFeedbackForm = (updates) => {
  */
 export const getCurrentFieldValue = (fieldName, formType = 'ticket', fallback = 'Not provided') => {
   const form = formType === 'ticket' ? getCurrentTicketForm() : getCurrentFeedbackForm();
-  return form[fieldName] || fallback;
+  return (form && form[fieldName]) || fallback;
 };
 
 /**
  * Gets current form with user info merged
  */
 export const getCurrentFormWithUserInfo = (userInfo = {}) => {
-  const currentForm = getCurrentTicketForm();
+  const currentForm = getCurrentTicketForm() || {};
+  const safeUserInfo = userInfo && typeof userInfo === 'object' ? userInfo : {};
+  
   return {
     ...currentForm,
-    email: userInfo.email || currentForm.email,
-    name: userInfo.name || currentForm.name,
-    accessId: userInfo.username || currentForm.accessId
+    email: safeUserInfo.email || currentForm.email,
+    name: safeUserInfo.name || currentForm.name,
+    accessId: safeUserInfo.username || currentForm.accessId
   };
 };

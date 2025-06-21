@@ -27,7 +27,7 @@ export const createTicketFlow = ({ ticketForm = {}, setTicketForm = () => {}, us
       ],
       chatDisabled: true,
       function: (chatState) => {
-        setTicketForm({...ticketForm, ticketType: chatState.userInput});
+        setTicketForm({...(ticketForm || {}), ticketType: chatState.userInput});
       },
       path: (chatState) => {
         if (chatState.userInput === "Logging into ACCESS website") {

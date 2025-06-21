@@ -24,7 +24,8 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
   const REQUEST_TYPE_IDS = {
     SUPPORT: 17,
     LOGIN_ACCESS: 30,
-    LOGIN_PROVIDER: 31
+    LOGIN_PROVIDER: 31,
+    SECURITY: 26
   };
   
   const requestTypeIds = {
@@ -32,17 +33,21 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
     general_help: REQUEST_TYPE_IDS.SUPPORT,
     feedback: REQUEST_TYPE_IDS.SUPPORT,
     loginAccess: REQUEST_TYPE_IDS.LOGIN_ACCESS,
-    loginProvider: REQUEST_TYPE_IDS.LOGIN_PROVIDER
+    loginProvider: REQUEST_TYPE_IDS.LOGIN_PROVIDER,
+    security: REQUEST_TYPE_IDS.SECURITY
   };
 
   const requestTypeId = requestTypeIds[ticketType] || requestTypeIds.support;
+  
+  // Determine the correct service desk ID based on ticket type
+  const serviceDeskId = ticketType === 'security' ? 3 : 2;
   
   // Map ProForma fields to JSM custom field IDs (now handled by API)
   const mappedFormData = mapProFormaFields(formData, requestTypeId);
 
   // Basic submission data (API handles ProForma form mapping automatically)
   const submissionData = {
-    serviceDeskId: 2,
+    serviceDeskId: serviceDeskId,
     requestTypeId: requestTypeId,
     requestFieldValues: {
       ...mappedFormData
@@ -87,9 +92,15 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
   
   // Use versioned API endpoints (these get redirected by netlify.toml)
   const serverBaseUrl = DEFAULT_CONFIG.netlifyBaseUrl.replace('/.netlify/functions/', ''); // Get base server URL
-  const proxyEndpoint = endpointName === 'create-support-ticket' 
-    ? `${serverBaseUrl}/api/v1/tickets`
-    : `${DEFAULT_CONFIG.netlifyBaseUrl}/${endpointName}`;
+  
+  let proxyEndpoint;
+  if (endpointName === 'create-support-ticket') {
+    proxyEndpoint = `${serverBaseUrl}/api/v1/tickets`;
+  } else if (endpointName === 'create-security-incident') {
+    proxyEndpoint = `${serverBaseUrl}/api/v1/security-incidents`;
+  } else {
+    proxyEndpoint = `${DEFAULT_CONFIG.netlifyBaseUrl}/${endpointName}`;
+  }
     
 
   try {
@@ -118,6 +129,30 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
     };
   } catch (error) {
     console.error('| ❌ Post data to proxy exception:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+};
+
+/**
+ * Submits a security incident to JSM
+ * @param {Object} formData Security incident form data
+ * @param {Array} uploadedFiles Files uploaded by the user (if any)
+ * @returns {Promise<Object>} The response from the API
+ */
+export const submitSecurityIncident = async (formData, uploadedFiles = []) => {
+  try {
+    // Prepare the data for security incident submission
+    const submissionData = await prepareApiSubmission(formData, 'security', uploadedFiles);
+    
+    // Submit to the security incident endpoint
+    const result = await sendPreparedDataToProxy(submissionData, 'create-security-incident');
+    
+    return result;
+  } catch (error) {
+    console.error('| ❌ Security incident submission failed:', error);
     return {
       success: false,
       error: error.message

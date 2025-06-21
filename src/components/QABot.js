@@ -50,7 +50,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     welcome,
     userEmail,
     userName,
-    username
+    accessId
   } = props;
 
   const finalApiKey = apiKey || process.env.REACT_APP_API_KEY;
@@ -104,7 +104,14 @@ const QABotInternal = React.forwardRef((props, botRef) => {
 
   const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
-  const formContext = { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm };
+  const formContext = useMemo(() => ({ 
+    ticketForm: ticketForm || {}, 
+    feedbackForm: feedbackForm || {}, 
+    updateTicketForm, 
+    updateFeedbackForm, 
+    resetTicketForm, 
+    resetFeedbackForm 
+  }), [ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm]);
   
   const flow = useMemo(() => createBotFlow({
     welcomeMessage,
@@ -119,11 +126,11 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     setFeedbackForm: updateFeedbackForm,
     formContext,
     userInfo: {
-      email: userEmail,
-      name: userName,
-      username: username
+      email: userEmail || null,
+      name: userName || null,
+      username: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, userEmail, userName, username]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);

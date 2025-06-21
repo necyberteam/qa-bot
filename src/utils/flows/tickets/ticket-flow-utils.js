@@ -12,7 +12,7 @@ export const createFileUploadComponent = (setTicketForm, ticketForm) => (
   <FileUploadComponent
     onFileUpload={(files) =>
       setTicketForm({
-        ...ticketForm,
+        ...(ticketForm || {}),
         uploadedFiles: files
       })
     }
@@ -78,12 +78,13 @@ export const createSubmissionHandler = (setTicketForm) => {
  */
 export const generateSuccessMessage = (submissionResult, ticketType = 'ticket') => {
   if (submissionResult && !submissionResult.success) {
-    return `Sorry, there was an error submitting your ticket: ${submissionResult.error}\n\nPlease try again or contact support directly.`;
+    return `We apologize, but there was an error submitting your ${ticketType}: ${submissionResult.error}\n\nPlease try again or contact our support team directly.`;
+  } else if (submissionResult && submissionResult.success && submissionResult.ticketUrl && submissionResult.ticketKey) {
+    return `Your ${ticketType} has been submitted successfully.\n\nTicket: <a href="${submissionResult.ticketUrl}" target="_blank">${submissionResult.ticketKey}</a>\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
   } else if (submissionResult && submissionResult.success) {
-    const successMessage = `✅ Your ${ticketType} has been created successfully!\n\nYou can track your ticket at: <a href="${submissionResult.ticketUrl}" target="_blank">${submissionResult.ticketKey}</a>\n\nWe will follow up with you shortly via email.`;
-    return successMessage;
+    return `Your ${ticketType} has been submitted successfully.\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
   } else {
-    return `✅ Your ${ticketType} has been submitted successfully!\n\nWe will follow up with you shortly via email.`;
+    return `Your ${ticketType} has been submitted successfully.\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
   }
 };
 

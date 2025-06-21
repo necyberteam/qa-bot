@@ -5,6 +5,7 @@ import { createMainMenuFlow } from './flows/main-menu-flow';
 import { createQAFlow } from './flows/qa-flow';
 import { createTicketFlow } from './flows/ticket-flow';
 import { createFeedbackFlow } from './flows/feedback-flow';
+import { createSecurityFlow } from './flows/security-flow';
 import { setCurrentFormContext } from './flow-context-utils';
 
 function createBotFlow({
@@ -68,12 +69,19 @@ function createBotFlow({
     userInfo
   });
 
-  // Combine all flows
+  const securityFlow = createSecurityFlow({
+    ticketForm,
+    setTicketForm,
+    userInfo
+  });
+
+  // Combine all flows with null safety
   const flow = {
-    ...mainMenuFlow,
-    ...qaFlow,
-    ...ticketFlow,
-    ...feedbackFlow,
+    ...(mainMenuFlow || {}),
+    ...(qaFlow || {}),
+    ...(ticketFlow || {}),
+    ...(feedbackFlow || {}),
+    ...(securityFlow || {}),
     // Add fallback loop for errors (only if logged in)
     ...(isBotLoggedIn && {
       loop: {

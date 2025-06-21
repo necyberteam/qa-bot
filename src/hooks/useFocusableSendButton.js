@@ -26,7 +26,7 @@ const useFocusableSendButton = () => {
             event.preventDefault();
             
             // Call the React onMouseDown handler directly
-            const reactPropsKey = Object.keys(sendButton).find(key => key.startsWith('__reactProps'));
+            const reactPropsKey = sendButton && Object.keys(sendButton).find(key => key.startsWith('__reactProps'));
             if (reactPropsKey) {
               const reactProps = sendButton[reactPropsKey];
               const onMouseDown = reactProps?.onMouseDown;

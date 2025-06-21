@@ -113,7 +113,7 @@ function ExampleApp() {
         welcome="Hello! I'm the ACCESS Q&A Bot. How can I help you today?"
         userEmail={userEmail || undefined}
         userName={userName || undefined}
-        username={username || undefined}
+        accessId={username || undefined}
       />
     </div>
   );

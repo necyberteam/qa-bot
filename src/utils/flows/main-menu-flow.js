@@ -36,16 +36,10 @@ export const createMainMenuFlow = ({
         } else if (chatState.userInput === "Report a security issue") {
           // Reset form data
           setTicketForm({});
-          return "security_ticket_placeholder";
+          return "security_incident";
         }
         return "start";
       }
-    },
-    security_ticket_placeholder: {
-      message: "Security form is not available yet.",
-      options: ["Continue"],
-      chatDisabled: true,
-      path: "start"
     }
   };
 };

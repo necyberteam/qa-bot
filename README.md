@@ -65,9 +65,13 @@ The bot supports several conversation flows:
 - Collect user feedback and suggestions
 - Optional file attachments for screenshots or documents
 
-### 🔒 Security Flow
-- Report security issues and vulnerabilities
-- Direct integration with security team
+### 🔒 Security Incident Flow
+- Report security issues, vulnerabilities, and incidents
+- Dedicated priority levels: Critical, High, Medium, Low
+- Direct routing to ACCESS cybersecurity team (Service Desk ID: 3)
+- Support for file attachments (screenshots, logs, evidence)
+- Professional incident tracking with ticket reference links
+- User contact information pre-population when logged in
 
 ## Integration Methods
 
@@ -236,6 +240,19 @@ The bot integrates with the ACCESS Q&A API and JSM (Jira Service Management) for
 - User authentication and session management
 
 ## Changelog
+
+### Version 2.3.0
+
+#### ✨ New Features
+- **Security Incident Reporting**: Complete security incident reporting flow for cybersecurity team
+- **Dedicated Security Routing**: Direct integration with ACCESS cybersecurity team (Service Desk ID: 3)
+- **Professional Security Flow**: Priority levels, detailed incident tracking, and file attachments
+- **Enhanced API Integration**: Expanded API endpoints for security incident submission
+
+#### 🔧 Security & Infrastructure
+- **Robust Error Handling**: Comprehensive null checks and error handling across all flows
+- **Security Portal Integration**: Proper routing to dedicated security service desk
+- **File Upload Support**: Attachment support for security evidence and documentation
 
 ### Version 2.2.0
 
