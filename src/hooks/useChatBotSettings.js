@@ -37,7 +37,7 @@ const useChatBotSettings = ({
         avatar: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
         buttons: [
           isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl="/login" />,
-          <Button.CLOSE_CHAT_BUTTON key="close-button" />
+          Button.CLOSE_CHAT_BUTTON
         ]
       },
       chatWindow: {
