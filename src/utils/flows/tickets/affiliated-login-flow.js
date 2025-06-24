@@ -25,10 +25,11 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
       message: "If you're having trouble logging into an affiliated infrastructure or resource provider, here are some common issues:\n\n" +
                "• Ensure your allocation is active\n" +
                "• Confirm you have the correct username for that resource\n" +
-               "• Check if the resource is undergoing maintenance\n\n" +
+               "• Check <a href=\"https://operations.access-ci.org/infrastructure_news_view\">System Status News</a> to see if the resource is undergoing maintenance\n\n" +
                "Would you like to submit a help ticket for resource provider login issues?",
       options: ["Yes, let's create a ticket", "Back to Main Menu"],
       chatDisabled: true,
+      renderHtml: ["BOT"],
       path: (chatState) =>
         chatState.userInput === "Yes, let's create a ticket"
           ? "affiliated_login_resource"

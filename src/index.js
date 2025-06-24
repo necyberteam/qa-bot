@@ -110,7 +110,7 @@ function ExampleApp() {
         onOpenChange={setChatOpen}
         loginUrl="/login"
         apiKey={process.env.REACT_APP_API_KEY}
-        welcome="Hello! I'm the ACCESS Q&A Bot. How can I help you today?"
+        welcome="What can I help you with?"
         userEmail={userEmail || undefined}
         userName={userName || undefined}
         accessId={username || undefined}

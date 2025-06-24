@@ -22,7 +22,7 @@ export const createTicketFlow = ({ ticketForm = {}, setTicketForm = () => {}, us
       message: "What is your help ticket related to?",
       options: [
         "Logging into ACCESS website",
-        "Logging into affiliated infrastructure",
+        "Logging into a resource",
         "Another question"
       ],
       chatDisabled: true,
@@ -32,7 +32,7 @@ export const createTicketFlow = ({ ticketForm = {}, setTicketForm = () => {}, us
       path: (chatState) => {
         if (chatState.userInput === "Logging into ACCESS website") {
           return "access_help";
-        } else if (chatState.userInput === "Logging into affiliated infrastructure") {
+        } else if (chatState.userInput === "Logging into a resource") {
           return "affiliated_help";
         } else if (chatState.userInput === "Another question") {
           return "general_help_summary_subject";

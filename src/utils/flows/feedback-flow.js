@@ -29,7 +29,33 @@ export const createFeedbackFlow = ({
 
   return {
     feedback: {
-      message: "We appreciate your feedback about ACCESS.\n\nWould you like to provide your contact information for follow up, or submit feedback anonymously?",
+      message: "We appreciate your feedback about ACCESS. Please provide your detailed feedback.",
+      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), feedback: chatState.userInput}),
+      path: "feedback_upload"
+    },
+    feedback_upload: {
+      message: "Would you like to upload a screenshot or file to help us better understand your feedback?",
+      options: ["Yes", "No"],
+      chatDisabled: true,
+      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), upload: chatState.userInput}),
+      path: (chatState) => {
+        if (chatState.userInput === "Yes") {
+          return "feedback_upload_yes";
+        } else {
+          return "feedback_contact_choice";
+        }
+      }
+    },
+    feedback_upload_yes: {
+      message: "Please upload a screenshot or file to help us better understand your feedback.",
+      component: fileUploadElement,
+      options: ["Continue"],
+      chatDisabled: true,
+      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
+      path: "feedback_contact_choice"
+    },
+    feedback_contact_choice: {
+      message: "Would you like to provide your contact information for follow up?",
       options: ["Include my contact info", "Submit anonymously"],
       chatDisabled: true,
       function: (chatState) => {
@@ -43,55 +69,6 @@ export const createFeedbackFlow = ({
       },
       path: (chatState) => {
         if (chatState.userInput === "Include my contact info") {
-          // If we have complete user info, go to confirmation step after collecting feedback
-          return "feedback_please_tell_us_more";
-        }
-        return "feedback_please_tell_us_more";
-      }
-    },
-    feedback_please_tell_us_more: {
-      message: "Please provide your detailed feedback.",
-      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), feedback: chatState.userInput}),
-      path: "feedback_upload"
-    },
-    feedback_upload: {
-      message: "Would you like to upload a screenshot or file to help us better understand your feedback?",
-      options: ["Yes", "No"],
-      chatDisabled: true,
-      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), upload: chatState.userInput}),
-      path: (chatState) => {
-        if (chatState.userInput === "Yes") {
-          return "feedback_upload_yes";
-        } else {
-          // Add contact choice to form state for path decisions
-          setFeedbackForm({...(feedbackForm || {}), pathDecision: (feedbackForm || {}).wantsContact});
-          // Check if they want contact info and handle accordingly
-          if (feedbackForm.wantsContact === "Yes") {
-            // If we have complete user info, go to confirmation step
-            if (userInfo.email && userInfo.name && userInfo.username) {
-              return "feedback_contact_confirm";
-            }
-            // Otherwise collect missing info - set flag to use custom info
-            const currentForm = getCurrentFeedbackForm();
-            setFeedbackForm({...currentForm, useCustomContactInfo: true});
-            if (!userInfo.name) return "feedback_name";
-            if (!userInfo.email) return "feedback_email";
-            if (!userInfo.username) return "feedback_accessid";
-            return "feedback_summary";
-          }
-          return "feedback_summary";
-        }
-      }
-    },
-    feedback_upload_yes: {
-      message: "Please upload a screenshot or file to help us better understand your feedback.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
-      path: (chatState) => {
-        // Check if they want contact info and handle accordingly
-        if (feedbackForm.wantsContact === "Yes") {
           // If we have complete user info, go to confirmation step
           if (userInfo.email && userInfo.name && userInfo.username) {
             return "feedback_contact_confirm";
