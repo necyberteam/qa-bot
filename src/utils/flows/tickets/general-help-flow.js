@@ -530,11 +530,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, accessId: chatState.userInput});
       },
-      path: (chatState) => {
-        // Add small delay to let React update state
-        setTimeout(() => {}, 100);
-        return "general_help_ticket_summary";
-      }
+      path: "general_help_ticket_summary"
     },
     general_help_ticket_summary: {
       message: (chatState) => {
@@ -544,6 +540,14 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         
         // Use current form state directly since Form Context always has fresh data
         const fileInfo = getFileInfo(currentForm.uploadedFiles);
+
+        // Handle ACCESS ID timing issue - if coming from accessid step, use the input directly
+        let finalAccessId = formWithUserInfo.accessId;
+        if (chatState.prevPath === 'general_help_accessid' && chatState.userInput) {
+          finalAccessId = chatState.userInput;
+        } else if (!finalAccessId && chatState.prevPath === 'general_help_accessid') {
+          finalAccessId = chatState.userInput;
+        }
 
         let resourceInfo = '';
         if (currentForm.involvesResource === 'yes') {
@@ -556,7 +560,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         return `Thank you for providing your issue details. Here's a summary:\n\n` +
                `Name: ${formWithUserInfo.name || 'Not provided'}\n` +
                `Email: ${formWithUserInfo.email || 'Not provided'}\n` +
-               `ACCESS ID: ${formWithUserInfo.accessId || 'Not provided'}\n` +
+               `ACCESS ID: ${finalAccessId || 'Not provided'}\n` +
                `Issue Summary: ${currentForm.summary || 'Not provided'}\n` +
                `Category: ${currentForm.category || 'Not provided'}\n` +
                `Priority: ${currentForm.priority || 'Not provided'}\n` +
