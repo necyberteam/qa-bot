@@ -46,7 +46,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     embedded = false,
     isLoggedIn,
     loginUrl = DEFAULT_CONFIG.LOGIN_URL,
-    ringEffect = true,
+    ringEffect = false,
     welcome,
     userEmail,
     userName,
