@@ -147,10 +147,18 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
         // Use current form state directly since Form Context always has fresh data
         const fileInfo = getFileInfo(currentForm.uploadedFiles);
 
+        // Handle ACCESS ID timing issue - if coming from accessid step, use the input directly
+        let finalAccessId = formWithUserInfo.accessId;
+        if (chatState.prevPath === 'access_login_accessid' && chatState.userInput) {
+          finalAccessId = chatState.userInput;
+        } else if (!finalAccessId && chatState.prevPath === 'access_login_accessid') {
+          finalAccessId = chatState.userInput;
+        }
+
         return `Thank you for providing your ACCESS login issue details. Here's a summary:\n\n` +
                `Name: ${formWithUserInfo.name || 'Not provided'}\n` +
                `Email: ${formWithUserInfo.email || 'Not provided'}\n` +
-               `ACCESS ID: ${formWithUserInfo.accessId || 'Not provided'}\n` +
+               `ACCESS ID: ${finalAccessId || 'Not provided'}\n` +
                `Identity Provider: ${currentForm.identityProvider || 'Not provided'}\n` +
                `Browser: ${currentForm.browser || 'Not provided'}\n` +
                `Issue Description: ${currentForm.description || 'Not provided'}${fileInfo}\n\n` +
