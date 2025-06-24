@@ -145,7 +145,7 @@ function MyApp() {
 | `loginUrl` | string | `"/login"` | Login redirect URL |
 | `open` | boolean | - | Controls chat window (floating mode only) |
 | `onOpenChange` | function | - | Chat window state change callback |
-| `ringEffect` | boolean | `true` | Phone ring animation on tooltip |
+| `ringEffect` | boolean | `false` | Phone ring animation on tooltip |
 | `welcome` | string | - | Welcome message |
 | `userEmail` | string | - | User's email (pre-populates ticket forms when logged in) |
 | `userName` | string | - | User's display name (pre-populates ticket forms when logged in) |
@@ -200,7 +200,7 @@ botController.destroy();
 | `embedded` | boolean | `false` | Floating or embedded mode |
 | `isLoggedIn` | boolean | `false` | User login state |
 | `loginUrl` | string | `"/login"` | Login redirect URL |
-| `ringEffect` | boolean | `true` | Phone ring animation on tooltip |
+| `ringEffect` | boolean | `false` | Phone ring animation on tooltip |
 | `welcome` | string | - | Welcome message |
 | `userEmail` | string | - | User's email (pre-populates ticket forms when logged in) |
 | `userName` | string | - | User's display name (pre-populates ticket forms when logged in) |
