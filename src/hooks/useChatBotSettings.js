@@ -21,6 +21,11 @@ const useChatBotSettings = ({
   isLoggedIn
 }) => {
   const isBotLoggedIn = isLoggedIn;
+  
+  // Check if tooltip has been shown in this session
+  const hasShownTooltip = sessionStorage.getItem('qa_bot_tooltip_shown');
+  const tooltipMode = hasShownTooltip ? 'NEVER' : 'START';
+  
   const settings = useMemo(() => {
     return {
       general: {
@@ -68,7 +73,7 @@ const useChatBotSettings = ({
       },
       tooltip: {
         text: DEFAULT_CONFIG.CHATBOT.TOOLTIP_TEXT,
-        mode: 'START'
+        mode: tooltipMode
       },
       audio: {
         disabled: true,
@@ -89,10 +94,10 @@ const useChatBotSettings = ({
         ]
       },
       event: {
-        rcbToggleChatWindow: true, // Enable chat window toggle event
+        rcbToggleChatWindow: true // Enable chat window toggle event
       }
     };
-  }, [themeColors, embedded, defaultOpen, isBotLoggedIn]);
+  }, [themeColors, embedded, defaultOpen, isBotLoggedIn, tooltipMode]);
 
   return settings;
 };

@@ -136,6 +136,23 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   useRingEffect(ringEffect, containerRef);
   useFocusableSendButton();
 
+  // Handle tooltip session tracking
+  useEffect(() => {
+    // Listen for chat window toggle (opening chat)
+    const handleToggle = () => {
+      // Mark tooltip as shown when user opens chat
+      sessionStorage.setItem('qa_bot_tooltip_shown', 'true');
+    };
+
+    // Add event listener
+    window.addEventListener('rcb-toggle-chat-window', handleToggle);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('rcb-toggle-chat-window', handleToggle);
+    };
+  }, []);
+
   return (
     <div 
       className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} 
