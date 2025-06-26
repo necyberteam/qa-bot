@@ -6,29 +6,123 @@ import { useEffect } from 'react';
  */
 const useKeyboardNavigation = () => {
   useEffect(() => {
-    console.log('useKeyboardNavigation hook initialized');
+    // Dedicated checkbox navigation handler
+    const handleCheckboxNavigation = (event, elements) => {
+      event.preventDefault();
+      
+      let currentIndex = -1;
+      
+      // Find currently focused element
+      for (let i = 0; i < elements.length; i++) {
+        if (elements[i] === document.activeElement || elements[i].contains(document.activeElement)) {
+          currentIndex = i;
+          break;
+        }
+      }
+      
+      // If no element is focused, start with first one
+      if (currentIndex === -1) {
+        currentIndex = 0;
+      }
+      
+      let newIndex = currentIndex;
+      
+      switch (event.key) {
+        case 'ArrowDown':
+        case 'ArrowRight':
+          newIndex = currentIndex < elements.length - 1 ? currentIndex + 1 : 0;
+          break;
+        case 'ArrowUp':
+        case 'ArrowLeft':
+          newIndex = currentIndex > 0 ? currentIndex - 1 : elements.length - 1;
+          break;
+        case 'Home':
+          newIndex = 0;
+          break;
+        case 'End':
+          newIndex = elements.length - 1;
+          break;
+        case 'Enter':
+        case ' ':
+          // Handle different types of elements
+          const currentElement = elements[currentIndex];
+          const mouseDownEvent = new MouseEvent('mousedown', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          });
+          currentElement.dispatchEvent(mouseDownEvent);
+          return;
+        default:
+          // No action needed for other keys
+          return;
+      }
+      
+      // Focus the new element
+      elements[newIndex].focus();
+      elements[newIndex].setAttribute('tabindex', '0');
+      elements[newIndex].classList.add('keyboard-focused');
+      
+      // Remove tabindex and focus class from other elements
+      elements.forEach((element, index) => {
+        if (index !== newIndex) {
+          element.setAttribute('tabindex', '-1');
+          element.classList.remove('keyboard-focused');
+        }
+      });
+    };
+
     const handleKeyboardNavigation = (event) => {
       // Only handle arrow keys and Enter/Space
       if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', 'Home', 'End'].includes(event.key)) {
         return;
       }
 
-
       const chatWindow = document.querySelector('.rcb-chat-window');
       if (!chatWindow) return;
       
-      // Check if chat window is visible and if there are options available
-      const optionsContainers = Array.from(chatWindow.querySelectorAll('.rcb-options-container'))
+      // Special handling for checkboxes - but only if they're in the most recent message
+      const checkboxContainer = chatWindow.querySelector('.rcb-checkbox-container');
+      if (checkboxContainer && checkboxContainer.offsetParent !== null) {
+        // Check if this checkbox container is in the last message
+        const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
+          .filter(el => el.offsetParent !== null);
+        
+        if (allMessages.length > 0) {
+          const lastMessage = allMessages[allMessages.length - 1];
+          
+          // Only handle checkboxes if they're in the last message
+          if (lastMessage.contains(checkboxContainer)) {
+            const checkboxes = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'));
+            const nextButton = checkboxContainer.querySelector('.rcb-checkbox-next-button');
+            
+            if (checkboxes.length > 0) {
+              // Include next button in navigable elements
+              const allElements = [...checkboxes];
+              if (nextButton) {
+                allElements.push(nextButton);
+              }
+              handleCheckboxNavigation(event, allElements);
+              return;
+            }
+          }
+        }
+      }
+      
+      // Check if chat window is visible and if there are options available - only in the most recent message
+      const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
         .filter(el => el.offsetParent !== null);
       
-      if (optionsContainers.length === 0) return;
-
-      // Get the last (most recent) options container that we already found above
       let options = [];
-      if (optionsContainers.length > 0) {
-        // Get the last (most recent) options container
-        const lastContainer = optionsContainers[optionsContainers.length - 1];
-        options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
+      if (allMessages.length > 0) {
+        const lastMessage = allMessages[allMessages.length - 1];
+        const optionsContainers = Array.from(lastMessage.querySelectorAll('.rcb-options-container'))
+          .filter(el => el.offsetParent !== null);
+        
+        if (optionsContainers.length > 0) {
+          const lastContainer = optionsContainers[optionsContainers.length - 1];
+          options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
+        }
       }
       
       if (options.length === 0) return;
@@ -88,17 +182,37 @@ const useKeyboardNavigation = () => {
         case ' ': // Space key
           event.preventDefault();
           if (document.activeElement && options.includes(document.activeElement)) {
-            // React ChatBotify responds to mousedown events
-            const mouseDownEvent = new MouseEvent('mousedown', {
-              bubbles: true,
-              cancelable: true,
-              view: window
-            });
-            document.activeElement.dispatchEvent(mouseDownEvent);
+            const activeElement = document.activeElement;
             
-            // Announce selection to screen readers
-            const selectedText = document.activeElement.textContent || document.activeElement.innerText;
-            announceToScreenReader(`Selected: ${selectedText}`);
+            // Handle checkboxes differently
+            if (activeElement.classList.contains('rcb-checkbox-row-container') || activeElement.closest('.rcb-checkbox-row-container')) {
+              // For checkboxes, trigger a mousedown event (React ChatBotify standard)
+              const mouseDownEvent = new MouseEvent('mousedown', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+              });
+              activeElement.dispatchEvent(mouseDownEvent);
+              
+              // Announce checkbox state
+              const labelElement = activeElement.querySelector('.rcb-checkbox-label');
+              const selectedText = labelElement ? labelElement.textContent : (activeElement.textContent || 'checkbox');
+              const checkboxMark = activeElement.querySelector('.rcb-checkbox-mark');
+              const isChecked = checkboxMark && checkboxMark.style.backgroundColor ? 'checked' : 'unchecked';
+              announceToScreenReader(`${selectedText} ${isChecked}`);
+            } else {
+              // For regular options, use mousedown
+              const mouseDownEvent = new MouseEvent('mousedown', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+              });
+              activeElement.dispatchEvent(mouseDownEvent);
+              
+              // Announce selection to screen readers
+              const selectedText = activeElement.textContent || activeElement.innerText;
+              announceToScreenReader(`Selected: ${selectedText}`);
+            }
           }
           break;
 
@@ -138,6 +252,7 @@ const useKeyboardNavigation = () => {
       }
     };
 
+
     // Screen reader announcement helper
     const announceToScreenReader = (message) => {
       const announcement = document.createElement('div');
@@ -164,36 +279,62 @@ const useKeyboardNavigation = () => {
         chatWindow = document.querySelector('.qa-bot');
       }
       
-      // Get the most recent options container - search in chat window or document
-      let optionsContainers;
+      // Get the most recent options container
+      let optionsContainers = [];
       if (chatWindow) {
-        const allContainers = Array.from(chatWindow.querySelectorAll('.rcb-options-container'));
-        console.log('Total .rcb-options-container elements in chat window:', allContainers.length);
-        optionsContainers = allContainers.filter(el => el.offsetParent !== null);
-        console.log('Visible .rcb-options-container elements:', optionsContainers.length);
-      } else {
-        const allContainers = Array.from(document.querySelectorAll('.rcb-options-container'));
-        console.log('Total .rcb-options-container elements in document:', allContainers.length);
-        optionsContainers = allContainers.filter(el => el.offsetParent !== null);
-        console.log('Visible .rcb-options-container elements:', optionsContainers.length);
+        optionsContainers = Array.from(chatWindow.querySelectorAll('.rcb-options-container'))
+          .filter(el => el.offsetParent !== null);
       }
       
-      // Also check for any element with "options" in the class name
-      const anyOptionsElements = chatWindow ? 
-        chatWindow.querySelectorAll('[class*="options"]') : 
-        document.querySelectorAll('[class*="options"]');
-      console.log('Any elements with "options" in class name:', anyOptionsElements.length);
-      if (anyOptionsElements.length > 0) {
-        console.log('Options elements found:', Array.from(anyOptionsElements).map(el => el.className));
+      let options = [];
+      let optionType = 'regular';
+      
+      // Look for regular options first
+      if (optionsContainers.length > 0) {
+        const lastContainer = optionsContainers[optionsContainers.length - 1];
+        options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
       }
       
-      console.log('Final count of visible options containers:', optionsContainers.length);
-      if (optionsContainers.length === 0) return;
+      // If no regular options, look for checkboxes and set them up
+      if (options.length === 0) {
+        const checkboxContainer = chatWindow ? 
+          chatWindow.querySelector('.rcb-checkbox-container') :
+          document.querySelector('.rcb-checkbox-container');
+        
+        if (checkboxContainer) {
+          const checkboxElements = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'))
+            .filter(el => el.offsetParent !== null && el.style.display !== 'none');
+          
+          if (checkboxElements.length > 0) {
+            // Include next button in navigable elements
+            const nextButton = checkboxContainer.querySelector('.rcb-checkbox-next-button');
+            const allElements = [...checkboxElements];
+            if (nextButton && nextButton.offsetParent !== null) {
+              allElements.push(nextButton);
+            }
+            
+            // Set up checkboxes for keyboard navigation
+            allElements.forEach((element, index) => {
+              element.setAttribute('tabindex', index === 0 ? '0' : '-1');
+              if (index === 0) {
+                element.classList.add('keyboard-focused');
+              } else {
+                element.classList.remove('keyboard-focused');
+              }
+            });
+            
+            // Focus first element
+            setTimeout(() => {
+              if (allElements[0] && allElements[0].offsetParent !== null) {
+                allElements[0].focus();
+              }
+            }, 150);
+            
+            return; // Don't process as regular options
+          }
+        }
+      }
       
-      const lastContainer = optionsContainers[optionsContainers.length - 1];
-      const options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
-      
-      console.log('Found', options.length, 'options in last container');
       if (options.length > 0) {
         // Set tabindex and ARIA attributes for keyboard navigation
         options.forEach((option, index) => {
@@ -211,21 +352,28 @@ const useKeyboardNavigation = () => {
         });
 
         // Add keyboard navigation hint only for multiple options
-        if (options.length > 1) {
-          // Remove any existing hint first
-          const existingHints = lastContainer.querySelectorAll('.keyboard-nav-hint');
-          existingHints.forEach(hint => hint.remove());
-          
-          // Add new hint
-          const hintElement = document.createElement('div');
-          hintElement.className = 'keyboard-nav-hint';
-          hintElement.textContent = 'Use arrow keys ↕ to navigate, Enter to select, or click any option';
-          hintElement.style.cssText = 'font-size: 12px !important; color: #666 !important; margin-bottom: 8px !important; font-style: italic !important; display: block !important;';
-          lastContainer.insertBefore(hintElement, lastContainer.firstChild);
-        } else {
-          // Remove hints for single options
-          const existingHints = lastContainer.querySelectorAll('.keyboard-nav-hint');
-          existingHints.forEach(hint => hint.remove());
+        if (options.length > 1 && optionType === 'regular') {
+          // Only add hints for regular options, and only if we have a container
+          const lastContainer = optionsContainers.length > 0 ? optionsContainers[optionsContainers.length - 1] : null;
+          if (lastContainer) {
+            // Remove any existing hint first
+            const existingHints = lastContainer.querySelectorAll('.keyboard-nav-hint');
+            existingHints.forEach(hint => hint.remove());
+            
+            // Add new hint
+            const hintElement = document.createElement('div');
+            hintElement.className = 'keyboard-nav-hint';
+            hintElement.textContent = 'Use arrow keys ↕ to navigate, Enter to select, or click any option';
+            hintElement.style.cssText = 'font-size: 12px !important; color: #666 !important; margin-bottom: 8px !important; font-style: italic !important; display: block !important;';
+            lastContainer.insertBefore(hintElement, lastContainer.firstChild);
+          }
+        } else if (optionType === 'regular') {
+          // Remove hints for single options, but only for regular options
+          const lastContainer = optionsContainers.length > 0 ? optionsContainers[optionsContainers.length - 1] : null;
+          if (lastContainer) {
+            const existingHints = lastContainer.querySelectorAll('.keyboard-nav-hint');
+            existingHints.forEach(hint => hint.remove());
+          }
         }
 
         // Focus first option after a short delay to allow rendering
@@ -242,10 +390,11 @@ const useKeyboardNavigation = () => {
 
     // Set up mutation observer to watch for new options
     const observer = new MutationObserver((mutations) => {
-      console.log('Mutation detected, checking for options...');
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           const addedNodes = Array.from(mutation.addedNodes);
+          const removedNodes = Array.from(mutation.removedNodes);
+          
           const hasNewOptions = addedNodes.some(node => 
             node.nodeType === Node.ELEMENT_NODE && 
             (node.classList?.contains('rcb-options-container') || 
@@ -254,11 +403,21 @@ const useKeyboardNavigation = () => {
              node.querySelector?.('.rcb-options'))
           );
           
-          console.log('Has new options:', hasNewOptions);
-          if (hasNewOptions) {
-            console.log('Calling handleNewOptions due to mutation');
-            // Small delay to ensure all options are rendered
-            setTimeout(handleNewOptions, 50);
+          const hasNewCheckboxes = addedNodes.some(node => 
+            node.nodeType === Node.ELEMENT_NODE && 
+            (node.classList?.contains('rcb-checkbox-container') ||
+             node.querySelector?.('.rcb-checkbox-container'))
+          );
+
+          
+          if (hasNewOptions || hasNewCheckboxes) {
+            // Clear tabindex from all existing elements to prevent old ones from being navigable
+            document.querySelectorAll('.rcb-options[tabindex], .rcb-checkbox-row-container[tabindex], .rcb-checkbox-next-button[tabindex]').forEach(el => {
+              el.setAttribute('tabindex', '-1');
+              el.classList.remove('keyboard-focused');
+            });
+            
+            setTimeout(handleNewOptions, 100);
           }
         }
       });
@@ -278,17 +437,27 @@ const useKeyboardNavigation = () => {
 
     // Check for existing options on mount
     handleNewOptions();
+    
 
-    // Periodic check as backup to catch any missed options
+    // Periodic check as backup to catch any missed options and checkboxes
     const periodicCheck = setInterval(() => {
       const hasVisibleOptions = document.querySelectorAll('.rcb-options-container .rcb-options').length > 0;
+      const hasVisibleCheckboxes = document.querySelectorAll('.rcb-checkbox-row-container').length > 0;
+      
       if (hasVisibleOptions) {
         const lastProcessedOptions = document.querySelectorAll('.rcb-options[tabindex]').length;
         const currentOptions = document.querySelectorAll('.rcb-options').length;
         
-        // If we have options that haven't been processed for keyboard navigation
         if (currentOptions > lastProcessedOptions) {
-          console.log('Periodic check found unprocessed options');
+          handleNewOptions();
+        }
+      }
+      
+      if (hasVisibleCheckboxes) {
+        const lastProcessedCheckboxes = document.querySelectorAll('.rcb-checkbox-row-container[tabindex]').length;
+        const currentCheckboxes = document.querySelectorAll('.rcb-checkbox-row-container').length;
+        
+        if (currentCheckboxes > lastProcessedCheckboxes) {
           handleNewOptions();
         }
       }

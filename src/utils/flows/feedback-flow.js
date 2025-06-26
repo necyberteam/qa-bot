@@ -30,8 +30,67 @@ export const createFeedbackFlow = ({
 
   return {
     feedback: {
-      message: "We appreciate your feedback about ACCESS. Please provide your detailed feedback.",
+      message: "We appreciate your feedback about ACCESS.\n\nFeedback submitted through this form will only be shared within the ACCESS teams. We encourage the sharing of contact information for potential follow-up, but understand that anonymity may be preferred when providing feedback on sensitive issues.\n\nPlease provide your detailed feedback:",
       function: (chatState) => setFeedbackForm({...(feedbackForm || {}), feedback: chatState.userInput}),
+      path: "feedback_please_tell_us_more"
+    },
+    feedback_please_tell_us_more: {
+      message: "Please detail any recommendations for improvement:",
+      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), recommendations: chatState.userInput}),
+      path: "feedback_primary_role"
+    },
+    feedback_primary_role: {
+      message: "What is your primary role pertaining to ACCESS?",
+      options: [
+        "ACCESS Staff",
+        "Campus Champion / Research Facilitator", 
+        "Educator",
+        "Researcher",
+        "Resource Provider",
+        "Reviewer",
+        "Other"
+      ],
+      chatDisabled: true,
+      function: (chatState) => {
+        const currentForm = getCurrentFeedbackForm();
+        if (chatState.userInput === "Other") {
+          setFeedbackForm({...currentForm, primaryRole: "Other", needsCustomRole: true});
+        } else {
+          setFeedbackForm({...currentForm, primaryRole: chatState.userInput, needsCustomRole: false});
+        }
+      },
+      path: (chatState) => {
+        return chatState.userInput === "Other" ? "feedback_custom_role" : "feedback_community_interest";
+      }
+    },
+    feedback_custom_role: {
+      message: "Please specify your role:",
+      function: (chatState) => {
+        const currentForm = getCurrentFeedbackForm();
+        setFeedbackForm({...currentForm, customRole: chatState.userInput});
+      },
+      path: "feedback_community_interest"
+    },
+    feedback_community_interest: {
+      message: "Are you interested, or potentially interested, in serving the ACCESS community and helping us improve in any of these roles? (This is not a commitment. We'll reach out with more information.) Select all that apply:",
+      checkboxes: {
+        items: [
+          "ACCESS Community Expert / Support",
+          "Design of Future Features",
+          "Focus Group Participant", 
+          "Panel Reviewer",
+          "Researcher Advisory Committee Member",
+          "Other",
+          "Not interested at this time"
+        ],
+        min: 0,
+        max: 7
+      },
+      chatDisabled: true,
+      function: (chatState) => {
+        const currentForm = getCurrentFeedbackForm();
+        setFeedbackForm({...currentForm, communityInterest: chatState.userInput});
+      },
       path: "feedback_upload"
     },
     feedback_upload: {
@@ -173,9 +232,26 @@ export const createFeedbackFlow = ({
           contactInfo = `Contact Information: Not provided\n`;
         }
 
+        // Format primary role
+        let primaryRole = currentForm.primaryRole || 'Not provided';
+        if (currentForm.primaryRole === 'Other' && currentForm.customRole) {
+          primaryRole = `Other: ${currentForm.customRole}`;
+        }
+
+        // Format community interest
+        let communityInterest = 'Not provided';
+        if (currentForm.communityInterest && Array.isArray(currentForm.communityInterest)) {
+          communityInterest = currentForm.communityInterest.join(', ');
+        } else if (currentForm.communityInterest) {
+          communityInterest = currentForm.communityInterest;
+        }
+
         return `Thank you for providing your feedback. Here's a summary:\n\n` +
                contactInfo +
-               `Feedback: ${currentForm.feedback || 'Not provided'}${fileInfo}\n\n` +
+               `Feedback: ${currentForm.feedback || 'Not provided'}\n` +
+               `Recommendations: ${currentForm.recommendations || 'Not provided'}\n` +
+               `Primary Role: ${primaryRole}\n` +
+               `Community Interest: ${communityInterest}${fileInfo}\n\n` +
                `Would you like to submit this feedback?`;
       },
       options: ["Submit Feedback", "Back to Main Menu"],
