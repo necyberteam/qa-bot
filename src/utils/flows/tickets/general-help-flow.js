@@ -5,6 +5,7 @@ import {
   getFileInfo
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
+import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
 
 /**
  * Creates the enhanced general help ticket flow with ProForma field support
@@ -133,10 +134,11 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     // NEW: Collect User ID at Resource (ProForma field)
     general_help_user_id_at_resource: {
-      message: "What is your User ID at the selected resource(s)? (Optional - leave blank if not applicable)",
+      message: "What is your User ID at the selected resource(s)? (Optional - press Enter to skip)",
+      validateTextInput: createOptionalFieldValidator(),
       function: (chatState) => {
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, userIdAtResource: chatState.userInput});
+        setTicketForm({...currentForm, userIdAtResource: processOptionalInput(chatState.userInput)});
       },
       path: "general_help_keywords"
     },
@@ -525,10 +527,11 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       }
     },
     general_help_accessid: {
-      message: "What is your ACCESS ID?",
+      message: "What is your ACCESS ID? (Optional - press Enter to skip)",
+      required: false,
       function: (chatState) => {
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, accessId: chatState.userInput});
+        setTicketForm({...currentForm, accessId: chatState.userInput || ""});
       },
       path: "general_help_ticket_summary"
     },

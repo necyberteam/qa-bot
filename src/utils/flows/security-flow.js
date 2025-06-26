@@ -2,6 +2,7 @@ import React from 'react';
 import FileUploadComponent from '../../components/FileUploadComponent';
 import { submitSecurityIncident } from '../api-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../flow-context-utils';
+import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
 
 /**
  * Creates the security incident conversation flow
@@ -173,12 +174,14 @@ export const createSecurityFlow = ({
       path: "security_accessid"
     },
     security_accessid: {
-      message: "What is your ACCESS ID?",
+      message: "What is your ACCESS ID? (Optional - press Enter to skip)",
+      validateTextInput: createOptionalFieldValidator(),
       function: (chatState) => {
-        // Store the most recent input to handle timing issues
-        mostRecentAccessId = chatState.userInput;
+        // Store the processed input
+        const finalInput = processOptionalInput(chatState.userInput);
+        mostRecentAccessId = finalInput;
         const currentForm = getCurrentTicketForm() || {};
-        setTicketForm({...currentForm, accessId: chatState.userInput});
+        setTicketForm({...currentForm, accessId: finalInput});
       },
       path: "security_summary"
     },

@@ -30,7 +30,12 @@ const useChatBotSettings = ({
     return {
       general: {
         ...themeColors,
-        embedded: embedded
+        embedded: embedded,
+        // Enhanced accessibility
+        primaryColor: themeColors.primaryColor,
+        fontFamily: 'Arial, sans-serif',
+        // Ensure good contrast ratios
+        secondaryColor: themeColors.secondaryColor
       },
       header: {
         title: (
@@ -56,7 +61,10 @@ const useChatBotSettings = ({
         sendButtonStyle: { display: 'flex' },
         characterLimit: 1000,
         sendButtonAriaLabel: 'Send message',
-        showCharacterCount: false
+        showCharacterCount: false,
+        // Enhanced accessibility
+        ariaLabel: 'Chat input area',
+        ariaDescribedBy: 'chat-input-help'
       },
       chatHistory: {
         disabled: false
@@ -66,7 +74,10 @@ const useChatBotSettings = ({
         streamSpeed: 10,
         allowNewline: true,
         dangerouslySetInnerHTML: true,
-        renderHtml: true
+        renderHtml: true,
+        // Enhanced accessibility
+        ariaLabel: 'Bot response',
+        role: 'log'
       },
       chatButton: {
         icon: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,

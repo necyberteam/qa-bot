@@ -1,6 +1,7 @@
 import React from 'react';
 import FileUploadComponent from '../../components/FileUploadComponent';
 import { getCurrentFeedbackForm } from '../flow-context-utils';
+import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
 
 /**
  * Creates the feedback conversation flow
@@ -126,10 +127,11 @@ export const createFeedbackFlow = ({
       path: "feedback_accessid"
     },
     feedback_accessid: {
-      message: "What is your ACCESS ID?",
+      message: "What is your ACCESS ID? (Optional - press Enter to skip)",
+      validateTextInput: createOptionalFieldValidator(),
       function: (chatState) => {
         const currentForm = getCurrentFeedbackForm();
-        setFeedbackForm({...currentForm, customAccessId: chatState.userInput});
+        setFeedbackForm({...currentForm, customAccessId: processOptionalInput(chatState.userInput)});
       },
       path: "feedback_summary"
     },

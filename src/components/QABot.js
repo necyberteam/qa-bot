@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useMemo } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
 import HtmlRenderer from "@rcb-plugins/html-renderer";
 import MarkdownRenderer from "@rcb-plugins/markdown-renderer";
+import InputValidator from "@rcb-plugins/input-validator";
 import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
@@ -10,6 +11,7 @@ import useHandleAIQuery from '../hooks/useHandleAIQuery';
 import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import useFocusableSendButton from '../hooks/useFocusableSendButton';
+import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
 import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
 import { createBotFlow } from '../utils/create-bot-flow';
 import { FormProvider, useFormContext } from '../contexts/FormContext';
@@ -135,6 +137,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
   useFocusableSendButton();
+  useKeyboardNavigation();
 
   // Handle tooltip session tracking
   useEffect(() => {
@@ -172,7 +175,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
             key={`chatbot-${sessionId}-${isBotLoggedIn}`}
             settings={chatBotSettings}
             flow={flow}
-            plugins={[HtmlRenderer(), MarkdownRenderer()]}
+            plugins={[HtmlRenderer(), MarkdownRenderer(), InputValidator()]}
           />
           {/* Live region for screen reader announcements */}
           <div 
@@ -181,6 +184,16 @@ const QABotInternal = React.forwardRef((props, botRef) => {
             className="sr-only"
             id="bot-live-region"
           />
+          
+          {/* Accessibility help text */}
+          <div id="chat-input-help" className="sr-only">
+            Type your message and press Enter to send. Use arrow keys to navigate through response options. Press Enter or Space to select an option.
+          </div>
+          
+          {/* Keyboard navigation instructions */}
+          <div id="keyboard-help" className="sr-only">
+            Available keyboard shortcuts: Arrow keys to navigate options, Enter or Space to select, Tab to move between interactive elements, Escape to close dialogs.
+          </div>
         </main>
       </ChatBotProvider>
     </div>

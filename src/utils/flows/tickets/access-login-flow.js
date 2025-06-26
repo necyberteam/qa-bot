@@ -5,6 +5,7 @@ import {
   getFileInfo
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
+import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
 
 /**
  * Creates the ACCESS login help ticket flow
@@ -133,10 +134,11 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
       }
     },
     access_login_accessid: {
-      message: "What is your ACCESS ID?",
+      message: "What is your ACCESS ID? (Optional - press Enter to skip)",
+      validateTextInput: createOptionalFieldValidator(),
       function: (chatState) => {
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, accessId: chatState.userInput});
+        setTicketForm({...currentForm, accessId: processOptionalInput(chatState.userInput)});
       },
       path: "access_login_summary"
     },
