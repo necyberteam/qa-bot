@@ -239,6 +239,94 @@ The bot integrates with the ACCESS Q&A API and JSM (Jira Service Management) for
 - File upload processing
 - User authentication and session management
 
+## Development & Release
+
+### Building the Library
+
+To build the distributable library files:
+
+```bash
+npm run build:lib
+```
+
+This creates the distribution files in the `dist/` directory:
+- `access-qa-bot.js` (ES module)
+- `access-qa-bot.umd.cjs` (UMD/CommonJS) 
+- `access-qa-bot.standalone.js` (Standalone version)
+
+### NPM Beta Release
+
+To release a beta version:
+
+```bash
+# 1. Update version to beta (without git operations)
+npm version 2.2.0-beta.0 --no-git-tag-version
+
+# 2. Build the library distribution files
+npm run build:lib
+
+# 3. Publish to npm with beta tag
+npm publish --tag beta
+
+# 4. Create meaningful git commit and tag
+git add package.json
+git commit -m "Release v2.2.0-beta.0: Add keyboard accessibility for checkboxes
+
+- Implement full keyboard navigation for feedback form checkboxes
+- Fix focus persistence issues between questions  
+- Add consistent styling across all interactive elements
+- Enhance screen reader support with ARIA attributes"
+
+# 5. Create git tag and push
+git tag v2.2.0-beta.0
+git push origin main --tags
+```
+
+### Installing Beta Versions
+
+Users can install beta versions with:
+
+```bash
+# Install latest beta
+npm install @snf/access-qa-bot@beta
+
+# Install specific beta version
+npm install @snf/access-qa-bot@2.2.0-beta.0
+```
+
+### Promoting Beta to Stable
+
+After testing and validation:
+
+```bash
+# Option A: Promote existing beta to latest
+npm dist-tag add @snf/access-qa-bot@2.2.0-beta.0 latest
+
+# Option B: Release new stable version
+npm version 2.2.0 --no-git-tag-version
+npm run build:lib
+npm publish
+git add package.json
+git commit -m "Release v2.2.0: Stable release with keyboard accessibility"
+git tag v2.2.0
+git push origin main --tags
+```
+
+### Release Verification
+
+Check that the release was successful:
+
+```bash
+# View all published versions
+npm view @snf/access-qa-bot versions --json
+
+# Check beta tag specifically
+npm view @snf/access-qa-bot@beta
+
+# Test installation
+npm install @snf/access-qa-bot@beta
+```
+
 ## Changelog
 
 ### Version 2.3.0
