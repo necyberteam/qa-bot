@@ -7,6 +7,9 @@ import reportWebVitals from './reportWebVitals';
 function ExampleApp() {
   const [userLoggedIn, setUserLoggedIn] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userName, setUserName] = useState('');
+  const [username, setUsername] = useState('');
   const botRef = useRef();
 
   const handleSendHelloWorld = () => {
@@ -45,6 +48,47 @@ function ExampleApp() {
             </label>
           </div>
 
+          <div className="demo-section">
+            <h3>User Information</h3>
+            <p className="demo-help">When logged in, these fields will pre-populate ticket forms:</p>
+            
+            <div className="demo-field">
+              <label htmlFor="user-email-react">Email:</label>
+              <input
+                id="user-email-react"
+                type="email"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                placeholder="user@example.com"
+                className="demo-input"
+              />
+            </div>
+
+            <div className="demo-field">
+              <label htmlFor="user-name-react">Name:</label>
+              <input
+                id="user-name-react"
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder="John Doe"
+                className="demo-input"
+              />
+            </div>
+
+            <div className="demo-field">
+              <label htmlFor="username-react">Username/ACCESS ID:</label>
+              <input
+                id="username-react"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="johndoe123"
+                className="demo-input"
+              />
+            </div>
+          </div>
+
           <div className="demo-message-section">
             <h3>Send Message</h3>
 
@@ -66,7 +110,10 @@ function ExampleApp() {
         onOpenChange={setChatOpen}
         loginUrl="/login"
         apiKey={process.env.REACT_APP_API_KEY}
-        welcome="Hello! I'm the ACCESS Q&A Bot. How can I help you today?"
+        welcome="What can I help you with?"
+        userEmail={userEmail || undefined}
+        userName={userName || undefined}
+        accessId={username || undefined}
       />
     </div>
   );
@@ -74,9 +121,7 @@ function ExampleApp() {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <ExampleApp />
-  </React.StrictMode>
+  <ExampleApp />
 );
 
 // If you want to start measuring performance in your app, pass a function

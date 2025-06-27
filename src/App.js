@@ -17,6 +17,9 @@ const App = React.forwardRef((props, ref) => {
       onClose={props.onClose}
       ringEffect={props.ringEffect}
       welcome={props.welcome}
+      userEmail={props.userEmail}
+      userName={props.userName}
+      accessId={props.accessId}
     />
   );
 });

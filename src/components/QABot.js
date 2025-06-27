@@ -1,14 +1,20 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import ChatBot, { ChatBotProvider } from "react-chatbotify";
+import HtmlRenderer from "@rcb-plugins/html-renderer";
+import MarkdownRenderer from "@rcb-plugins/markdown-renderer";
+import InputValidator from "@rcb-plugins/input-validator";
 import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
 import useChatBotSettings from '../hooks/useChatBotSettings';
 import useHandleAIQuery from '../hooks/useHandleAIQuery';
-import useChatFlow from '../hooks/useChatFlow';
 import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
-import { DEFAULT_CONFIG } from '../config/constants';
+import useFocusableSendButton from '../hooks/useFocusableSendButton';
+import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
+import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
+import { createBotFlow } from '../utils/create-bot-flow';
+import { FormProvider, useFormContext } from '../contexts/FormContext';
 
 
 const generateSessionId = () => {
@@ -31,29 +37,10 @@ const getOrCreateSessionId = () => {
   return newSessionId;
 };
 
-const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
-  if (isLoggedIn) {
-    return welcomeMessage || DEFAULT_CONFIG.WELCOME_MESSAGE;
-  } else {
-    return DEFAULT_CONFIG.WELCOME_MESSAGE_LOGGED_OUT;
-  }
-}
-
 /**
- * Q&A Bot Component (Controlled)
- *
- * @param {Object}    [props]
- * @param {string}    [props.apiKey] - API key for the Q&A endpoint
- * @param {boolean}   [props.open] - Whether the chat window is open (floating mode only, ignored for embedded)
- * @param {Function}  [props.onOpenChange] - Callback when chat window open state changes
- * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page (always open when embedded)
- * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
- * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
- * @param {boolean}   [props.ringEffect=true] - Whether to apply the phone ring animation effect to the tooltip
- * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
- * @returns {JSX.Element}
+ * Internal QABot component that uses Form Context
  */
-const QABot = React.forwardRef((props, botRef) => {
+const QABotInternal = React.forwardRef((props, botRef) => {
   const {
     apiKey,
     open = false,
@@ -61,8 +48,11 @@ const QABot = React.forwardRef((props, botRef) => {
     embedded = false,
     isLoggedIn,
     loginUrl = DEFAULT_CONFIG.LOGIN_URL,
-    ringEffect = true,
-    welcome
+    ringEffect = false,
+    welcome,
+    userEmail,
+    userName,
+    accessId
   } = props;
 
   const finalApiKey = apiKey || process.env.REACT_APP_API_KEY;
@@ -71,6 +61,9 @@ const QABot = React.forwardRef((props, botRef) => {
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
   const [currentQueryId, setCurrentQueryId] = useState(null);
+  
+  // Use Form Context instead of local state
+  const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
 
   // Update internal state when isLoggedIn prop changes
   useEffect(() => {
@@ -113,33 +106,122 @@ const QABot = React.forwardRef((props, botRef) => {
 
   const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
-  const flow = useChatFlow({
+  const formContext = useMemo(() => ({ 
+    ticketForm: ticketForm || {}, 
+    feedbackForm: feedbackForm || {}, 
+    updateTicketForm, 
+    updateFeedbackForm, 
+    resetTicketForm, 
+    resetFeedbackForm 
+  }), [ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm]);
+  
+  const flow = useMemo(() => createBotFlow({
     welcomeMessage,
     isBotLoggedIn,
     loginUrl,
     handleQuery,
     sessionId,
-    currentQueryId
-  });
+    currentQueryId,
+    ticketForm,
+    setTicketForm: updateTicketForm,
+    feedbackForm,
+    setFeedbackForm: updateFeedbackForm,
+    formContext,
+    userInfo: {
+      email: userEmail || null,
+      name: userName || null,
+      username: accessId || null
+    }
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
+  useFocusableSendButton();
+  useKeyboardNavigation();
+
+  // Handle tooltip session tracking
+  useEffect(() => {
+    // Listen for chat window toggle (opening chat)
+    const handleToggle = () => {
+      // Mark tooltip as shown when user opens chat
+      sessionStorage.setItem('qa_bot_tooltip_shown', 'true');
+    };
+
+    // Add event listener
+    window.addEventListener('rcb-toggle-chat-window', handleToggle);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('rcb-toggle-chat-window', handleToggle);
+    };
+  }, []);
 
   return (
-    <div className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} ref={containerRef}>
+    <div 
+      className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} 
+      ref={containerRef}
+      role="region"
+      aria-label="Ask ACCESS tool"
+    >
       <ChatBotProvider>
-        <BotController
-          ref={botRef}
-          embedded={embedded}
-          isBotLoggedIn={isBotLoggedIn}
-          currentOpen={open}
-        />
-        <ChatBot
-          settings={chatBotSettings}
-          flow={flow}
-        />
+        <main role="main" aria-label="Chat interface">
+          <BotController
+            ref={botRef}
+            embedded={embedded}
+            isBotLoggedIn={isBotLoggedIn}
+            currentOpen={open}
+          />
+          <ChatBot
+            key={`chatbot-${sessionId}-${isBotLoggedIn}`}
+            settings={chatBotSettings}
+            flow={flow}
+            plugins={[HtmlRenderer(), MarkdownRenderer(), InputValidator()]}
+          />
+          {/* Live region for screen reader announcements */}
+          <div 
+            aria-live="polite" 
+            aria-label="Bot response updates"
+            className="sr-only"
+            id="bot-live-region"
+          />
+          
+          {/* Accessibility help text */}
+          <div id="chat-input-help" className="sr-only">
+            Type your message and press Enter to send. Use arrow keys to navigate through response options. Press Enter or Space to select an option.
+          </div>
+          
+          {/* Keyboard navigation instructions */}
+          <div id="keyboard-help" className="sr-only">
+            Available keyboard shortcuts: Arrow keys to navigate options, Enter or Space to select, Tab to move between interactive elements, Escape to close dialogs.
+          </div>
+        </main>
       </ChatBotProvider>
     </div>
+  );
+});
+
+/**
+ * Q&A Bot Component (Controlled)
+ *
+ * @param {Object}    [props]
+ * @param {string}    [props.apiKey] - API key for the Q&A endpoint
+ * @param {boolean}   [props.open] - Whether the chat window is open (floating mode only, ignored for embedded)
+ * @param {Function}  [props.onOpenChange] - Callback when chat window open state changes
+ * @param {boolean}   [props.embedded=false] - Whether the bot is embedded in the page (always open when embedded)
+ * @param {boolean}   [props.isLoggedIn=false] - Whether the user is logged in
+ * @param {string}    [props.loginUrl='/login'] - URL to redirect for login
+ * @param {boolean}   [props.ringEffect=true] - Whether to apply the phone ring animation effect to the tooltip
+ * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
+ * @param {string}    [props.userEmail] - User's email address (when logged in)
+ * @param {string}    [props.userName] - User's display name (when logged in)
+ * @param {string}    [props.username] - User's username/ID (when logged in)
+ * @returns {JSX.Element}
+ */
+const QABot = React.forwardRef((props, ref) => {
+  return (
+    <FormProvider>
+      <QABotInternal {...props} ref={ref} />
+    </FormProvider>
   );
 });
 

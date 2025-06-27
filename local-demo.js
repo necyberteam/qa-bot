@@ -19,13 +19,25 @@ function isUserLoggedIn() {
     });
 }
 
+function getUserInfo() {
+    return {
+        email: document.getElementById('user-email').value || undefined,
+        name: document.getElementById('user-name').value || undefined,
+        username: document.getElementById('username').value || undefined
+    };
+}
+
 function initializeQABot() {
     const qaBotElement = document.getElementById('qa-bot');
     if (qaBotElement && qaBot && !qaBotElement.hasChildNodes()) {
+        const userInfo = getUserInfo();
         bot1Controller = qaBot({
             target: qaBotElement,
             isLoggedIn: isUserLoggedIn(),
             defaultOpen: false,
+            userEmail: userInfo.email,
+            userName: userInfo.name,
+            username: userInfo.username
         });
     }
 }
@@ -33,11 +45,15 @@ function initializeQABot() {
 function initializeEmbeddedBot() {
     const customBot = document.getElementById('custom-qa-bot');
     if (qaBot && customBot && !customBot.hasChildNodes()) {
+        const userInfo = getUserInfo();
         bot2Controller = qaBot({
             target: customBot,
             embedded: true,
             welcome: "This is an embedded bot created programmatically!",
-            isLoggedIn: isUserLoggedIn()
+            isLoggedIn: isUserLoggedIn(),
+            userEmail: userInfo.email,
+            userName: userInfo.name,
+            username: userInfo.username
         });
     } else if (!qaBot) {
         console.error("qaBot not found. Make sure the standalone JS file is loaded properly.");
@@ -65,6 +81,26 @@ function setupLoginCheckbox() {
     }
 }
 
+function recreateBots() {
+    // Destroy existing bots
+    if (bot1Controller) {
+        bot1Controller.destroy();
+        bot1Controller = null;
+    }
+    if (bot2Controller) {
+        bot2Controller.destroy();
+        bot2Controller = null;
+    }
+    
+    // Clear containers
+    document.getElementById('qa-bot').innerHTML = '';
+    document.getElementById('custom-qa-bot').innerHTML = '';
+    
+    // Recreate with new user info
+    initializeQABot();
+    initializeEmbeddedBot();
+}
+
 function setupDemoButtons() {
     document.getElementById('bot1-send').addEventListener('click', () => {
         bot1Controller.addMessage("Hello World!");
@@ -84,6 +120,10 @@ function setupDemoButtons() {
 
     document.getElementById('bot2-send').addEventListener('click', () => {
         bot2Controller.addMessage("Hello World!");
+    });
+
+    document.getElementById('update-bot').addEventListener('click', () => {
+        recreateBots();
     });
 }
 

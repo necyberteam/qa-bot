@@ -1,4 +1,5 @@
 import React from 'react';
+import { useMessages, useFlow } from 'react-chatbotify';
 import { DEFAULT_CONFIG } from '../config/constants';
 
 /**
@@ -11,38 +12,59 @@ import { DEFAULT_CONFIG } from '../config/constants';
  * @param {string} props.currentQueryId - Current query ID for tracking feedback
  * @param {string} [props.className] - Optional CSS class for styling
  * @param {Object} [props.style] - Optional inline styles
+ * @param {Function} [props.onAskAnother] - Callback for "Ask another question"
+ * @param {Function} [props.onOpenTicket] - Callback for "Open a ticket for assistance"
  * @returns {JSX.Element} Rendered thumbs up/down component
  */
-const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style }) => {
+const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style, onFeedbackChange }) => {
+  const [feedbackGiven, setFeedbackGiven] = React.useState(null); // null, 'positive', 'negative'
+  const [hoveredButton, setHoveredButton] = React.useState(null); // 'up', 'down', or null
+  const { injectMessage } = useMessages();
+  const { goToPath } = useFlow();
   const defaultStyle = {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: '10px',
+    justifyContent: 'space-between',
+    gap: '15px',
     margin: '18px',
     fontFamily: 'Arial, sans-serif'
   };
 
   const buttonContainerStyle = {
     display: 'flex',
-    gap: '15px'
+    gap: '4px'
   };
 
-  const buttonStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '8px 12px',
-    backgroundColor: 'white',
-    border: '1px solid #107180',
-    color: '#107180',
-    textDecoration: 'none',
-    borderRadius: '4px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-    fontSize: '14px',
-    minWidth: '60px'
+  const getButtonStyle = (buttonType) => {
+    const isHovered = hoveredButton === buttonType;
+    return {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '6px 8px',
+      backgroundColor: isHovered ? '#f8f9fa' : 'transparent',
+      border: 'none',
+      color: isHovered ? '#107180' : '#666666',
+      textDecoration: 'none',
+      borderRadius: '12px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      boxShadow: isHovered ? '0 2px 8px rgba(16, 113, 128, 0.15)' : 'none',
+      fontSize: '20px',
+      minWidth: '44px',
+      minHeight: '44px',
+      transition: 'all 0.2s ease-in-out',
+    };
+  };
+
+  const getIconStyle = (buttonType) => {
+    const isHovered = hoveredButton === buttonType;
+    return {
+      display: 'inline-block',
+      transform: isHovered ? 'scale(1.2)' : 'scale(1)',
+      transition: 'transform 0.2s ease-in-out',
+    };
   };
 
   /**
@@ -74,7 +96,7 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style }
       const response = await fetch(`${DEFAULT_CONFIG.API_ENDPOINT}/rating`, requestOptions);
 
       if (response.ok) {
-        console.log(`Feedback sent successfully: ${isPositive ? '1' : '0'}`);
+        // Feedback sent successfully
       } else {
         console.error('Failed to send feedback:', response.status);
       }
@@ -84,34 +106,64 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style }
   };
 
   const handleThumbsUp = async () => {
-    console.log('Thumbs up clicked for session:', sessionId);
     await sendFeedback(true);
+    setFeedbackGiven('positive');
+    
+    // Inject feedback and follow-up message
+    if (injectMessage) {
+      injectMessage("Thank you for your feedback!", 'bot');
+      // Add a brief delay before the next message
+      setTimeout(() => {
+        injectMessage("Ask another question, but remember that each question must stand alone.", 'bot');
+      }, 500);
+    }
+    
+    if (onFeedbackChange) {
+      onFeedbackChange('positive');
+    }
   };
 
   const handleThumbsDown = async () => {
-    console.log('Thumbs down clicked for session:', sessionId);
     await sendFeedback(false);
+    setFeedbackGiven('negative');
+    
+    if (onFeedbackChange) {
+      onFeedbackChange('negative');
+    }
   };
 
+
+  if (feedbackGiven === 'positive' || feedbackGiven === 'negative') {
+    return null;
+  }
+
+  // Initial state - show thumbs up/down with prompt
   return (
     <div
       className={`qa-bot-thumbs-feedback ${className}`}
       style={{ ...defaultStyle, ...style }}
     >
+      <div>Was this helpful?</div>
       <div style={buttonContainerStyle}>
         <button
           onClick={handleThumbsUp}
-          style={buttonStyle}
+          onMouseEnter={() => setHoveredButton('up')}
+          onMouseLeave={() => setHoveredButton(null)}
+          style={getButtonStyle('up')}
           className="qa-bot-thumbs-up"
+          aria-label="This was helpful"
         >
-          👍
+          <span style={getIconStyle('up')}>👍</span>
         </button>
         <button
           onClick={handleThumbsDown}
-          style={buttonStyle}
+          onMouseEnter={() => setHoveredButton('down')}
+          onMouseLeave={() => setHoveredButton(null)}
+          style={getButtonStyle('down')}
           className="qa-bot-thumbs-down"
+          aria-label="This was not helpful"
         >
-          👎
+          <span style={getIconStyle('down')}>👎</span>
         </button>
       </div>
     </div>

@@ -50,6 +50,9 @@ const ProgrammaticQABot = React.forwardRef((props, ref) => {
       loginUrl={props.loginUrl}
       ringEffect={props.ringEffect}
       welcome={props.welcome}
+      userEmail={props.userEmail}
+      userName={props.userName}
+      username={props.username}
     />
   );
 });

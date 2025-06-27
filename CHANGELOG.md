@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+- HTML rendering support for clickable ticket links in success messages
+- ProForma form field mapping for JSM integration
+- Added some accessibility enhancements for ketyboard navigation and screenreaders
+
+### Changed
+- Update to react-chatbotify v2.1.0
+- Cleaned up development flow, comments, and debug logging
+
 ## [2.0.0-rc.1] - 2025-05-28
 
 ### BREAKING CHANGES
