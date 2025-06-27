@@ -393,7 +393,6 @@ const useKeyboardNavigation = () => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           const addedNodes = Array.from(mutation.addedNodes);
-          const removedNodes = Array.from(mutation.removedNodes);
           
           const hasNewOptions = addedNodes.some(node => 
             node.nodeType === Node.ELEMENT_NODE && 
