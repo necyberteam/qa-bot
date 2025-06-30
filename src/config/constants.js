@@ -24,7 +24,7 @@ export const DEFAULT_CONFIG = {
   },
 
   CHATBOT: {
-    TITLE: 'ACCESS Q&A Bot',
+    TITLE: 'ACCESS Q&A',
     AVATAR_URL: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
     TOOLTIP_TEXT: 'Ask me about ACCESS! 😊'
   }

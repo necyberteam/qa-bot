@@ -13,7 +13,7 @@ const NewChatButton = () => {
     <button
       onClick={handleNewChat}
       tabIndex={0}
-      aria-label="Restart chat conversation"
+      aria-label="New chat conversation"
       style={{
         backgroundColor: '#107180',
         border: 'none',
@@ -36,7 +36,7 @@ const NewChatButton = () => {
       }}
     >
       <RefreshIcon width={16} height={16} />
-      Restart
+      New Chat
     </button>
   );
 };
