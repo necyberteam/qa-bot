@@ -64,7 +64,8 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
     },
     qa_positive_feedback: {
       message: "Thank you for your feedback! It helps us improve this tool.",
-      path: "qa_continue"
+      transition: { duration: 1000 },
+      path: "go_ahead_and_ask"
     },
     qa_negative_feedback: {
       message: "Sorry that wasn't useful. Would you like to open a help ticket for assistance?",
