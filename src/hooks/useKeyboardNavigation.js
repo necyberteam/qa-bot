@@ -78,6 +78,17 @@ const useKeyboardNavigation = () => {
         return;
       }
 
+      // Don't interfere with typing in input fields
+      const activeElement = document.activeElement;
+      if (activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.contentEditable === 'true' ||
+        activeElement.classList.contains('rcb-chat-input-textarea')
+      )) {
+        return;
+      }
+
       const chatWindow = document.querySelector('.rcb-chat-window');
       if (!chatWindow) return;
       
