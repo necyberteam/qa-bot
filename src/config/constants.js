@@ -4,7 +4,8 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGGED_OUT: 'To ask questions, please log in.',
   WELCOME_MESSAGE_LOGIN_TRANSITION: 'Welcome! You are now logged in. What can I help you with?',
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
-  API_ENDPOINT: 'https://access-ai.ccs.uky.edu/api/query',
+  // API_ENDPOINT: 'https://access-ai.ccs.uky.edu/api/query',
+  API_ENDPOINT: 'https://access-ai.ccs.uky.edu:543/api/query',
 
   // Netlify function URL
   netlifyBaseUrl: process.env.REACT_APP_NETLIFY_BASE_URL,
