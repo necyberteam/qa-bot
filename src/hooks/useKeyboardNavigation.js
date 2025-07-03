@@ -290,29 +290,34 @@ const useKeyboardNavigation = () => {
         chatWindow = document.querySelector('.qa-bot');
       }
       
-      // Get the most recent options container
-      let optionsContainers = [];
-      if (chatWindow) {
-        optionsContainers = Array.from(chatWindow.querySelectorAll('.rcb-options-container'))
-          .filter(el => el.offsetParent !== null);
-      }
+      if (!chatWindow) return;
+      
+      // Get all messages to ensure we only focus options in the most recent message
+      const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
+        .filter(el => el.offsetParent !== null);
+      
+      if (allMessages.length === 0) return;
+      
+      const lastMessage = allMessages[allMessages.length - 1];
+      
+      // Get options containers only from the last message
+      let optionsContainers = Array.from(lastMessage.querySelectorAll('.rcb-options-container'))
+        .filter(el => el.offsetParent !== null);
       
       let options = [];
       let optionType = 'regular';
       
-      // Look for regular options first
+      // Look for regular options first - but only in the last message
       if (optionsContainers.length > 0) {
         const lastContainer = optionsContainers[optionsContainers.length - 1];
         options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
       }
       
-      // If no regular options, look for checkboxes and set them up
+      // If no regular options, look for checkboxes and set them up - but only in the last message
       if (options.length === 0) {
-        const checkboxContainer = chatWindow ? 
-          chatWindow.querySelector('.rcb-checkbox-container') :
-          document.querySelector('.rcb-checkbox-container');
+        const checkboxContainer = lastMessage.querySelector('.rcb-checkbox-container');
         
-        if (checkboxContainer) {
+        if (checkboxContainer && checkboxContainer.offsetParent !== null) {
           const checkboxElements = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'))
             .filter(el => el.offsetParent !== null && el.style.display !== 'none');
           
