@@ -5,11 +5,24 @@
 ### Added
 - HTML rendering support for clickable ticket links in success messages
 - ProForma form field mapping for JSM integration
-- Added some accessibility enhancements for ketyboard navigation and screenreaders
+- Comprehensive email validation with user-friendly error messages for all forms
+- Keyboard navigation hints for checkbox selections
+- Email validation using InputValidator plugin with toast notifications and input highlighting
 
 ### Changed
 - Update to react-chatbotify v2.1.0
 - Cleaned up development flow, comments, and debug logging
+- **Feedback Flow Reordering**: File upload question now appears before role question for better UX
+- **Community Interest Targeting**: Community involvement question now only shown to users who provide contact information
+- **Anonymous Feedback Improvements**: Community interest field hidden from summary for anonymous submissions
+- **Focus Management**: Fixed keyboard focus jumping to previous questions; now properly targets current question only
+
+### Fixed
+- Resolved form state persistence issues where previous session data would interfere with new submissions
+- Fixed multiple checkbox selection display in feedback summary (was showing only one selection)
+- Corrected timing issues with form context updates using chatState.userInput pattern
+- Fixed anonymous feedback showing previous contact information in summary
+- Improved keyboard accessibility for checkboxes with proper focus management
 
 ## [2.0.0-rc.1] - 2025-05-28
 

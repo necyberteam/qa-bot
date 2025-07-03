@@ -6,6 +6,7 @@ import {
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
+import { validateEmail } from '../../validation-utils';
 
 /**
  * Creates the enhanced general help ticket flow with ProForma field support
@@ -505,6 +506,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     general_help_email: {
       message: "What is your email address?",
+      validateTextInput: (email) => validateEmail(email),
       function: (chatState) => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, email: chatState.userInput});

@@ -2,6 +2,7 @@ import React from 'react';
 import FileUploadComponent from '../../components/FileUploadComponent';
 import { getCurrentFeedbackForm } from '../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
+import { validateEmail, isValidEmail } from '../validation-utils';
 
 /**
  * Creates the feedback conversation flow
@@ -31,13 +32,32 @@ export const createFeedbackFlow = ({
   return {
     feedback: {
       message: "We appreciate your feedback about ACCESS.\n\nFeedback submitted through this form will only be shared within the ACCESS teams. We encourage the sharing of contact information for potential follow-up, but understand that anonymity may be preferred when providing feedback on sensitive issues.\n\nPlease provide your detailed feedback:",
-      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), feedback: chatState.userInput}),
+      function: (chatState) => {
+        // Clear any previous feedback form state to start fresh
+        setFeedbackForm({
+          feedback: chatState.userInput,
+          // Explicitly clear all other fields to prevent state persistence
+          recommendations: undefined,
+          primaryRole: undefined,
+          needsCustomRole: false,
+          customRole: undefined,
+          communityInterest: undefined,
+          upload: undefined,
+          uploadConfirmed: false,
+          uploadedFiles: undefined,
+          wantsContact: undefined,
+          useCustomContactInfo: false,
+          customName: undefined,
+          customEmail: undefined,
+          customAccessId: undefined
+        });
+      },
       path: "feedback_please_tell_us_more"
     },
     feedback_please_tell_us_more: {
       message: "Please detail any recommendations for improvement:",
       function: (chatState) => setFeedbackForm({...(feedbackForm || {}), recommendations: chatState.userInput}),
-      path: "feedback_primary_role"
+      path: "feedback_upload"
     },
     feedback_primary_role: {
       message: "What is your primary role pertaining to ACCESS?",
@@ -60,7 +80,7 @@ export const createFeedbackFlow = ({
         }
       },
       path: (chatState) => {
-        return chatState.userInput === "Other" ? "feedback_custom_role" : "feedback_community_interest";
+        return chatState.userInput === "Other" ? "feedback_custom_role" : "feedback_contact_choice";
       }
     },
     feedback_custom_role: {
@@ -69,7 +89,7 @@ export const createFeedbackFlow = ({
         const currentForm = getCurrentFeedbackForm();
         setFeedbackForm({...currentForm, customRole: chatState.userInput});
       },
-      path: "feedback_community_interest"
+      path: "feedback_contact_choice"
     },
     feedback_community_interest: {
       message: "Are you interested, or potentially interested, in serving the ACCESS community and helping us improve in any of these roles? (This is not a commitment. We'll reach out with more information.) Select all that apply:",
@@ -91,7 +111,7 @@ export const createFeedbackFlow = ({
         const currentForm = getCurrentFeedbackForm();
         setFeedbackForm({...currentForm, communityInterest: chatState.userInput});
       },
-      path: "feedback_upload"
+      path: "feedback_summary"
     },
     feedback_upload: {
       message: "Would you like to upload a screenshot or file to help us better understand your feedback?",
@@ -102,7 +122,7 @@ export const createFeedbackFlow = ({
         if (chatState.userInput === "Yes") {
           return "feedback_upload_yes";
         } else {
-          return "feedback_contact_choice";
+          return "feedback_primary_role";
         }
       }
     },
@@ -112,7 +132,7 @@ export const createFeedbackFlow = ({
       options: ["Continue"],
       chatDisabled: true,
       function: (chatState) => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
-      path: "feedback_contact_choice"
+      path: "feedback_primary_role"
     },
     feedback_contact_choice: {
       message: "Would you like to provide your contact information for follow up?",
@@ -134,8 +154,14 @@ export const createFeedbackFlow = ({
             return "feedback_contact_confirm";
           }
           // Otherwise collect missing info - set flag to use custom info
+          // Use the updatedForm from the function above to preserve wantsContact
           const currentForm = getCurrentFeedbackForm();
-          setFeedbackForm({...currentForm, useCustomContactInfo: true});
+          const wantsContact = chatState.userInput === "Include my contact info";
+          setFeedbackForm({
+            ...currentForm, 
+            useCustomContactInfo: true,
+            wantsContact: wantsContact ? "Yes" : "No"
+          });
           if (!userInfo.name) return "feedback_name";
           if (!userInfo.email) return "feedback_email";
           if (!userInfo.username) return "feedback_accessid";
@@ -163,7 +189,7 @@ export const createFeedbackFlow = ({
       },
       path: (chatState) => {
         if (chatState.userInput === "Use this information") {
-          return "feedback_summary";
+          return "feedback_community_interest";
         } else {
           return "feedback_name";
         }
@@ -179,6 +205,7 @@ export const createFeedbackFlow = ({
     },
     feedback_email: {
       message: "What is your email address?",
+      validateTextInput: (email) => validateEmail(email),
       function: (chatState) => {
         const currentForm = getCurrentFeedbackForm();
         setFeedbackForm({...currentForm, customEmail: chatState.userInput});
@@ -192,7 +219,7 @@ export const createFeedbackFlow = ({
         const currentForm = getCurrentFeedbackForm();
         setFeedbackForm({...currentForm, customAccessId: processOptionalInput(chatState.userInput)});
       },
-      path: "feedback_summary"
+      path: "feedback_community_interest"
     },
     feedback_summary: {
       message: (chatState) => {
@@ -229,7 +256,7 @@ export const createFeedbackFlow = ({
                        `ACCESS ID: ${finalAccessId}\n` +
                        '';
         } else {
-          contactInfo = `Contact Information: Not provided\n`;
+          contactInfo = `Contact Information: Anonymous submission\n`;
         }
 
         // Format primary role
@@ -238,12 +265,21 @@ export const createFeedbackFlow = ({
           primaryRole = `Other: ${currentForm.customRole}`;
         }
 
-        // Format community interest
-        let communityInterest = 'Not provided';
-        if (currentForm.communityInterest && Array.isArray(currentForm.communityInterest)) {
-          communityInterest = currentForm.communityInterest.join(', ');
-        } else if (currentForm.communityInterest) {
-          communityInterest = currentForm.communityInterest;
+        // Format community interest - handle timing issue like ACCESS ID (only for non-anonymous)
+        let communityInterestLine = '';
+        if (currentForm.wantsContact === "Yes") {
+          let communityInterest = 'Not provided';
+          
+          // If coming directly from community interest step, use chatState.userInput
+          if (chatState.prevPath === 'feedback_community_interest') {
+            communityInterest = chatState.userInput || 'Not provided';
+          } else if (currentForm.communityInterest && Array.isArray(currentForm.communityInterest)) {
+            communityInterest = currentForm.communityInterest.join(', ');
+          } else if (currentForm.communityInterest) {
+            communityInterest = currentForm.communityInterest;
+          }
+          
+          communityInterestLine = `Community Interest: ${communityInterest}\n`;
         }
 
         return `Thank you for providing your feedback. Here's a summary:\n\n` +
@@ -251,7 +287,8 @@ export const createFeedbackFlow = ({
                `Feedback: ${currentForm.feedback || 'Not provided'}\n` +
                `Recommendations: ${currentForm.recommendations || 'Not provided'}\n` +
                `Primary Role: ${primaryRole}\n` +
-               `Community Interest: ${communityInterest}${fileInfo}\n\n` +
+               communityInterestLine +
+               `${fileInfo}\n\n` +
                `Would you like to submit this feedback?`;
       },
       options: ["Submit Feedback", "Back to Main Menu"],
@@ -265,7 +302,27 @@ export const createFeedbackFlow = ({
       }
     },
     feedback_success: {
-      message: "Thank you for your feedback! If you provided your contact information, we will follow up with you shortly.",
+      message: () => {
+        const currentForm = getCurrentFeedbackForm();
+        const baseMessage = "Thank you for your feedback!";
+        
+        // Determine if they provided a valid email (using same logic as summary)
+        let finalEmail;
+        if (currentForm.wantsContact === "No") {
+          finalEmail = null;
+        } else if (currentForm.useCustomContactInfo) {
+          finalEmail = currentForm.customEmail;
+        } else {
+          finalEmail = userInfo.email;
+        }
+        
+        // Only add follow-up message if they provided a valid email
+        if (finalEmail && finalEmail.trim() && isValidEmail(finalEmail)) {
+          return `${baseMessage} We will follow up with you shortly.`;
+        }
+        
+        return baseMessage;
+      },
       options: ["Back to Main Menu"],
       chatDisabled: true,
       path: "start"

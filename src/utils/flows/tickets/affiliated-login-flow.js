@@ -6,6 +6,7 @@ import {
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
+import { validateEmail } from '../../validation-utils';
 
 /**
  * Creates the affiliated/resource provider login help ticket flow
@@ -129,6 +130,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
     },
     affiliated_login_email: {
       message: "What is your email?",
+      validateTextInput: (email) => validateEmail(email),
       function: (chatState) => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, email: chatState.userInput});

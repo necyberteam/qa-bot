@@ -93,36 +93,30 @@ const useKeyboardNavigation = () => {
       if (!chatWindow) return;
       
       // Special handling for checkboxes - but only if they're in the most recent message
-      const checkboxContainer = chatWindow.querySelector('.rcb-checkbox-container');
-      if (checkboxContainer && checkboxContainer.offsetParent !== null) {
-        // Check if this checkbox container is in the last message
-        const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
-          .filter(el => el.offsetParent !== null);
+      const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
+        .filter(el => el.offsetParent !== null);
+      
+      if (allMessages.length > 0) {
+        const lastMessage = allMessages[allMessages.length - 1];
+        const checkboxContainer = lastMessage.querySelector('.rcb-checkbox-container');
         
-        if (allMessages.length > 0) {
-          const lastMessage = allMessages[allMessages.length - 1];
+        if (checkboxContainer && checkboxContainer.offsetParent !== null) {
+          const checkboxes = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'));
+          const nextButton = checkboxContainer.querySelector('.rcb-checkbox-next-button');
           
-          // Only handle checkboxes if they're in the last message
-          if (lastMessage.contains(checkboxContainer)) {
-            const checkboxes = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'));
-            const nextButton = checkboxContainer.querySelector('.rcb-checkbox-next-button');
-            
-            if (checkboxes.length > 0) {
-              // Include next button in navigable elements
-              const allElements = [...checkboxes];
-              if (nextButton) {
-                allElements.push(nextButton);
-              }
-              handleCheckboxNavigation(event, allElements);
-              return;
+          if (checkboxes.length > 0) {
+            // Include next button in navigable elements
+            const allElements = [...checkboxes];
+            if (nextButton) {
+              allElements.push(nextButton);
             }
+            handleCheckboxNavigation(event, allElements);
+            return;
           }
         }
       }
       
       // Check if chat window is visible and if there are options available - only in the most recent message
-      const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
-        .filter(el => el.offsetParent !== null);
       
       let options = [];
       if (allMessages.length > 0) {
@@ -313,9 +307,13 @@ const useKeyboardNavigation = () => {
         options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
       }
       
-      // If no regular options, look for checkboxes and set them up - but only in the last message
+      // If no regular options, look for checkboxes and set them up
       if (options.length === 0) {
-        const checkboxContainer = lastMessage.querySelector('.rcb-checkbox-container');
+        // First try to find checkbox container in last message, but fallback to chatWindow if not found
+        let checkboxContainer = lastMessage.querySelector('.rcb-checkbox-container');
+        if (!checkboxContainer && chatWindow) {
+          checkboxContainer = chatWindow.querySelector('.rcb-checkbox-container');
+        }
         
         if (checkboxContainer && checkboxContainer.offsetParent !== null) {
           const checkboxElements = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'))
@@ -338,6 +336,20 @@ const useKeyboardNavigation = () => {
                 element.classList.remove('keyboard-focused');
               }
             });
+            
+            // Add keyboard navigation hint for checkboxes if there are multiple elements
+            if (checkboxElements.length > 1) {
+              // Remove any existing hints first
+              const existingHints = checkboxContainer.querySelectorAll('.keyboard-nav-hint');
+              existingHints.forEach(hint => hint.remove());
+              
+              // Add new hint
+              const hintElement = document.createElement('div');
+              hintElement.className = 'keyboard-nav-hint';
+              hintElement.textContent = 'Use arrow keys ↕ to navigate, Enter to select/deselect, or click any option';
+              hintElement.style.cssText = 'font-size: 12px !important; color: #666 !important; margin-bottom: 8px !important; font-style: italic !important; display: block !important;';
+              checkboxContainer.insertBefore(hintElement, checkboxContainer.firstChild);
+            }
             
             // Focus first element
             setTimeout(() => {
