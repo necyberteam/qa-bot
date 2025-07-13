@@ -30,3 +30,7 @@ yarn-error.log*
 # Build output
 /build
 /dist
+
+# local-notes, claude
+local-notes
+.claude
