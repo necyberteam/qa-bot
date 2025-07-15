@@ -4,7 +4,7 @@ import { buildWelcomeMessage } from '../config/constants';
 import { createMainMenuFlow } from './flows/main-menu-flow';
 import { createQAFlow } from './flows/qa-flow';
 import { createTicketFlow } from './flows/ticket-flow';
-import { createFeedbackFlow } from './flows/feedback-flow';
+// import { createFeedbackFlow } from './flows/feedback-flow';
 import { createSecurityFlow } from './flows/security-flow';
 import { setCurrentFormContext } from './flow-context-utils';
 
@@ -35,7 +35,7 @@ function createBotFlow({
   });
 
   // Create Q&A flow (requires login)
-  const qaFlow = isBotLoggedIn 
+  const qaFlow = isBotLoggedIn
     ? createQAFlow({
         fetchAndStreamResponse: handleQuery,
         sessionId,
@@ -63,11 +63,11 @@ function createBotFlow({
     userInfo
   });
 
-  const feedbackFlow = createFeedbackFlow({
-    feedbackForm,
-    setFeedbackForm,
-    userInfo
-  });
+  // const feedbackFlow = createFeedbackFlow({
+  //   feedbackForm,
+  //   setFeedbackForm,
+  //   userInfo
+  // });
 
   const securityFlow = createSecurityFlow({
     ticketForm,
@@ -80,7 +80,7 @@ function createBotFlow({
     ...(mainMenuFlow || {}),
     ...(qaFlow || {}),
     ...(ticketFlow || {}),
-    ...(feedbackFlow || {}),
+    // ...(feedbackFlow || {}),
     ...(securityFlow || {}),
     // Add fallback loop for errors (only if logged in)
     ...(isBotLoggedIn && {
