@@ -14,7 +14,6 @@ import { createOptionalFieldValidator, processOptionalInput } from '../optional-
  * @returns {Object} Security incident flow configuration
  */
 export const createSecurityFlow = ({
-  ticketForm = {},
   setTicketForm = () => {},
   userInfo = {}
 }) => {
@@ -108,7 +107,7 @@ export const createSecurityFlow = ({
       path: "security_contact_info"
     },
     security_contact_info: {
-      message: (chatState) => {
+      message: () => {
         // Always merge with user info to get the most current data
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (formWithUserInfo.name && formWithUserInfo.email && formWithUserInfo.accessId) {
@@ -186,7 +185,7 @@ export const createSecurityFlow = ({
       path: "security_summary"
     },
     security_summary: {
-      message: (chatState) => {
+      message: () => {
         // Get current form state from context
         const currentForm = getCurrentTicketForm() || {};
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);

@@ -6,7 +6,7 @@ import { DEFAULT_CONFIG } from '../config/constants';
  * @param {number} requestTypeId The JSM request type ID
  * @returns {Object} Form data (unchanged - API handles ProForma mapping)
  */
-const mapProFormaFields = (formData, requestTypeId) => {
+const mapProFormaFields = (formData) => {
   // ProForma field mapping is now handled by the API
   // This function is kept for backward compatibility but does no transformation
   return formData;

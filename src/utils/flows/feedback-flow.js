@@ -131,7 +131,7 @@ export const createFeedbackFlow = ({
       component: fileUploadElement,
       options: ["Continue"],
       chatDisabled: true,
-      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
+      function: () => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
       path: "feedback_primary_role"
     },
     feedback_contact_choice: {
@@ -171,7 +171,7 @@ export const createFeedbackFlow = ({
       }
     },
     feedback_contact_confirm: {
-      message: (chatState) => {
+      message: () => {
         return `We have the following contact information from your account:\n\n` +
                `Name: ${userInfo.name || 'Not provided'}\n` +
                `Email: ${userInfo.email || 'Not provided'}\n` +

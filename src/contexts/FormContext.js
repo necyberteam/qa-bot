@@ -63,8 +63,10 @@ export const useFormContext = () => {
 
 // Higher-order component for flows that need form context
 export const withFormContext = (Component) => {
-  return (props) => {
+  const WrappedComponent = (props) => {
     const formContext = useFormContext();
     return <Component {...props} formContext={formContext} />;
   };
+  WrappedComponent.displayName = `withFormContext(${Component.displayName || Component.name || 'Component'})`;
+  return WrappedComponent;
 };

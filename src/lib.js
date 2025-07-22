@@ -57,6 +57,8 @@ const ProgrammaticQABot = React.forwardRef((props, ref) => {
   );
 });
 
+ProgrammaticQABot.displayName = 'ProgrammaticQABot';
+
 // Export for JS API - now React-backed for all usage
 export function qaBot(config) {
   if (!config.target || !(config.target instanceof HTMLElement)) {

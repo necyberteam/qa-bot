@@ -84,7 +84,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
       },
       path: (chatState) => chatState.userInput === "Yes"
         ? "access_login_upload"
-        : ((chatState) => {
+        : (() => {
             const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
             if (!formWithUserInfo.email) return "access_login_email";
             if (!formWithUserInfo.name) return "access_login_name";
@@ -101,7 +101,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, uploadConfirmed: true});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.email) return "access_login_email";
         if (!formWithUserInfo.name) return "access_login_name";
@@ -116,7 +116,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, email: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.name) return "access_login_name";
         if (!formWithUserInfo.accessId) return "access_login_accessid";
@@ -129,7 +129,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, name: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.accessId) return "access_login_accessid";
         return "access_login_summary";

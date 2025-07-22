@@ -497,7 +497,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, priority: chatState.userInput.toLowerCase()});
       },
-      path: (chatState) => {
+      path: () => {
         if (!userInfo.email) return "general_help_email";
         if (!userInfo.name) return "general_help_name";
         if (!userInfo.accessId) return "general_help_accessid";
@@ -511,7 +511,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, email: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         if (!userInfo.name) return "general_help_name";
         if (!userInfo.accessId) return "general_help_accessid";
         return "general_help_ticket_summary";
@@ -523,7 +523,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, name: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         if (!userInfo.accessId) return "general_help_accessid";
         return "general_help_ticket_summary";
       }

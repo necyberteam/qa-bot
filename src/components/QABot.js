@@ -200,6 +200,8 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   );
 });
 
+QABotInternal.displayName = 'QABotInternal';
+
 /**
  * Q&A Bot Component (Controlled)
  *
@@ -224,5 +226,7 @@ const QABot = React.forwardRef((props, ref) => {
     </FormProvider>
   );
 });
+
+QABot.displayName = 'QABot';
 
 export default QABot;
