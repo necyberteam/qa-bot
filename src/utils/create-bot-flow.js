@@ -88,6 +88,7 @@ function createBotFlow({
         message: async (params) => {
           await handleQuery(params);
         },
+        renderMarkdown: ["BOT"],
         path: () => hasQueryError ? 'start' : 'loop'
       }
     })
