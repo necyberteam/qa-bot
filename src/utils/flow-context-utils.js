@@ -81,6 +81,6 @@ export const getCurrentFormWithUserInfo = (userInfo = {}) => {
     ...currentForm,
     email: safeUserInfo.email || currentForm.email,
     name: safeUserInfo.name || currentForm.name,
-    accessId: safeUserInfo.username || currentForm.accessId
+    accessId: safeUserInfo.accessId || currentForm.accessId
   };
 };

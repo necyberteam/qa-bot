@@ -60,7 +60,7 @@ export const createSecurityFlow = ({
           summary: chatState.userInput,
           email: userInfo.email || currentForm.email,
           name: userInfo.name || currentForm.name,
-          accessId: userInfo.username || currentForm.accessId
+          accessId: userInfo.accessId || currentForm.accessId
         };
         setTicketForm(updatedForm);
       },

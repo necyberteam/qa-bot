@@ -33,7 +33,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
           summary: chatState.userInput,
           email: userInfo.email || currentForm.email,
           name: userInfo.name || currentForm.name,
-          accessId: userInfo.username || currentForm.accessId
+          accessId: userInfo.accessId || currentForm.accessId
         };
         setTicketForm(updatedForm);
       },
@@ -500,7 +500,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       path: (chatState) => {
         if (!userInfo.email) return "general_help_email";
         if (!userInfo.name) return "general_help_name";
-        if (!userInfo.username) return "general_help_accessid";
+        if (!userInfo.accessId) return "general_help_accessid";
         return "general_help_ticket_summary";
       }
     },
@@ -513,7 +513,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       },
       path: (chatState) => {
         if (!userInfo.name) return "general_help_name";
-        if (!userInfo.username) return "general_help_accessid";
+        if (!userInfo.accessId) return "general_help_accessid";
         return "general_help_ticket_summary";
       }
     },
@@ -524,7 +524,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         setTicketForm({...currentForm, name: chatState.userInput});
       },
       path: (chatState) => {
-        if (!userInfo.username) return "general_help_accessid";
+        if (!userInfo.accessId) return "general_help_accessid";
         return "general_help_ticket_summary";
       }
     },
@@ -586,7 +586,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
             description: currentForm.description || "",
             priority: currentForm.priority || "medium",
             accessId: formWithUserInfo.accessId || "",
-            userName: formWithUserInfo.name || "",
+            name: formWithUserInfo.name || "",
             issueType: currentForm.category || "",
             // ProForma fields for request type 17
             hasResourceProblem: currentForm.involvesResource === 'yes' ? 'Yes' : 'No',

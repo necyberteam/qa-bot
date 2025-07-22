@@ -52,7 +52,7 @@ const ProgrammaticQABot = React.forwardRef((props, ref) => {
       welcome={props.welcome}
       userEmail={props.userEmail}
       userName={props.userName}
-      accessId={props.accessid}
+      accessId={props.accessId}
     />
   );
 });
@@ -65,7 +65,7 @@ export function qaBot(config) {
   }
 
   const root = ReactDOM.createRoot(config.target);
-  let wrapperRef = { current: null };
+  const wrapperRef = { current: null };
 
   root.render(
     <React.StrictMode>
@@ -80,7 +80,7 @@ export function qaBot(config) {
         welcome={config.welcome}
         userEmail={config.userEmail}
         userName={config.userName}
-        accessId={config.accessid}
+        accessId={config.accessId}
       />
     </React.StrictMode>
   );

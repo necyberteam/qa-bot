@@ -87,7 +87,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
           description: chatState.userInput,
           email: userInfo.email || currentForm.email,
           name: userInfo.name || currentForm.name,
-          accessId: userInfo.username || currentForm.accessId
+          accessId: userInfo.accessId || currentForm.accessId
         };
         setTicketForm(updatedForm);
       },
@@ -195,7 +195,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
           const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
           const formData = {
             email: formWithUserInfo.email || "",
-            userName: formWithUserInfo.name || "",
+            name: formWithUserInfo.name || "",
             accessId: formWithUserInfo.accessId || "",
             accessResource: currentForm.resource || "",
             description: currentForm.description || "",

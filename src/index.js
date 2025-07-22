@@ -7,9 +7,9 @@ import reportWebVitals from './reportWebVitals';
 function ExampleApp() {
   const [userLoggedIn, setUserLoggedIn] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [userName, setUserName] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setUserEmail] = useState('');
+  const [name, setUserName] = useState('');
+  const [accessId, setAccessId] = useState('');
   const botRef = useRef();
 
   const handleSendHelloWorld = () => {
@@ -57,7 +57,7 @@ function ExampleApp() {
               <input
                 id="user-email-react"
                 type="email"
-                value={userEmail}
+                value={email}
                 onChange={(e) => setUserEmail(e.target.value)}
                 placeholder="user@example.com"
                 className="demo-input"
@@ -69,7 +69,7 @@ function ExampleApp() {
               <input
                 id="user-name-react"
                 type="text"
-                value={userName}
+                value={name}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="John Doe"
                 className="demo-input"
@@ -77,12 +77,12 @@ function ExampleApp() {
             </div>
 
             <div className="demo-field">
-              <label htmlFor="username-react">Username/ACCESS ID:</label>
+              <label htmlFor="accessId-react">ACCESS ID:</label>
               <input
-                id="username-react"
+                id="accessId-react"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={accessId}
+                onChange={(e) => setAccessId(e.target.value)}
                 placeholder="johndoe123"
                 className="demo-input"
               />
@@ -111,9 +111,9 @@ function ExampleApp() {
         loginUrl="/login"
         apiKey={process.env.REACT_APP_API_KEY}
         welcome="What can I help you with?"
-        userEmail={userEmail || undefined}
-        userName={userName || undefined}
-        accessId={username || undefined}
+        userEmail={email || undefined}
+        userName={name || undefined}
+        accessId={accessId || undefined}
       />
     </div>
   );

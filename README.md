@@ -149,7 +149,7 @@ function MyApp() {
 | `welcome` | string | - | Welcome message |
 | `userEmail` | string | - | User's email (pre-populates ticket forms when logged in) |
 | `userName` | string | - | User's display name (pre-populates ticket forms when logged in) |
-| `username` | string | - | User's username/ACCESS ID (pre-populates ticket forms when logged in) |
+| `accessId` | string | - | User's ACCESS ID (pre-populates ticket forms when logged in) |
 
 ### Standalone Javascript
 
@@ -204,7 +204,7 @@ botController.destroy();
 | `welcome` | string | - | Welcome message |
 | `userEmail` | string | - | User's email (pre-populates ticket forms when logged in) |
 | `userName` | string | - | User's display name (pre-populates ticket forms when logged in) |
-| `username` | string | - | User's username/ACCESS ID (pre-populates ticket forms when logged in) |
+| `accessId` | string | - | User's ACCESS ID (pre-populates ticket forms when logged in) |
 
 > **More Examples**: See `index.html` in this repository for examples including login state management, embedded mode, and programmatic control. Run the react app to see the same in a react context.
 
