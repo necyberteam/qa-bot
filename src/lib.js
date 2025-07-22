@@ -52,7 +52,7 @@ const ProgrammaticQABot = React.forwardRef((props, ref) => {
       welcome={props.welcome}
       userEmail={props.userEmail}
       userName={props.userName}
-      username={props.username}
+      accessId={props.accessid}
     />
   );
 });
@@ -78,6 +78,9 @@ export function qaBot(config) {
         loginUrl={config.loginUrl}
         ringEffect={config.ringEffect}
         welcome={config.welcome}
+        userEmail={config.userEmail}
+        userName={config.userName}
+        accessId={config.accessid}
       />
     </React.StrictMode>
   );
