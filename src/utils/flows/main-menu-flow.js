@@ -18,7 +18,7 @@ export const createMainMenuFlow = ({
       options: [
         "Ask a question about ACCESS", // AI loop
         "Open a Help Ticket", // Jira Ticket
-        "Provide feedback to ACCESS", // Feedback
+        // "Provide feedback to ACCESS", // TODO: Add feedback flow back in
         "Report a security issue" // Security
       ],
       chatDisabled: true,
@@ -29,10 +29,10 @@ export const createMainMenuFlow = ({
           // Reset form data
           setTicketForm({});
           return "help_ticket";
-        } else if (chatState.userInput === "Provide feedback to ACCESS") {
-          // Reset form data
-          setFeedbackForm({});
-          return "feedback";
+        // } else if (chatState.userInput === "Provide feedback to ACCESS") {
+        //   // Reset form data
+        //   setFeedbackForm({});
+        //   return "feedback";
         } else if (chatState.userInput === "Report a security issue") {
           // Reset form data
           setTicketForm({});
