@@ -131,7 +131,7 @@ export const createFeedbackFlow = ({
       component: fileUploadElement,
       options: ["Continue"],
       chatDisabled: true,
-      function: (chatState) => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
+      function: () => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
       path: "feedback_primary_role"
     },
     feedback_contact_choice: {
@@ -150,7 +150,7 @@ export const createFeedbackFlow = ({
       path: (chatState) => {
         if (chatState.userInput === "Include my contact info") {
           // If we have complete user info, go to confirmation step
-          if (userInfo.email && userInfo.name && userInfo.username) {
+          if (userInfo.email && userInfo.name && userInfo.accessId) {
             return "feedback_contact_confirm";
           }
           // Otherwise collect missing info - set flag to use custom info
@@ -164,18 +164,18 @@ export const createFeedbackFlow = ({
           });
           if (!userInfo.name) return "feedback_name";
           if (!userInfo.email) return "feedback_email";
-          if (!userInfo.username) return "feedback_accessid";
+          if (!userInfo.accessId) return "feedback_accessid";
           return "feedback_summary";
         }
         return "feedback_summary";
       }
     },
     feedback_contact_confirm: {
-      message: (chatState) => {
+      message: () => {
         return `We have the following contact information from your account:\n\n` +
                `Name: ${userInfo.name || 'Not provided'}\n` +
                `Email: ${userInfo.email || 'Not provided'}\n` +
-               `ACCESS ID: ${userInfo.username || 'Not provided'}\n\n` +
+               `ACCESS ID: ${userInfo.accessId || 'Not provided'}\n\n` +
                `Would you like to use this information or provide different details?`;
       },
       options: ["Use this information", "I'll provide different details"],
@@ -241,7 +241,7 @@ export const createFeedbackFlow = ({
           // Use pre-populated userInfo
           finalName = userInfo.name || 'Not provided';
           finalEmail = userInfo.email || 'Not provided';
-          finalAccessId = userInfo.username || 'Not provided';
+          finalAccessId = userInfo.accessId || 'Not provided';
         }
 
         let fileInfo = '';

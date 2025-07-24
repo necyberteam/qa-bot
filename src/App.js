@@ -24,4 +24,6 @@ const App = React.forwardRef((props, ref) => {
   );
 });
 
+App.displayName = 'App';
+
 export default App;

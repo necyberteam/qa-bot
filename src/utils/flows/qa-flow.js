@@ -26,6 +26,7 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
           return handleBotError(error);
         }
       },
+      renderMarkdown: ["BOT"],
       options: ["👍 Yes", "👎 No"],
       chatDisabled: false,
       function: async (chatState) => {

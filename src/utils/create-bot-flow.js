@@ -18,8 +18,8 @@ function createBotFlow({
   currentQueryId,
   ticketForm = {},
   setTicketForm = () => {},
-  feedbackForm = {},
-  setFeedbackForm = () => {},
+  // feedbackForm = {},
+  // setFeedbackForm = () => {},
   formContext,
   userInfo = {}
 }) {
@@ -31,7 +31,7 @@ function createBotFlow({
   const mainMenuFlow = createMainMenuFlow({
     welcome: buildWelcomeMessage(true, welcomeMessage), // Always use logged-in style welcome
     setTicketForm,
-    setFeedbackForm
+    // setFeedbackForm
   });
 
   // Create Q&A flow (requires login)
@@ -63,6 +63,7 @@ function createBotFlow({
     userInfo
   });
 
+  // TODO: Add feedback flow back in
   // const feedbackFlow = createFeedbackFlow({
   //   feedbackForm,
   //   setFeedbackForm,
@@ -80,7 +81,7 @@ function createBotFlow({
     ...(mainMenuFlow || {}),
     ...(qaFlow || {}),
     ...(ticketFlow || {}),
-    // ...(feedbackFlow || {}),
+    //...(feedbackFlow || {}), // TODO: add feedback flow back in
     ...(securityFlow || {}),
     // Add fallback loop for errors (only if logged in)
     ...(isBotLoggedIn && {
@@ -88,6 +89,7 @@ function createBotFlow({
         message: async (params) => {
           await handleQuery(params);
         },
+        renderMarkdown: ["BOT"],
         path: () => hasQueryError ? 'start' : 'loop'
       }
     })

@@ -43,7 +43,7 @@ const useKeyboardNavigation = () => {
           newIndex = elements.length - 1;
           break;
         case 'Enter':
-        case ' ':
+        case ' ': {
           // Handle different types of elements
           const currentElement = elements[currentIndex];
           const mouseDownEvent = new MouseEvent('mousedown', {
@@ -53,6 +53,7 @@ const useKeyboardNavigation = () => {
           });
           currentElement.dispatchEvent(mouseDownEvent);
           return;
+        }
         default:
           // No action needed for other keys
           return;
@@ -136,7 +137,7 @@ const useKeyboardNavigation = () => {
       
       switch (event.key) {
         case 'ArrowDown':
-        case 'ArrowRight':
+        case 'ArrowRight': {
           event.preventDefault();
           let nextIndex;
           if (currentIndex < options.length - 1) {
@@ -158,9 +159,10 @@ const useKeyboardNavigation = () => {
           options[nextIndex].classList.add('keyboard-focused');
           options[nextIndex].focus();
           break;
+        }
 
         case 'ArrowUp':
-        case 'ArrowLeft':
+        case 'ArrowLeft': {
           event.preventDefault();
           let prevIndex;
           if (currentIndex > 0) {
@@ -182,6 +184,7 @@ const useKeyboardNavigation = () => {
           options[prevIndex].classList.add('keyboard-focused');
           options[prevIndex].focus();
           break;
+        }
 
         case 'Enter':
         case ' ': // Space key
@@ -295,11 +298,11 @@ const useKeyboardNavigation = () => {
       const lastMessage = allMessages[allMessages.length - 1];
       
       // Get options containers only from the last message
-      let optionsContainers = Array.from(lastMessage.querySelectorAll('.rcb-options-container'))
+      const optionsContainers = Array.from(lastMessage.querySelectorAll('.rcb-options-container'))
         .filter(el => el.offsetParent !== null);
       
       let options = [];
-      let optionType = 'regular';
+      const optionType = 'regular';
       
       // Look for regular options first - but only in the last message
       if (optionsContainers.length > 0) {

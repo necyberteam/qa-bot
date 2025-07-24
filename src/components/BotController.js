@@ -69,4 +69,6 @@ const BotController = React.forwardRef(({
   return null;
 });
 
+BotController.displayName = 'BotController';
+
 export default BotController;

@@ -23,7 +23,7 @@ function getUserInfo() {
     return {
         email: document.getElementById('user-email').value || undefined,
         name: document.getElementById('user-name').value || undefined,
-        username: document.getElementById('username').value || undefined
+        accessId: document.getElementById('accessId').value || undefined
     };
 }
 
@@ -37,7 +37,7 @@ function initializeQABot() {
             defaultOpen: false,
             userEmail: userInfo.email,
             userName: userInfo.name,
-            username: userInfo.username
+            accessId: userInfo.accessId
         });
     }
 }
@@ -53,7 +53,7 @@ function initializeEmbeddedBot() {
             isLoggedIn: isUserLoggedIn(),
             userEmail: userInfo.email,
             userName: userInfo.name,
-            username: userInfo.username
+            accessId: userInfo.accessId
         });
     } else if (!qaBot) {
         console.error("qaBot not found. Make sure the standalone JS file is loaded properly.");

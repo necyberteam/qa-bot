@@ -52,10 +52,12 @@ const ProgrammaticQABot = React.forwardRef((props, ref) => {
       welcome={props.welcome}
       userEmail={props.userEmail}
       userName={props.userName}
-      username={props.username}
+      accessId={props.accessId}
     />
   );
 });
+
+ProgrammaticQABot.displayName = 'ProgrammaticQABot';
 
 // Export for JS API - now React-backed for all usage
 export function qaBot(config) {
@@ -65,7 +67,7 @@ export function qaBot(config) {
   }
 
   const root = ReactDOM.createRoot(config.target);
-  let wrapperRef = { current: null };
+  const wrapperRef = { current: null };
 
   root.render(
     <React.StrictMode>
@@ -78,6 +80,9 @@ export function qaBot(config) {
         loginUrl={config.loginUrl}
         ringEffect={config.ringEffect}
         welcome={config.welcome}
+        userEmail={config.userEmail}
+        userName={config.userName}
+        accessId={config.accessId}
       />
     </React.StrictMode>
   );

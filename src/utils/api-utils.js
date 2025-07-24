@@ -2,11 +2,11 @@ import { DEFAULT_CONFIG } from '../config/constants';
 
 /**
  * Legacy function - ProForma mapping is now handled by the API
- * @param {Object} formData Form data 
+ * @param {Object} formData Form data
  * @param {number} requestTypeId The JSM request type ID
  * @returns {Object} Form data (unchanged - API handles ProForma mapping)
  */
-const mapProFormaFields = (formData, requestTypeId) => {
+const mapProFormaFields = (formData) => {
   // ProForma field mapping is now handled by the API
   // This function is kept for backward compatibility but does no transformation
   return formData;
@@ -27,7 +27,7 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
     LOGIN_PROVIDER: 31,
     SECURITY: 26
   };
-  
+
   const requestTypeIds = {
     support: REQUEST_TYPE_IDS.SUPPORT,
     general_help: REQUEST_TYPE_IDS.SUPPORT,
@@ -38,10 +38,10 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
   };
 
   const requestTypeId = requestTypeIds[ticketType] || requestTypeIds.support;
-  
+
   // Determine the correct service desk ID based on ticket type
   const serviceDeskId = ticketType === 'security' ? 3 : 2;
-  
+
   // Map ProForma fields to JSM custom field IDs (now handled by API)
   const mappedFormData = mapProFormaFields(formData, requestTypeId);
 
@@ -89,10 +89,15 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
  * @returns {Promise<Object>} The response from the proxy
  */
 export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
-  
-  // Use versioned API endpoints (these get redirected by netlify.toml)
-  const serverBaseUrl = DEFAULT_CONFIG.netlifyBaseUrl.replace('/.netlify/functions/', ''); // Get base server URL
-  
+
+  // Use versioned API endpoints
+  // These get redirected by netlify.toml in backend repo (e.g. /api/v1/tickets → /.netlify/functions/tickets)
+  // But some legacy env files might have "/.netlify/functions/" or "/.netlify/functions"
+  // Once we are sure no one else is developing with that pattern we can remove these replaces
+  const serverBaseUrl = DEFAULT_CONFIG.netlifyBaseUrl
+    .replace('/.netlify/functions/', '')
+    .replace('/.netlify/functions', '');
+
   let proxyEndpoint;
   if (endpointName === 'create-support-ticket') {
     proxyEndpoint = `${serverBaseUrl}/api/v1/tickets`;
@@ -101,7 +106,7 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
   } else {
     proxyEndpoint = `${DEFAULT_CONFIG.netlifyBaseUrl}/${endpointName}`;
   }
-    
+
 
   try {
     const response = await fetch(proxyEndpoint, {
@@ -146,10 +151,10 @@ export const submitSecurityIncident = async (formData, uploadedFiles = []) => {
   try {
     // Prepare the data for security incident submission
     const submissionData = await prepareApiSubmission(formData, 'security', uploadedFiles);
-    
+
     // Submit to the security incident endpoint
     const result = await sendPreparedDataToProxy(submissionData, 'create-security-incident');
-    
+
     return result;
   } catch (error) {
     console.error('| ❌ Security incident submission failed:', error);

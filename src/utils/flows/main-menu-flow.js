@@ -18,7 +18,7 @@ export const createMainMenuFlow = ({
       options: [
         "Ask a question about ACCESS", // AI loop
         "Open a Help Ticket", // Jira Ticket
-        //"Provide feedback to ACCESS", // Feedback
+        // "Provide feedback to ACCESS", // TODO: Add feedback flow back in
         "Report a security issue" // Security
       ],
       chatDisabled: true,
