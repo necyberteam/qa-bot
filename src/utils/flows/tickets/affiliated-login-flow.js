@@ -87,7 +87,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
           description: chatState.userInput,
           email: userInfo.email || currentForm.email,
           name: userInfo.name || currentForm.name,
-          accessId: userInfo.username || currentForm.accessId
+          accessId: userInfo.accessId || currentForm.accessId
         };
         setTicketForm(updatedForm);
       },
@@ -103,7 +103,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
       },
       path: (chatState) => chatState.userInput === "Yes"
         ? "affiliated_login_upload"
-        : ((chatState) => {
+        : (() => {
             const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
             if (!formWithUserInfo.email) return "affiliated_login_email";
             if (!formWithUserInfo.name) return "affiliated_login_name";
@@ -120,7 +120,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, uploadConfirmed: true});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.email) return "affiliated_login_email";
         if (!formWithUserInfo.name) return "affiliated_login_name";
@@ -135,7 +135,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, email: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.name) return "affiliated_login_name";
         if (!formWithUserInfo.accessId) return "affiliated_login_accessid";
@@ -148,7 +148,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, name: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.accessId) return "affiliated_login_accessid";
         return "affiliated_login_summary";
@@ -195,7 +195,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
           const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
           const formData = {
             email: formWithUserInfo.email || "",
-            userName: formWithUserInfo.name || "",
+            name: formWithUserInfo.name || "",
             accessId: formWithUserInfo.accessId || "",
             accessResource: currentForm.resource || "",
             description: currentForm.description || "",

@@ -130,7 +130,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     userInfo: {
       email: userEmail || null,
       name: userName || null,
-      username: accessId || null
+      accessId: accessId || null
     }
   }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, userEmail, userName, accessId]);
 
@@ -200,6 +200,8 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   );
 });
 
+QABotInternal.displayName = 'QABotInternal';
+
 /**
  * Q&A Bot Component (Controlled)
  *
@@ -214,7 +216,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
  * @param {string}    [props.welcome='Hello! What can I help you with?'] - Welcome message
  * @param {string}    [props.userEmail] - User's email address (when logged in)
  * @param {string}    [props.userName] - User's display name (when logged in)
- * @param {string}    [props.username] - User's username/ID (when logged in)
+ * @param {string}    [props.accessId] - User's ACCESS ID (when logged in)
  * @returns {JSX.Element}
  */
 const QABot = React.forwardRef((props, ref) => {
@@ -224,5 +226,7 @@ const QABot = React.forwardRef((props, ref) => {
     </FormProvider>
   );
 });
+
+QABot.displayName = 'QABot';
 
 export default QABot;

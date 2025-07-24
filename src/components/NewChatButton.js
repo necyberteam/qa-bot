@@ -1,11 +1,16 @@
 import React from 'react';
 import { useFlow } from 'react-chatbotify';
+import { useFormContext } from '../contexts/FormContext';
 import RefreshIcon from './icons/RefreshIcon';
 
 const NewChatButton = () => {
   const { restartFlow } = useFlow();
+  const { resetTicketForm, resetFeedbackForm } = useFormContext();
 
   const handleNewChat = () => {
+    // Clear all form state to ensure a clean start
+    resetTicketForm();
+    resetFeedbackForm();
     restartFlow();
   };
 

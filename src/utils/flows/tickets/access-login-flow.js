@@ -48,7 +48,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
           description: chatState.userInput,
           email: userInfo.email || currentForm.email,
           name: userInfo.name || currentForm.name,
-          accessId: userInfo.username || currentForm.accessId
+          accessId: userInfo.accessId || currentForm.accessId
         };
         setTicketForm(updatedForm);
       },
@@ -84,7 +84,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
       },
       path: (chatState) => chatState.userInput === "Yes"
         ? "access_login_upload"
-        : ((chatState) => {
+        : (() => {
             const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
             if (!formWithUserInfo.email) return "access_login_email";
             if (!formWithUserInfo.name) return "access_login_name";
@@ -101,7 +101,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, uploadConfirmed: true});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.email) return "access_login_email";
         if (!formWithUserInfo.name) return "access_login_name";
@@ -116,7 +116,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, email: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.name) return "access_login_name";
         if (!formWithUserInfo.accessId) return "access_login_accessid";
@@ -129,7 +129,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
         const currentForm = getCurrentTicketForm();
         setTicketForm({...currentForm, name: chatState.userInput});
       },
-      path: (chatState) => {
+      path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
         if (!formWithUserInfo.accessId) return "access_login_accessid";
         return "access_login_summary";
@@ -177,7 +177,7 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
           const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
           const formData = {
             email: formWithUserInfo.email || "",
-            userName: formWithUserInfo.name || "",
+            name: formWithUserInfo.name || "",
             accessId: formWithUserInfo.accessId || "",
             description: currentForm.description || "",
             // ProForma fields for request type 30

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMessages, useFlow } from 'react-chatbotify';
+import { useMessages } from 'react-chatbotify';
 import { DEFAULT_CONFIG } from '../config/constants';
 
 /**
@@ -20,7 +20,6 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style, 
   const [feedbackGiven, setFeedbackGiven] = React.useState(null); // null, 'positive', 'negative'
   const [hoveredButton, setHoveredButton] = React.useState(null); // 'up', 'down', or null
   const { injectMessage } = useMessages();
-  const { goToPath } = useFlow();
   const defaultStyle = {
     display: 'flex',
     flexDirection: 'row',

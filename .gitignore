@@ -10,6 +10,7 @@
 
 # misc
 .DS_Store
+.idea
 .env
 .env.local
 .env.development.local
@@ -27,8 +28,8 @@ yarn-error.log*
 *.diff
 *.patch
 
-# Build output
-/build
+# Library output
+# /build (still required, to refactor?)
 /dist
 
 # local-notes, claude

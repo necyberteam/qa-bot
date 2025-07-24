@@ -17,6 +17,7 @@
   "types": "index.d.ts",
   "files": [
     "dist",
+    "build",
     "index.d.ts"
   ],
   "dependencies": {
@@ -41,6 +42,7 @@
     "@babel/core": "^7.23.9",
     "@babel/preset-env": "^7.23.9",
     "@babel/preset-react": "^7.23.9",
+    "@eslint/js": "^9.31.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
@@ -50,6 +52,9 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "customize-cra": "^1.0.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.3.0",
     "react": "^18.3.1",
     "react-app-rewired": "^2.2.1",
     "react-dom": "^18.3.1",
@@ -64,7 +69,9 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "build:lib": "rollup -c",
-    "prepublishOnly": "npm run build:lib"
+    "prepublishOnly": "npm run build:lib",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   },
   "eslintConfig": {
     "extends": [
