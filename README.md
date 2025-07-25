@@ -153,6 +153,8 @@ function MyApp() {
 
 ### Standalone Javascript
 
+**Recommended approach** - use the self-contained standalone bundle:
+
 ```html
 <script src="https://unpkg.com/@snf/access-qa-bot@2.4.0/dist/access-qa-bot.standalone.js"></script>
 
@@ -167,6 +169,8 @@ qaBot({
 });
 </script>
 ```
+
+> **Note**: Early versions (v0.1.x) supported a "three files" CDN approach using `/build/` directory files. This approach is no longer supported as the build architecture changed from auto-executing scripts to library exports. Use the standalone bundle above instead.
 
 #### Programmatic Control
 
@@ -264,6 +268,7 @@ The package includes both `/dist/` and `/build/` directories:
   - `access-qa-bot.standalone.js` (Self-contained for plain HTML)
 
 - **`/build/`**: React app build files
+  - **Not for standalone CDN usage** (use `/dist/access-qa-bot.standalone.js` instead)
   - Required for shadow DOM implementations that need to import CSS directly
   - Example: `import qaStyle from '@snf/access-qa-bot/build/static/css/main.css?inline'`
   - Maintained for backward compatibility with existing integrations
