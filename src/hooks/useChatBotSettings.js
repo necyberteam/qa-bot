@@ -12,13 +12,15 @@ import { Button } from "react-chatbotify"
  * @param {boolean} params.embedded - Whether the bot is embedded
  * @param {boolean} params.defaultOpen - Default open state (floating mode only)
  * @param {boolean} params.isLoggedIn - Whether user is logged in (passed to UserIcon)
+ * @param {string} params.loginUrl - URL to navigate to for login
  * @returns {Object} ChatBot settings object
  */
 const useChatBotSettings = ({
   themeColors,
   embedded,
   defaultOpen,
-  isLoggedIn
+  isLoggedIn,
+  loginUrl
 }) => {
   const isBotLoggedIn = isLoggedIn;
   
@@ -46,7 +48,7 @@ const useChatBotSettings = ({
         ),
         avatar: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
         buttons: [
-          isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl="/login" isHeaderButton={true} />,
+          isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl={loginUrl} isHeaderButton={true} />,
           Button.CLOSE_CHAT_BUTTON
         ]
       },
@@ -108,7 +110,7 @@ const useChatBotSettings = ({
         rcbToggleChatWindow: true // Enable chat window toggle event
       }
     };
-  }, [themeColors, embedded, defaultOpen, isBotLoggedIn, tooltipMode]);
+  }, [themeColors, embedded, defaultOpen, isBotLoggedIn, tooltipMode, loginUrl]);
 
   return settings;
 };
