@@ -101,7 +101,8 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     themeColors,
     embedded,
     defaultOpen: open,
-    isLoggedIn: isBotLoggedIn
+    isLoggedIn: isBotLoggedIn,
+    loginUrl
   });
 
   const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
