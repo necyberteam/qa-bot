@@ -154,7 +154,7 @@ function MyApp() {
 ### Standalone Javascript
 
 ```html
-<script src="https://unpkg.com/@snf/access-qa-bot@2.x/dist/access-qa-bot.standalone.js"></script>
+<script src="https://unpkg.com/@snf/access-qa-bot@2.4.0/dist/access-qa-bot.standalone.js"></script>
 
 <div id="qa-bot"></div>
 
@@ -253,6 +253,22 @@ This creates the distribution files in the `dist/` directory:
 - `access-qa-bot.js` (ES module)
 - `access-qa-bot.umd.cjs` (UMD/CommonJS) 
 - `access-qa-bot.standalone.js` (Standalone version)
+
+### Build Directory
+
+The package includes both `/dist/` and `/build/` directories:
+
+- **`/dist/`**: Library files for npm consumers and CDN usage
+  - `access-qa-bot.js` (ES module for React apps)
+  - `access-qa-bot.umd.cjs` (CommonJS)
+  - `access-qa-bot.standalone.js` (Self-contained for plain HTML)
+
+- **`/build/`**: React app build files
+  - Required for shadow DOM implementations that need to import CSS directly
+  - Example: `import qaStyle from '@snf/access-qa-bot/build/static/css/main.css?inline'`
+  - Maintained for backward compatibility with existing integrations
+
+Both directories are published to npm to support different integration patterns.
 
 ### NPM Beta Release
 
@@ -380,7 +396,7 @@ npm install @snf/access-qa-bot@beta
 - Removed unused helper functions (`getCurrentPriority`, `getCurrentAccessId`)
 - Cleaned up debug console statements for production
 - Added markdown renderer plugin alongside HTML renderer
-- Improved build configuration and excluded build directory from version control
+- Improved build configuration and updated build directory handling
 
 #### 📚 Documentation
 - Updated README with comprehensive feature list and integration examples

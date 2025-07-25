@@ -79,7 +79,8 @@ export default [
         preventAssignment: true,
         'process.env.NODE_ENV': JSON.stringify('production'),
         // Replace react app environment variables
-        'process.env.REACT_APP_API_KEY': JSON.stringify('demo-key')
+        'process.env.REACT_APP_API_KEY': JSON.stringify('demo-key'),
+        'process.env.REACT_APP_NETLIFY_BASE_URL': JSON.stringify('https://access-jsm-api.netlify.app')
       }),
       resolve({
         extensions: ['.js', '.jsx'],
