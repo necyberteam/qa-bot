@@ -39,21 +39,21 @@ export const createSubmissionHandler = (setTicketForm) => {
       if (proxyResponse.success) {
         submissionResult = {
           success: true,
-          ticketKey: proxyResponse.data.ticketKey,
-          ticketUrl: proxyResponse.data.ticketUrl
+          ticketKey: proxyResponse.data.data.ticketKey,
+          ticketUrl: proxyResponse.data.data.ticketUrl
         };
         setTicketForm(prevForm => ({
           ...prevForm, 
-          ticketKey: proxyResponse.data.ticketKey, 
-          ticketUrl: proxyResponse.data.ticketUrl
+          ticketKey: proxyResponse.data.data.ticketKey, 
+          ticketUrl: proxyResponse.data.data.ticketUrl
         }));
       } else {
-        console.error(`| ❌ ${ticketType} ticket creation failed:`, proxyResponse.data?.message || proxyResponse.error);
+        console.error(`| ❌ ${ticketType} ticket creation failed:`, proxyResponse);
         submissionResult = {
           success: false,
-          error: proxyResponse.data?.message || proxyResponse.error
+          error: proxyResponse.error || 'Unknown error'
         };
-        setTicketForm(prevForm => ({...prevForm, submissionError: proxyResponse.data?.message || proxyResponse.error}));
+        setTicketForm(prevForm => ({...prevForm, submissionError: proxyResponse.error || 'Unknown error'}));
       }
     } catch (error) {
       console.error(`| ❌ Error sending ${ticketType} data to proxy:`, error);
