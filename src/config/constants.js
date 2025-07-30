@@ -44,5 +44,6 @@ export const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
 
 export const getApiKey = (providedApiKey) => {
   // Return provided API key if available, otherwise fall back to environment variable
-  return providedApiKey || ((typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null);
+  // Simplified for better Netlify compatibility
+  return providedApiKey || process.env.REACT_APP_API_KEY || null;
 };
