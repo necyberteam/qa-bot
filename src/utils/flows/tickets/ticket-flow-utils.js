@@ -39,13 +39,13 @@ export const createSubmissionHandler = (setTicketForm) => {
       if (proxyResponse.success) {
         submissionResult = {
           success: true,
-          ticketKey: proxyResponse.data.data.ticketKey,
-          ticketUrl: proxyResponse.data.data.ticketUrl
+          ticketKey: proxyResponse.data.ticketKey,
+          ticketUrl: proxyResponse.data.ticketUrl
         };
         setTicketForm(prevForm => ({
           ...prevForm, 
-          ticketKey: proxyResponse.data.data.ticketKey, 
-          ticketUrl: proxyResponse.data.data.ticketUrl
+          ticketKey: proxyResponse.data.ticketKey, 
+          ticketUrl: proxyResponse.data.ticketUrl
         }));
       } else {
         console.error(`| ❌ ${ticketType} ticket creation failed:`, proxyResponse.data?.message || proxyResponse.error);

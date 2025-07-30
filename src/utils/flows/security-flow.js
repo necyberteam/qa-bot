@@ -249,13 +249,13 @@ export const createSecurityFlow = ({
             if (result.success) {
               submissionResult = {
                 success: true,
-                ticketKey: result.data?.data?.ticketKey,
-                ticketUrl: result.data?.data?.ticketUrl
+                ticketKey: result.data?.ticketKey,
+                ticketUrl: result.data?.ticketUrl
               };
               setTicketForm(prevForm => ({
                 ...prevForm,
-                ticketKey: result.data?.data?.ticketKey,
-                ticketUrl: result.data?.data?.ticketUrl
+                ticketKey: result.data?.ticketKey,
+                ticketUrl: result.data?.ticketUrl
               }));
             } else {
               submissionResult = {
