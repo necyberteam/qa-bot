@@ -9,6 +9,12 @@ interface QABotProps {
   isLoggedIn?: boolean;
   loginUrl?: string;
   welcome?: string;
+  /** User's email address (when logged in) */
+  userEmail?: string;
+  /** User's display name (when logged in) */
+  userName?: string;
+  /** User's ACCESS ID (when logged in) */
+  accessId?: string;
   [key: string]: any; // Allow additional props
 }
 

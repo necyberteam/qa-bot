@@ -10,7 +10,7 @@
 export const createMainMenuFlow = ({
   welcome,
   setTicketForm = () => {},
-  setFeedbackForm = () => {}
+  setFeedbackForm = () => {} // eslint-disable-line no-unused-vars -- Temporarily disabled feedback flow
 }) => {
   return {
     start: {

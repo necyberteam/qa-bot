@@ -77,15 +77,23 @@ export const createSubmissionHandler = (setTicketForm) => {
  * @returns {string} Success message with clickable URL
  */
 export const generateSuccessMessage = (submissionResult, ticketType = 'ticket') => {
-  if (submissionResult && !submissionResult.success) {
-    return `We apologize, but there was an error submitting your ${ticketType}: ${submissionResult.error}\n\nPlease try again or contact our support team directly.`;
-  } else if (submissionResult && submissionResult.success && submissionResult.ticketUrl && submissionResult.ticketKey) {
-    return `Your ${ticketType} has been submitted successfully.\n\nTicket: <a href="${submissionResult.ticketUrl}" target="_blank">${submissionResult.ticketKey}</a>\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
-  } else if (submissionResult && submissionResult.success) {
-    return `Your ${ticketType} has been submitted successfully.\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
-  } else {
-    return `Your ${ticketType} has been submitted successfully.\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
+  // Handle null/undefined submission result as an error
+  if (!submissionResult) {
+    return `We apologize, but there was an error submitting your ${ticketType}.\n\nPlease try again or contact our support team directly.`;
   }
+  
+  // Handle explicit failure
+  if (!submissionResult.success) {
+    return `We apologize, but there was an error submitting your ${ticketType}: ${submissionResult.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+  }
+  
+  // Handle success with ticket URL and key
+  if (submissionResult.ticketUrl && submissionResult.ticketKey) {
+    return `Your ${ticketType} has been submitted successfully.\n\nTicket: <a href="${submissionResult.ticketUrl}" target="_blank">${submissionResult.ticketKey}</a>\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
+  }
+  
+  // Handle success without ticket URL (but this might indicate a partial failure)
+  return `Your ${ticketType} has been submitted successfully.\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
 };
 
 /**

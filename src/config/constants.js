@@ -7,8 +7,9 @@ export const DEFAULT_CONFIG = {
   API_ENDPOINT: 'https://access-ai.ccs.uky.edu/api/query',
   //API_ENDPOINT: 'https://access-ai.ccs.uky.edu:543/api/query',
 
-  // Netlify function URL
-  netlifyBaseUrl: (typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_NETLIFY_BASE_URL : 'https://access-ai.ccs.uky.edu/api/query',
+  // Netlify function URL - this should point to the Netlify functions endpoint for ticket submission
+  // NOT the Q&A API endpoint
+  netlifyBaseUrl: (typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_NETLIFY_BASE_URL : 'https://access-jsm-api.netlify.app',
 
   ERRORS: {
     API_UNAVAILABLE: 'Unable to contact the Q&A Bot. Please try again later.',
