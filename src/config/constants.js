@@ -8,7 +8,7 @@ export const DEFAULT_CONFIG = {
   //API_ENDPOINT: 'https://access-ai.ccs.uky.edu:543/api/query',
 
   // Netlify function URL
-  netlifyBaseUrl: process.env.REACT_APP_NETLIFY_BASE_URL,
+  netlifyBaseUrl: (typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_NETLIFY_BASE_URL : 'https://access-ai.ccs.uky.edu/api/query',
 
   ERRORS: {
     API_UNAVAILABLE: 'Unable to contact the Q&A Bot. Please try again later.',
@@ -43,5 +43,5 @@ export const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
 
 export const getApiKey = (providedApiKey) => {
   // Return provided API key if available, otherwise fall back to environment variable
-  return providedApiKey || process.env.REACT_APP_API_KEY;
+  return providedApiKey || ((typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null);
 };

@@ -55,7 +55,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     accessId
   } = props;
 
-  const finalApiKey = apiKey || process.env.REACT_APP_API_KEY;
+  const finalApiKey = apiKey || ((typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null);
 
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
   const sessionIdRef = useRef(getOrCreateSessionId());
@@ -128,12 +128,13 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     feedbackForm,
     setFeedbackForm: updateFeedbackForm,
     formContext,
+    apiKey: finalApiKey,
     userInfo: {
       email: userEmail || null,
       name: userName || null,
       accessId: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, userEmail, userName, accessId]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);

@@ -109,7 +109,7 @@ function ExampleApp() {
         open={chatOpen}
         onOpenChange={setChatOpen}
         loginUrl="/login"
-        apiKey={process.env.REACT_APP_API_KEY}
+        apiKey={(typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null}
         welcome="What can I help you with?"
         userEmail={email || undefined}
         userName={name || undefined}

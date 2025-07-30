@@ -21,6 +21,7 @@ function createBotFlow({
   // feedbackForm = {},
   // setFeedbackForm = () => {},
   formContext,
+  apiKey,
   userInfo = {}
 }) {
   // Set the current form context for use in flow functions
@@ -39,7 +40,8 @@ function createBotFlow({
     ? createQAFlow({
         fetchAndStreamResponse: handleQuery,
         sessionId,
-        currentQueryId
+        currentQueryId,
+        apiKey
       })
     : {
         go_ahead_and_ask: {

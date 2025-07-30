@@ -10,7 +10,7 @@ import { DEFAULT_CONFIG } from '../../config/constants';
  * @param {string} params.currentQueryId Current query ID
  * @returns {Object} Q&A flow configuration
  */
-export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId }) => {
+export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId, apiKey }) => {
   return {
     go_ahead_and_ask: {
       message: "Please type your question.",
@@ -31,7 +31,6 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
       chatDisabled: false,
       function: async (chatState) => {
         if (chatState.userInput === "👍 Yes" || chatState.userInput === "👎 No") {
-          const apiKey = process.env.REACT_APP_API_KEY;
           if (apiKey && sessionId) {
             const isPositive = chatState.userInput === "👍 Yes";
             const headers = {
