@@ -11,6 +11,16 @@ function ExampleApp() {
   const [name, setUserName] = useState('');
   const [accessId, setAccessId] = useState('');
   const botRef = useRef();
+  
+  // Debug: Check what the API key value is after build
+  const apiKey = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) || null;
+  console.log('API Key check:', {
+    hasProcess: typeof process !== 'undefined',
+    hasEnv: typeof process !== 'undefined' && process.env !== undefined,
+    apiKey: apiKey,
+    rawValue: typeof process !== 'undefined' && process.env ? process.env.REACT_APP_API_KEY : 'process not defined'
+  });
+  
 
   const handleSendHelloWorld = () => {
     if (botRef.current) {
@@ -109,7 +119,7 @@ function ExampleApp() {
         open={chatOpen}
         onOpenChange={setChatOpen}
         loginUrl="/login"
-        apiKey={(typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null}
+        apiKey={apiKey}
         welcome="What can I help you with?"
         userEmail={email || undefined}
         userName={name || undefined}
