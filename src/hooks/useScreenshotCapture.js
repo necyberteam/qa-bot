@@ -7,7 +7,20 @@ import { useState } from 'react';
 const useScreenshotCapture = () => {
   const [isCapturing, setIsCapturing] = useState(false);
 
+  // Check if screen capture is available
+  const isScreenCaptureAvailable = () => {
+    return (
+      typeof navigator !== 'undefined' &&
+      navigator.mediaDevices &&
+      typeof navigator.mediaDevices.getDisplayMedia === 'function'
+    );
+  };
+
   const captureScreenshot = async () => {
+    if (!isScreenCaptureAvailable()) {
+      throw new Error('Screen capture is not available in this environment');
+    }
+
     try {
       setIsCapturing(true);
 
@@ -65,7 +78,8 @@ const useScreenshotCapture = () => {
 
   return {
     captureScreenshot,
-    isCapturing
+    isCapturing,
+    isScreenCaptureAvailable: isScreenCaptureAvailable()
   };
 };
 
