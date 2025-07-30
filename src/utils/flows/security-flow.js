@@ -255,7 +255,8 @@ export const createSecurityFlow = ({
               setTicketForm(prevForm => ({
                 ...prevForm,
                 ticketKey: result.data?.data?.ticketKey,
-                ticketUrl: result.data?.data?.ticketUrl
+                ticketUrl: result.data?.data?.ticketUrl,
+                submissionResult: submissionResult
               }));
             } else {
               submissionResult = {
@@ -289,7 +290,9 @@ export const createSecurityFlow = ({
     },
     security_success: {
       message: () => {
-        return generateSecuritySuccessMessage(submissionResult);
+        const currentForm = getCurrentTicketForm() || {};
+        const result = currentForm.submissionResult || submissionResult;
+        return generateSecuritySuccessMessage(result);
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,

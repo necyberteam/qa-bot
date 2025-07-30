@@ -14,7 +14,7 @@ const FileUploadComponent = ({ onFileUpload }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const fileInputRef = useRef(null);
-  const { captureScreenshot, isCapturing } = useScreenshotCapture();
+  const { captureScreenshot, isCapturing, isScreenCaptureAvailable } = useScreenshotCapture();
 
   // Helper function to announce messages to screen readers
   const announceToScreenReader = (message) => {
@@ -28,7 +28,21 @@ const FileUploadComponent = ({ onFileUpload }) => {
   };
 
   const handleFiles = (files) => {
-    const newFileArray = Array.from(files);
+    // Defensive check: ensure files is valid and iterable
+    if (!files || !files.length || files.length === 0) {
+      console.warn('FileUploadComponent: No valid files provided to handleFiles');
+      return;
+    }
+
+    let newFileArray;
+    try {
+      newFileArray = Array.from(files);
+    } catch (error) {
+      console.error('FileUploadComponent: Error converting files to array:', error);
+      announceToScreenReader('Error processing selected files. Please try again.');
+      return;
+    }
+
     const updatedFiles = [...selectedFiles, ...newFileArray];
     setSelectedFiles(updatedFiles);
 
@@ -66,19 +80,36 @@ const FileUploadComponent = ({ onFileUpload }) => {
     e.stopPropagation();
     setDragActive(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFiles(e.dataTransfer.files);
+    try {
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
+      }
+    } catch (error) {
+      console.error('FileUploadComponent: Error in handleDrop:', error);
+      announceToScreenReader('Error processing dropped files. Please try again.');
     }
   };
 
   const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFiles(e.target.files);
+    try {
+      if (e.target && e.target.files && e.target.files.length > 0) {
+        handleFiles(e.target.files);
+      }
+    } catch (error) {
+      console.error('FileUploadComponent: Error in handleFileSelect:', error);
+      announceToScreenReader('Error processing selected files. Please try again.');
     }
   };
 
   const handleButtonClick = () => {
-    fileInputRef.current.click();
+    try {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    } catch (error) {
+      console.error('FileUploadComponent: Error in handleButtonClick:', error);
+      announceToScreenReader('Error opening file selection dialog. Please try again.');
+    }
   };
 
   const handleRemoveFile = (indexToRemove) => {
@@ -202,50 +233,52 @@ const FileUploadComponent = ({ onFileUpload }) => {
 
   return (
     <div className="file-upload-container" style={{ padding: '16px', margin: '8px 0' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            handleScreenshotCapture();
-          }}
-          disabled={isCapturing}
-          aria-describedby="screenshot-help"
-          aria-label={isCapturing ? 'Taking screenshot, please wait' : 'Take a screenshot to attach'}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#107180',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            padding: '8px 12px',
-            cursor: isCapturing ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      {isScreenCaptureAvailable && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              handleScreenshotCapture();
+            }}
+            disabled={isCapturing}
+            aria-describedby="screenshot-help"
+            aria-label={isCapturing ? 'Taking screenshot, please wait' : 'Take a screenshot to attach'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#107180',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              padding: '8px 12px',
+              cursor: isCapturing ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+            }}
           >
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-            <circle cx="12" cy="13" r="4"></circle>
-          </svg>
-          {isCapturing ? 'Taking screenshot...' : 'Take screenshot...'}
-        </button>
-        <span id="screenshot-help" className="sr-only">
-          Captures the current screen and adds it as an attachment
-        </span>
-      </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            {isCapturing ? 'Taking screenshot...' : 'Take screenshot...'}
+          </button>
+          <span id="screenshot-help" className="sr-only">
+            Captures the current screen and adds it as an attachment
+          </span>
+        </div>
+      )}
 
       <div
         className={`file-upload-dropzone ${dragActive ? "active" : ""}`}

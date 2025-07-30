@@ -118,12 +118,38 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('| ❌ Post data to proxy failed:', response.status, errorText);
+      let errorMessage = '';
+      try {
+        const errorText = await response.text();
+        console.error('| ❌ Post data to proxy failed:', response.status, errorText);
+        
+        // Try to parse as JSON to get a better error message
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.message || errorJson.error || errorText;
+        } catch {
+          // If not JSON, use the text as-is
+          errorMessage = errorText;
+        }
+      } catch {
+        errorMessage = `HTTP ${response.status} ${response.statusText}`;
+      }
+      
+      // Add user-friendly message for common HTTP errors
+      if (response.status === 403) {
+        errorMessage = 'The ticket service is temporarily unavailable. Please try again later or contact support directly.';
+      } else if (response.status === 404) {
+        errorMessage = 'Ticket service not found. Please try again later.';
+      } else if (response.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (response.status === 401) {
+        errorMessage = 'Authentication error with the ticket service. Please contact support.';
+      }
+      
       return {
         success: false,
         status: response.status,
-        error: errorText
+        error: errorMessage
       };
     }
 

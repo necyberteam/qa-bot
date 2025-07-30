@@ -16,7 +16,7 @@ import { DEFAULT_CONFIG } from '../config/constants';
  * @param {Function} [props.onOpenTicket] - Callback for "Open a ticket for assistance"
  * @returns {JSX.Element} Rendered thumbs up/down component
  */
-const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style, onFeedbackChange }) => {
+const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, apiKey, className = '', style, onFeedbackChange }) => {
   const [feedbackGiven, setFeedbackGiven] = React.useState(null); // null, 'positive', 'negative'
   const [hoveredButton, setHoveredButton] = React.useState(null); // 'up', 'down', or null
   const { injectMessage } = useMessages();
@@ -71,8 +71,6 @@ const ThumbsUpThumbsDown = ({ sessionId, currentQueryId, className = '', style, 
    * @param {boolean} isPositive - true for thumbs up, false for thumbs down
    */
   const sendFeedback = async (isPositive) => {
-    const apiKey = process.env.REACT_APP_API_KEY;
-
     if (!apiKey || !sessionId) {
       console.warn('Missing apiKey or sessionId for feedback');
       return;
