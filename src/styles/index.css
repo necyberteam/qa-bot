@@ -566,3 +566,37 @@
   }
 }
 
+/* Fix mobile scrolling issues - especially Safari zoom-instead-of-scroll */
+.rcb-chat-input-textarea {
+  touch-action: pan-y !important;
+  user-select: text !important;
+}
+
+.rcb-chat-body-container {
+  touch-action: pan-y !important;
+}
+
+/* Allow page scrolling even when chat is present */
+.rcb-chat-window {
+  touch-action: pan-y !important;
+}
+
+/* Safari-specific fixes */
+.rcb-chat-window,
+.embedded-qa-bot {
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Specific fixes for embedded qa-bot */
+.embedded-qa-bot .rcb-chat-input-textarea {
+  touch-action: pan-y !important;
+  user-select: text !important;
+}
+
+.embedded-qa-bot .rcb-chat-body-container {
+  touch-action: pan-y !important;
+}
+
+.embedded-qa-bot .rcb-chat-window {
+  touch-action: pan-y !important;
+}
