@@ -91,11 +91,11 @@ function recreateBots() {
         bot2Controller.destroy();
         bot2Controller = null;
     }
-    
+
     // Clear containers
     document.getElementById('qa-bot').innerHTML = '';
     document.getElementById('custom-qa-bot').innerHTML = '';
-    
+
     // Recreate with new user info
     initializeQABot();
     initializeEmbeddedBot();

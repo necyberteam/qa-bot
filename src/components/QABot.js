@@ -61,7 +61,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
   const [currentQueryId, setCurrentQueryId] = useState(null);
-  
+
   // Use Form Context instead of local state
   const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
 
@@ -107,15 +107,15 @@ const QABotInternal = React.forwardRef((props, botRef) => {
 
   const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
-  const formContext = useMemo(() => ({ 
-    ticketForm: ticketForm || {}, 
-    feedbackForm: feedbackForm || {}, 
-    updateTicketForm, 
-    updateFeedbackForm, 
-    resetTicketForm, 
-    resetFeedbackForm 
+  const formContext = useMemo(() => ({
+    ticketForm: ticketForm || {},
+    feedbackForm: feedbackForm || {},
+    updateTicketForm,
+    updateFeedbackForm,
+    resetTicketForm,
+    resetFeedbackForm
   }), [ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm]);
-  
+
   const flow = useMemo(() => createBotFlow({
     welcomeMessage,
     isBotLoggedIn,
@@ -139,7 +139,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
   useFocusableSendButton();
-  useKeyboardNavigation();
+  useKeyboardNavigation(containerRef);
 
   // Handle tooltip session tracking
   useEffect(() => {
@@ -159,8 +159,8 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   }, []);
 
   return (
-    <div 
-      className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`} 
+    <div
+      className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`}
       ref={containerRef}
       role="region"
       aria-label="Ask ACCESS tool"
@@ -180,18 +180,18 @@ const QABotInternal = React.forwardRef((props, botRef) => {
             plugins={[HtmlRenderer(), MarkdownRenderer(), InputValidator()]}
           />
           {/* Live region for screen reader announcements */}
-          <div 
-            aria-live="polite" 
+          <div
+            aria-live="polite"
             aria-label="Bot response updates"
             className="sr-only"
             id="bot-live-region"
           />
-          
+
           {/* Accessibility help text */}
           <div id="chat-input-help" className="sr-only">
             Type your message and press Enter to send. Use arrow keys to navigate through response options. Press Enter or Space to select an option.
           </div>
-          
+
           {/* Keyboard navigation instructions */}
           <div id="keyboard-help" className="sr-only">
             Available keyboard shortcuts: Arrow keys to navigate options, Enter or Space to select, Tab to move between interactive elements, Escape to close dialogs.
