@@ -139,7 +139,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
   useFocusableSendButton();
-  useKeyboardNavigation(containerRef);
+  useKeyboardNavigation();
 
   // Handle tooltip session tracking
   useEffect(() => {

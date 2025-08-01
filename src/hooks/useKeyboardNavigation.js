@@ -4,7 +4,7 @@ import { useEffect } from 'react';
  * Custom hook for keyboard navigation in chatbot options
  * Provides arrow key navigation, Enter/Space selection, and accessibility features
  */
-const useKeyboardNavigation = (containerRef = null) => {
+const useKeyboardNavigation = () => {
   useEffect(() => {
     // Dedicated checkbox navigation handler
     const handleCheckboxNavigation = (event, elements) => {
@@ -277,22 +277,11 @@ const useKeyboardNavigation = (containerRef = null) => {
     };
 
     // Auto-focus first option when new options appear
-    const handleNewOptions = () => {
-      // Use the provided container ref, or fall back to document search as last resort
-      let chatWindow = null;
+    const handleNewOptions = (targetContainer = null) => {
+      let chatWindow = targetContainer;
 
-      if (containerRef && containerRef.current) {
-        // First try to find chat window within the specific bot container
-        chatWindow = containerRef.current.querySelector('.rcb-chat-window');
-        if (!chatWindow) {
-          chatWindow = containerRef.current.querySelector('[class*="rcb-chat"]');
-        }
-        if (!chatWindow) {
-          // If this container IS the qa-bot, use it directly
-          chatWindow = containerRef.current.classList.contains('qa-bot') ? containerRef.current : containerRef.current.querySelector('.qa-bot');
-        }
-      } else {
-        // Fallback to global search (for backwards compatibility)
+      // If no specific container provided, try to find one
+      if (!chatWindow) {
         chatWindow = document.querySelector('.rcb-chat-window');
         if (!chatWindow) {
           chatWindow = document.querySelector('[class*="rcb-chat"]');
@@ -456,40 +445,33 @@ const useKeyboardNavigation = (containerRef = null) => {
 
 
           if (hasNewOptions || hasNewCheckboxes) {
-            // Clear tabindex from existing elements, but scope to this bot's container
-            const scopeElement = (containerRef && containerRef.current) ? containerRef.current : document;
+            // Find which bot container this mutation occurred in
+            let botContainer = mutation.target;
+            while (botContainer && !botContainer.classList?.contains('qa-bot') && !botContainer.classList?.contains('rcb-chat-window')) {
+              botContainer = botContainer.parentElement;
+            }
+
+            // If we found a bot container, scope operations to it; otherwise fallback to global
+            const scopeElement = botContainer || document;
+
+            // Clear tabindex from existing elements within this bot
             scopeElement.querySelectorAll('.rcb-options[tabindex], .rcb-checkbox-row-container[tabindex], .rcb-checkbox-next-button[tabindex]').forEach(el => {
               el.setAttribute('tabindex', '-1');
               el.classList.remove('keyboard-focused');
             });
 
-            setTimeout(handleNewOptions, 100);
+            // Handle new options for this specific bot
+            setTimeout(() => handleNewOptions(botContainer), 100);
           }
         }
       });
     });
 
-    // Start observing - scope to this bot's container
-    let observeTarget = null;
-
-    if (containerRef && containerRef.current) {
-      // First try to find chat window within the specific bot container
-      observeTarget = containerRef.current.querySelector('.rcb-chat-window');
-      if (!observeTarget) {
-        // If no chat window found, observe the container itself
-        observeTarget = containerRef.current;
-      }
-    } else {
-      // Fallback to global search (for backwards compatibility)
-      observeTarget = document.querySelector('.rcb-chat-window');
-    }
-
-    if (observeTarget) {
-      observer.observe(observeTarget, {
-        childList: true,
-        subtree: true
-      });
-    }
+    // Start observing the document body for changes in any bot
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
 
     // Add keyboard event listener to document only
     document.addEventListener('keydown', handleKeyboardNavigation);
@@ -500,29 +482,29 @@ const useKeyboardNavigation = (containerRef = null) => {
 
     // Periodic check as backup to catch any missed options and checkboxes
     const periodicCheck = setInterval(() => {
-      // Scope the periodic check to this bot's container
-      const scopeElement = (containerRef && containerRef.current) ? containerRef.current : document;
+      // Check each bot container individually
+      document.querySelectorAll('.qa-bot').forEach(botContainer => {
+        const hasVisibleOptions = botContainer.querySelectorAll('.rcb-options-container .rcb-options').length > 0;
+        const hasVisibleCheckboxes = botContainer.querySelectorAll('.rcb-checkbox-row-container').length > 0;
 
-      const hasVisibleOptions = scopeElement.querySelectorAll('.rcb-options-container .rcb-options').length > 0;
-      const hasVisibleCheckboxes = scopeElement.querySelectorAll('.rcb-checkbox-row-container').length > 0;
+        if (hasVisibleOptions) {
+          const lastProcessedOptions = botContainer.querySelectorAll('.rcb-options[tabindex]').length;
+          const currentOptions = botContainer.querySelectorAll('.rcb-options').length;
 
-      if (hasVisibleOptions) {
-        const lastProcessedOptions = scopeElement.querySelectorAll('.rcb-options[tabindex]').length;
-        const currentOptions = scopeElement.querySelectorAll('.rcb-options').length;
-
-        if (currentOptions > lastProcessedOptions) {
-          handleNewOptions();
+          if (currentOptions > lastProcessedOptions) {
+            handleNewOptions(botContainer);
+          }
         }
-      }
 
-      if (hasVisibleCheckboxes) {
-        const lastProcessedCheckboxes = scopeElement.querySelectorAll('.rcb-checkbox-row-container[tabindex]').length;
-        const currentCheckboxes = scopeElement.querySelectorAll('.rcb-checkbox-row-container').length;
+        if (hasVisibleCheckboxes) {
+          const lastProcessedCheckboxes = botContainer.querySelectorAll('.rcb-checkbox-row-container[tabindex]').length;
+          const currentCheckboxes = botContainer.querySelectorAll('.rcb-checkbox-row-container').length;
 
-        if (currentCheckboxes > lastProcessedCheckboxes) {
-          handleNewOptions();
+          if (currentCheckboxes > lastProcessedCheckboxes) {
+            handleNewOptions(botContainer);
+          }
         }
-      }
+      });
     }, 1000);
 
     // Cleanup
