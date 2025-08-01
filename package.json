@@ -1,6 +1,6 @@
 {
   "name": "@snf/access-qa-bot",
-  "version": "2.4.7",
+  "version": "2.4.8-debug.0",
   "private": false,
   "homepage": ".",
   "description": "ACCESS Q&A Bot React Component with support ticket creation, feedback collection, and ProForma integration",
