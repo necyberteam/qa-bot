@@ -14,7 +14,7 @@ import { DEFAULT_CONFIG } from '../../config/constants';
 export const createMetricsFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId, apiKey }) => {
   return {
     metrics_intro: {
-      message: `Type your natural language question about usage and performance metrics. You can see some <a target="_blank" href="${DEFAULT_CONFIG.EXAMPLE_METRICS_QUESTIONS_URL}">examples here</a>.`,
+      message: `What is your question about usage and performance metrics? You can see some <a target="_blank" href="${DEFAULT_CONFIG.EXAMPLE_METRICS_QUESTIONS_URL}">examples here</a>.`,
       renderHtml: ["BOT"],
       path: "metrics_loop"
     },
