@@ -18,7 +18,7 @@ export const createMainMenuFlow = ({
       options: [
         "Ask a question about ACCESS", // AI loop
         "Open a Help Ticket", // Jira Ticket
-        "Investigate Usage and Performance Metrics", // Metrics
+        "Usage and performance of ACCESS resources", // Metrics
         // "Provide feedback to ACCESS", // TODO: Add feedback flow back in
         "Report a security issue" // Security
       ],
@@ -30,7 +30,7 @@ export const createMainMenuFlow = ({
           // Reset form data
           setTicketForm({});
           return "help_ticket";
-        } else if (chatState.userInput === "Investigate Usage and Performance Metrics") {
+        } else if (chatState.userInput === "Usage and performance of ACCESS resources") {
           return "metrics_intro";
         // } else if (chatState.userInput === "Provide feedback to ACCESS") {
         //   // Reset form data
