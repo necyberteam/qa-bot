@@ -61,7 +61,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
   const [currentQueryId, setCurrentQueryId] = useState(null);
-  const [hasQueryError, setHasQueryError] = useState(false);
 
   // Use Form Context instead of local state
   const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
@@ -124,7 +123,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     loginUrl,
     handleQuery,
     handleMetricsQuery,
-    hasQueryError,
+    hasQueryError: false, // TODO: Remove this parameter - see create-bot-flow.js
     sessionId,
     currentQueryId,
     ticketForm,
@@ -138,7 +137,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
       name: userName || null,
       accessId: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, handleMetricsQuery, hasQueryError, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, handleMetricsQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);

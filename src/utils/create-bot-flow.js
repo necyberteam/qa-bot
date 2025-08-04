@@ -111,7 +111,9 @@ function createBotFlow({
     ...(ticketFlow || {}),
     //...(feedbackFlow || {}), // TODO: add feedback flow back in
     ...(securityFlow || {}),
-    // Add fallback loop for errors (only if logged in)
+    // TODO: Review this fallback loop - hasQueryError is always false?
+    // Error handling is currently done per-flow with handleBotError()
+    // Add fallback loop for errors? (only if logged in)
     ...(isBotLoggedIn && {
       loop: {
         message: async (params) => {
