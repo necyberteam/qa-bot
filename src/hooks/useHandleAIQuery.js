@@ -7,9 +7,10 @@ import useGetLastUserQuery from './useGetLastUserQuery';
  * @param {string} apiKey - API key for the Q&A endpoint
  * @param {string} sessionId - Session ID for tracking the conversation
  * @param {Function} setCurrentQueryId - Function to update the current query ID state
+ * @param {string} origin - Origin header value ('access' or 'metrics')
  * @returns {Function} handleQuery function that returns true for success, false for error
  */
-const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
+const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId, origin = 'access') => {
   const getLastUserQueryId = useGetLastUserQuery();
 
   const handleQuery = useCallback(async (params) => {
@@ -21,9 +22,14 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
       setCurrentQueryId(actualQueryId);
     }
 
+        // Determine endpoint based on origin
+    const endpoint = origin === 'metrics'
+      ? DEFAULT_CONFIG.METRICS_API_ENDPOINT
+      : DEFAULT_CONFIG.API_ENDPOINT;
+
     const headers = {
       'Content-Type': 'application/json',
-      'X-Origin': 'access',
+      'X-Origin': origin,
       'X-API-KEY': apiKey,
       'X-Session-ID': sessionId,
       'X-Query-ID': actualQueryId
@@ -38,7 +44,7 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
         })
       };
 
-      const response = await fetch(DEFAULT_CONFIG.API_ENDPOINT, requestOptions);
+      const response = await fetch(endpoint, requestOptions);
       const body = await response.json();
       const text = body.response;
       await params.streamMessage(text);
@@ -49,7 +55,7 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
       await params.injectMessage(DEFAULT_CONFIG.ERRORS.API_UNAVAILABLE);
       return false; // Error
     }
-  }, [apiKey, setCurrentQueryId, getLastUserQueryId, sessionId]);
+  }, [apiKey, setCurrentQueryId, getLastUserQueryId, sessionId, origin]);
 
   return handleQuery;
 };
