@@ -105,7 +105,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     loginUrl
   });
 
-  const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId, 'q-and-a');
+  const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId, 'access');
   const handleMetricsQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId, 'metrics');
 
   const formContext = useMemo(() => ({

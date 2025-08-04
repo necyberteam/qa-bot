@@ -7,10 +7,10 @@ import useGetLastUserQuery from './useGetLastUserQuery';
  * @param {string} apiKey - API key for the Q&A endpoint
  * @param {string} sessionId - Session ID for tracking the conversation
  * @param {Function} setCurrentQueryId - Function to update the current query ID state
- * @param {string} queryType - Type of query ('q-and-a' or 'metrics')
+ * @param {string} origin - Origin header value ('access' or 'metrics')
  * @returns {Function} handleQuery function that returns true for success, false for error
  */
-const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId, queryType = 'q-and-a') => {
+const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId, origin = 'access') => {
   const getLastUserQueryId = useGetLastUserQuery();
 
   const handleQuery = useCallback(async (params) => {
@@ -22,16 +22,14 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId, queryType = 'q-a
       setCurrentQueryId(actualQueryId);
     }
 
-    // Determine endpoint and origin header based on query type
-    const endpoint = queryType === 'metrics'
+        // Determine endpoint based on origin
+    const endpoint = origin === 'metrics'
       ? DEFAULT_CONFIG.METRICS_API_ENDPOINT
       : DEFAULT_CONFIG.API_ENDPOINT;
 
-    const originHeader = queryType === 'metrics' ? 'metrics' : 'access';
-
     const headers = {
       'Content-Type': 'application/json',
-      'X-Origin': originHeader,
+      'X-Origin': origin,
       'X-API-KEY': apiKey,
       'X-Session-ID': sessionId,
       'X-Query-ID': actualQueryId
@@ -57,7 +55,7 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId, queryType = 'q-a
       await params.injectMessage(DEFAULT_CONFIG.ERRORS.API_UNAVAILABLE);
       return false; // Error
     }
-  }, [apiKey, setCurrentQueryId, getLastUserQueryId, sessionId, queryType]);
+  }, [apiKey, setCurrentQueryId, getLastUserQueryId, sessionId, origin]);
 
   return handleQuery;
 };
