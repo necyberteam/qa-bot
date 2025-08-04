@@ -6,6 +6,8 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
   API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/api/',
   RATING_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/rating/',
+  METRICS_API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/api/',
+  EXAMPLE_METRICS_QUESTIONS_URL: 'https://docs.google.com/document/d/1-0000000000000000000000000000000000000000/edit?usp=sharing',
 
   // Netlify function URL - this should point to the Netlify functions endpoint for ticket submission
   // NOT the Q&A API endpoint

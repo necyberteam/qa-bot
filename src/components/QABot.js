@@ -11,6 +11,7 @@ import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import useFocusableSendButton from '../hooks/useFocusableSendButton';
 import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
+import useHandleAIQuery from '../hooks/useHandleAIQuery';
 import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
 import { createBotFlow } from '../utils/create-bot-flow';
 import { FormProvider, useFormContext } from '../contexts/FormContext';
@@ -68,6 +69,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
+  const [currentQueryId, setCurrentQueryId] = useState(null);
 
   // Use Form Context instead of local state
   const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
@@ -110,6 +112,8 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     loginUrl
   });
 
+  const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId, 'access');
+  const handleMetricsQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId, 'metrics');
   const formContext = useMemo(() => ({
     ticketForm: ticketForm || {},
     feedbackForm: feedbackForm || {},
@@ -121,11 +125,13 @@ const QABotInternal = React.forwardRef((props, botRef) => {
 
   // loads plugins to be passed into chatbot, matching pattern in docs
   const plugins = [HtmlRenderer(), MarkdownRenderer(), InputValidator()];
-
   const flow = useMemo(() => createBotFlow({
     welcomeMessage,
     isBotLoggedIn,
     loginUrl,
+    handleQuery,
+    handleMetricsQuery,
+    hasQueryError: false, // TODO: Remove this parameter - see create-bot-flow.js
     sessionId,
     ticketForm,
     setTicketForm: updateTicketForm,
@@ -138,7 +144,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
       name: userName || null,
       accessId: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, sessionId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, handleMetricsQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
