@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { DEFAULT_CONFIG } from '../config/constants';
 import NewChatButton from '../components/NewChatButton';
+import UserIcon from '../components/UserIcon';
+import LoginButton from '../components/LoginButton';
 import { Button } from "react-chatbotify"
 
 /**
@@ -46,7 +48,7 @@ const useChatBotSettings = ({
         ),
         avatar: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
         buttons: [
-          () => isBotLoggedIn ? "✓ Logged In" : null,
+          isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl={loginUrl} isHeaderButton={true} />,
           Button.CLOSE_CHAT_BUTTON
         ]
       },
