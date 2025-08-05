@@ -19,10 +19,10 @@ export const createSecurityFlow = ({
 }) => {
   // Store the most recent ACCESS ID input to handle timing issues
   let mostRecentAccessId = null;
-  
+
   // Store submission result for success message
   let submissionResult = null;
-  
+
   // Custom success message for security incidents
   const generateSecuritySuccessMessage = (result) => {
     if (result && !result.success) {
@@ -35,8 +35,8 @@ export const createSecurityFlow = ({
       return `Your security incident report has been submitted successfully.\n\nOur cybersecurity team will review your report and respond accordingly. Thank you for helping keep ACCESS secure.`;
     }
   };
-  // Store the FileUploadComponent JSX in a variable for better readability
-  const fileUploadElement = (
+  // Create FileUploadComponent as a function for better cross-environment compatibility
+  const fileUploadElement = () => (
     <FileUploadComponent
       onFileUpload={(files) => {
         const currentForm = getCurrentTicketForm() || {};
@@ -118,7 +118,7 @@ export const createSecurityFlow = ({
       options: (chatState) => {
         if (!chatState) return [];
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-        return (formWithUserInfo.name && formWithUserInfo.email && formWithUserInfo.accessId) 
+        return (formWithUserInfo.name && formWithUserInfo.email && formWithUserInfo.accessId)
           ? ["Yes, that's correct", "Let me update it"]
           : [];
       },
@@ -189,7 +189,7 @@ export const createSecurityFlow = ({
         // Get current form state from context
         const currentForm = getCurrentTicketForm() || {};
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-        
+
         // Create a merged form that includes the most recent data
         const finalForm = {
           ...currentForm,
@@ -197,14 +197,14 @@ export const createSecurityFlow = ({
           email: formWithUserInfo.email || currentForm.email,
           accessId: mostRecentAccessId || formWithUserInfo.accessId || currentForm.accessId
         };
-        
+
         let fileInfo = '';
         if (currentForm.uploadedFiles && currentForm.uploadedFiles.length > 0) {
           fileInfo = `\nAttachments: ${currentForm.uploadedFiles.length} file(s) attached`;
         }
 
         const accessIdDisplay = finalForm.accessId || 'Not provided';
-        
+
         return `Here's a summary of your security incident report:\n\n` +
                `Summary: ${finalForm.summary || 'Not provided'}\n` +
                `Priority: ${finalForm.priority || 'Not provided'}\n` +
@@ -220,7 +220,7 @@ export const createSecurityFlow = ({
         if (chatState.userInput === "Submit Security Report") {
           const currentForm = getCurrentTicketForm() || {};
           const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-          
+
           // Create final merged form to handle timing issues
           const finalForm = {
             ...currentForm,
@@ -228,7 +228,7 @@ export const createSecurityFlow = ({
             email: formWithUserInfo.email || currentForm.email,
             accessId: mostRecentAccessId || formWithUserInfo.accessId || currentForm.accessId
           };
-          
+
           // Prepare form data for security incident submission
           const formData = {
             summary: finalForm.summary || "",

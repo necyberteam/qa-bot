@@ -23,11 +23,11 @@ const useChatBotSettings = ({
   loginUrl
 }) => {
   const isBotLoggedIn = isLoggedIn;
-  
+
   // Check if tooltip has been shown in this session
   const hasShownTooltip = sessionStorage.getItem('qa_bot_tooltip_shown');
   const tooltipMode = hasShownTooltip ? 'NEVER' : 'START';
-  
+
   const settings = useMemo(() => {
     return {
       general: {
@@ -48,7 +48,7 @@ const useChatBotSettings = ({
         ),
         avatar: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
         buttons: [
-          isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl={loginUrl} isHeaderButton={true} />,
+          () => isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl={loginUrl} isHeaderButton={true} />,
           Button.CLOSE_CHAT_BUTTON
         ]
       },

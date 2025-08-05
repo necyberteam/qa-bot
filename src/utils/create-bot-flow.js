@@ -46,7 +46,7 @@ function createBotFlow({
     : {
         go_ahead_and_ask: {
           message: "To ask questions, you need to log in first.",
-          component: <LoginButton loginUrl={loginUrl} />,
+          component: () => <LoginButton loginUrl={loginUrl} />,
           options: ["Back to Main Menu"],
           chatDisabled: true,
           path: (chatState) => {

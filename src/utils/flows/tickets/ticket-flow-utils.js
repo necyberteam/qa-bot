@@ -6,18 +6,23 @@ import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
  * Creates a reusable file upload component for ticket flows
  * @param {Function} setTicketForm - Function to update ticket form state
  * @param {Object} ticketForm - Current ticket form state
- * @returns {JSX.Element} File upload component
+ * @returns {Function} Function that returns a FileUploadComponent JSX element
  */
-export const createFileUploadComponent = (setTicketForm, ticketForm) => (
-  <FileUploadComponent
-    onFileUpload={(files) =>
-      setTicketForm({
-        ...(ticketForm || {}),
-        uploadedFiles: files
-      })
-    }
-  />
-);
+export const createFileUploadComponent = (setTicketForm, ticketForm) => {
+  const FileUploadWrapper = () => (
+    <FileUploadComponent
+      onFileUpload={(files) =>
+        setTicketForm({
+          ...(ticketForm || {}),
+          uploadedFiles: files
+        })
+      }
+    />
+  );
+
+  FileUploadWrapper.displayName = 'FileUploadWrapper';
+  return FileUploadWrapper;
+};
 
 /**
  * Creates a submission handler with external result storage to avoid React closure issues
@@ -35,7 +40,7 @@ export const createSubmissionHandler = (setTicketForm) => {
         uploadedFiles
       );
       const proxyResponse = await sendPreparedDataToProxy(apiData, 'create-support-ticket');
-      
+
       if (proxyResponse.success) {
         submissionResult = {
           success: true,
@@ -43,8 +48,8 @@ export const createSubmissionHandler = (setTicketForm) => {
           ticketUrl: proxyResponse.data.data.ticketUrl
         };
         setTicketForm(prevForm => ({
-          ...prevForm, 
-          ticketKey: proxyResponse.data.data.ticketKey, 
+          ...prevForm,
+          ticketKey: proxyResponse.data.data.ticketKey,
           ticketUrl: proxyResponse.data.data.ticketUrl
         }));
       } else {
@@ -81,17 +86,17 @@ export const generateSuccessMessage = (submissionResult, ticketType = 'ticket') 
   if (!submissionResult) {
     return `We apologize, but there was an error submitting your ${ticketType}.\n\nPlease try again or contact our support team directly.`;
   }
-  
+
   // Handle explicit failure
   if (!submissionResult.success) {
     return `We apologize, but there was an error submitting your ${ticketType}: ${submissionResult.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
   }
-  
+
   // Handle success with ticket URL and key
   if (submissionResult.ticketUrl && submissionResult.ticketKey) {
     return `Your ${ticketType} has been submitted successfully.\n\nTicket: <a href="${submissionResult.ticketUrl}" target="_blank">${submissionResult.ticketKey}</a>\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
   }
-  
+
   // Handle success without ticket URL (but this might indicate a partial failure)
   return `Your ${ticketType} has been submitted successfully.\n\nOur support team will review your request and respond accordingly. Thank you for contacting ACCESS.`;
 };

@@ -17,8 +17,8 @@ export const createFeedbackFlow = ({
   setFeedbackForm = () => {},
   userInfo = {}
 }) => {
-  // Store the FileUploadComponent JSX in a variable for better readability
-  const fileUploadElement = (
+  // Create FileUploadComponent as a function for better cross-environment compatibility
+  const fileUploadElement = () => (
     <FileUploadComponent
       onFileUpload={(files) =>
         setFeedbackForm({
@@ -63,7 +63,7 @@ export const createFeedbackFlow = ({
       message: "What is your primary role pertaining to ACCESS?",
       options: [
         "ACCESS Staff",
-        "Campus Champion / Research Facilitator", 
+        "Campus Champion / Research Facilitator",
         "Educator",
         "Researcher",
         "Resource Provider",
@@ -97,7 +97,7 @@ export const createFeedbackFlow = ({
         items: [
           "ACCESS Community Expert / Support",
           "Design of Future Features",
-          "Focus Group Participant", 
+          "Focus Group Participant",
           "Panel Reviewer",
           "Researcher Advisory Committee Member",
           "Other",
@@ -158,7 +158,7 @@ export const createFeedbackFlow = ({
           const currentForm = getCurrentFeedbackForm();
           const wantsContact = chatState.userInput === "Include my contact info";
           setFeedbackForm({
-            ...currentForm, 
+            ...currentForm,
             useCustomContactInfo: true,
             wantsContact: wantsContact ? "Yes" : "No"
           });
@@ -225,7 +225,7 @@ export const createFeedbackFlow = ({
       message: (chatState) => {
         const currentForm = getCurrentFeedbackForm();
         let finalName, finalEmail, finalAccessId;
-        
+
         if (currentForm.wantsContact === "No") {
           // Anonymous submission - no contact info
           finalName = finalEmail = finalAccessId = 'Anonymous';
@@ -234,8 +234,8 @@ export const createFeedbackFlow = ({
           finalName = currentForm.customName || 'Not provided';
           finalEmail = currentForm.customEmail || 'Not provided';
           // Handle ACCESS ID specially since it's the last field collected
-          finalAccessId = chatState.prevPath === 'feedback_accessid' 
-            ? chatState.userInput 
+          finalAccessId = chatState.prevPath === 'feedback_accessid'
+            ? chatState.userInput
             : (currentForm.customAccessId || 'Not provided');
         } else {
           // Use pre-populated userInfo
@@ -269,7 +269,7 @@ export const createFeedbackFlow = ({
         let communityInterestLine = '';
         if (currentForm.wantsContact === "Yes") {
           let communityInterest = 'Not provided';
-          
+
           // If coming directly from community interest step, use chatState.userInput
           if (chatState.prevPath === 'feedback_community_interest') {
             communityInterest = chatState.userInput || 'Not provided';
@@ -278,7 +278,7 @@ export const createFeedbackFlow = ({
           } else if (currentForm.communityInterest) {
             communityInterest = currentForm.communityInterest;
           }
-          
+
           communityInterestLine = `Community Interest: ${communityInterest}\n`;
         }
 
@@ -305,7 +305,7 @@ export const createFeedbackFlow = ({
       message: () => {
         const currentForm = getCurrentFeedbackForm();
         const baseMessage = "Thank you for your feedback!";
-        
+
         // Determine if they provided a valid email (using same logic as summary)
         let finalEmail;
         if (currentForm.wantsContact === "No") {
@@ -315,12 +315,12 @@ export const createFeedbackFlow = ({
         } else {
           finalEmail = userInfo.email;
         }
-        
+
         // Only add follow-up message if they provided a valid email
         if (finalEmail && finalEmail.trim() && isValidEmail(finalEmail)) {
           return `${baseMessage} We will follow up with you shortly.`;
         }
-        
+
         return baseMessage;
       },
       options: ["Back to Main Menu"],
