@@ -1,5 +1,4 @@
 import React from 'react';
-import LoginButton from '../components/LoginButton';
 import { buildWelcomeMessage } from '../config/constants';
 import { createMainMenuFlow } from './flows/main-menu-flow';
 import { createQAFlow } from './flows/qa-flow';
@@ -45,12 +44,19 @@ function createBotFlow({
       })
     : {
         go_ahead_and_ask: {
-          message: "To ask questions, you need to log in first.",
-          component: () => <LoginButton loginUrl={loginUrl} />,
-          options: ["Back to Main Menu"],
+          message: `To ask questions, you need to log in first.
+
+<a href="${loginUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 20px; background-color: white; border: 1px solid #107180; color: #107180; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 10px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">Log In</a>
+
+After logging in, you can ask your question or return to the main menu.`,
+          options: ["Back to Main Menu", "I'm Logged In Now"],
           chatDisabled: true,
           path: (chatState) => {
             if (chatState.userInput === "Back to Main Menu") {
+              return "start";
+            }
+            if (chatState.userInput === "I'm Logged In Now") {
+              // Re-check login status by returning to start flow
               return "start";
             }
             return "go_ahead_and_ask";

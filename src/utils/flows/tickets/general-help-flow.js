@@ -1,5 +1,4 @@
 import { 
-  createFileUploadComponent, 
   createSubmissionHandler, 
   generateSuccessMessage,
   getFileInfo
@@ -18,8 +17,6 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
-  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
-
 
   return {
     // FORM flow - Enhanced General Help Ticket Form Flow
@@ -81,13 +78,15 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         : "general_help_resource"
     },
     general_help_upload: {
-      message: "Please upload your file.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => {
+      message: "Please upload your file(s). Click the file attachment button in the chat footer to select files.",
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, uploadConfirmed: true});
+        setTicketForm({
+          ...currentForm, 
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
       },
       path: "general_help_resource"
     },

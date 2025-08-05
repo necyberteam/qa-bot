@@ -1,5 +1,4 @@
 import React from 'react';
-import FileUploadComponent from '../../components/FileUploadComponent';
 import { getCurrentFeedbackForm } from '../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
 import { validateEmail, isValidEmail } from '../validation-utils';
@@ -17,18 +16,6 @@ export const createFeedbackFlow = ({
   setFeedbackForm = () => {},
   userInfo = {}
 }) => {
-  // Create FileUploadComponent as a function for better cross-environment compatibility
-  const fileUploadElement = () => (
-    <FileUploadComponent
-      onFileUpload={(files) =>
-        setFeedbackForm({
-          ...(feedbackForm || {}),
-          uploadedFiles: files
-        })
-      }
-    />
-  );
-
   return {
     feedback: {
       message: "We appreciate your feedback about ACCESS.\n\nFeedback submitted through this form will only be shared within the ACCESS teams. We encourage the sharing of contact information for potential follow-up, but understand that anonymity may be preferred when providing feedback on sensitive issues.\n\nPlease provide your detailed feedback:",
@@ -127,11 +114,15 @@ export const createFeedbackFlow = ({
       }
     },
     feedback_upload_yes: {
-      message: "Please upload a screenshot or file to help us better understand your feedback.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => setFeedbackForm({...(feedbackForm || {}), uploadConfirmed: true}),
+      message: "Please upload a screenshot or file to help us better understand your feedback. Click the file attachment button in the chat footer to select files.",
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
+        setFeedbackForm({
+          ...(feedbackForm || {}),
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
+      },
       path: "feedback_primary_role"
     },
     feedback_contact_choice: {

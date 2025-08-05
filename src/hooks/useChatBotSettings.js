@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import { DEFAULT_CONFIG } from '../config/constants';
 import NewChatButton from '../components/NewChatButton';
-import UserIcon from '../components/UserIcon';
-import LoginButton from '../components/LoginButton';
 import { Button } from "react-chatbotify"
 
 /**
@@ -48,7 +46,7 @@ const useChatBotSettings = ({
         ),
         avatar: DEFAULT_CONFIG.CHATBOT.AVATAR_URL,
         buttons: [
-          () => isBotLoggedIn ? <UserIcon key="user-icon" /> : <LoginButton key="login-button" loginUrl={loginUrl} isHeaderButton={true} />,
+          () => isBotLoggedIn ? "✓ Logged In" : null,
           Button.CLOSE_CHAT_BUTTON
         ]
       },
@@ -103,8 +101,17 @@ const useChatBotSettings = ({
       footer: {
         text: (<div key="footer-text"><a href="https://support.access-ci.org/tools/access-qa-tool">About this tool</a>.</div>),
         buttons: [
+          Button.FILE_ATTACHMENT_BUTTON,
+          Button.EMOJI_PICKER_BUTTON,
           <NewChatButton key="new-chat-button" />
         ]
+      },
+      fileAttachment: {
+        disabled: false,
+        multiple: true,
+        accept: ".pdf,.png,.jpg,.jpeg,.gif,.doc,.docx,.txt,.csv,.zip",
+        sendFileName: true,
+        showMediaDisplay: false
       },
       event: {
         rcbToggleChatWindow: true // Enable chat window toggle event

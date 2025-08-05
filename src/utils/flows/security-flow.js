@@ -1,5 +1,4 @@
 import React from 'react';
-import FileUploadComponent from '../../components/FileUploadComponent';
 import { submitSecurityIncident } from '../api-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
@@ -35,19 +34,7 @@ export const createSecurityFlow = ({
       return `Your security incident report has been submitted successfully.\n\nOur cybersecurity team will review your report and respond accordingly. Thank you for helping keep ACCESS secure.`;
     }
   };
-  // Create FileUploadComponent as a function for better cross-environment compatibility
-  const fileUploadElement = () => (
-    <FileUploadComponent
-      onFileUpload={(files) => {
-        const currentForm = getCurrentTicketForm() || {};
-        setTicketForm({
-          ...currentForm,
-          uploadedFiles: files
-        });
-      }}
-    />
-  );
-
+  
   return {
     security_incident: {
       message: "You're reporting a security incident. Please provide a brief summary of the security concern.",
@@ -96,13 +83,15 @@ export const createSecurityFlow = ({
         : "security_contact_info"
     },
     security_upload: {
-      message: "Please upload your files.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => {
+      message: "Please upload your files. Click the file attachment button in the chat footer to select files.",
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm() || {};
-        setTicketForm({...currentForm, uploadConfirmed: true});
+        setTicketForm({
+          ...currentForm,
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
       },
       path: "security_contact_info"
     },

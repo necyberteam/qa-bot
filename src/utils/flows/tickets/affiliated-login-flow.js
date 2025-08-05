@@ -1,5 +1,4 @@
 import { 
-  createFileUploadComponent, 
   createSubmissionHandler, 
   generateSuccessMessage,
   getFileInfo
@@ -18,8 +17,6 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
-  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
-
 
   return {
     // PATH: Affiliated/Resource Provider Login Help Path
@@ -112,13 +109,15 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
           })()
     },
     affiliated_login_upload: {
-      message: "Please upload your screenshot.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => {
+      message: "Please upload your screenshot(s). Click the file attachment button in the chat footer to select files.",
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, uploadConfirmed: true});
+        setTicketForm({
+          ...currentForm, 
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
       },
       path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
