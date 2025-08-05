@@ -18,7 +18,7 @@ import { FormProvider, useFormContext } from '../contexts/FormContext';
 
 // Build signature for deployment verification
 console.info(
-  `%c🤖 ACCESS QA Bot v2.4.8-debug.5 - react-chatbotify v2.2.0 Update [${new Date().toISOString().slice(0,10)}]`,
+  `%c🤖 ACCESS QA Bot v2.5.0-debug.0 - Function Components + react-chatbotify v2.2.0 [${new Date().toISOString().slice(0,10)}]`,
   'background: #107180; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold;'
 );
 
