@@ -6,18 +6,23 @@ import { prepareApiSubmission, sendPreparedDataToProxy } from '../../api-utils';
  * Creates a reusable file upload component for ticket flows
  * @param {Function} setTicketForm - Function to update ticket form state
  * @param {Object} ticketForm - Current ticket form state
- * @returns {JSX.Element} File upload component
+ * @returns {Function} Function that returns a FileUploadComponent JSX element
  */
-export const createFileUploadComponent = (setTicketForm, ticketForm) => (
-  <FileUploadComponent
-    onFileUpload={(files) =>
-      setTicketForm({
-        ...(ticketForm || {}),
-        uploadedFiles: files
-      })
-    }
-  />
-);
+export const createFileUploadComponent = (setTicketForm, ticketForm) => {
+  const FileUploadWrapper = () => (
+    <FileUploadComponent
+      onFileUpload={(files) =>
+        setTicketForm({
+          ...(ticketForm || {}),
+          uploadedFiles: files
+        })
+      }
+    />
+  );
+
+  FileUploadWrapper.displayName = 'FileUploadWrapper';
+  return FileUploadWrapper;
+};
 
 /**
  * Creates a submission handler with external result storage to avoid React closure issues
