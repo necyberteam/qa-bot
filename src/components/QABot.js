@@ -18,8 +18,7 @@ import { FormProvider, useFormContext } from '../contexts/FormContext';
 
 // Build signature for deployment verification
 console.info(
-  `%c🤖 ACCESS QA Bot v2.5.1-debug.1 - Header Components Restored + Built-in File Upload [${new Date().toISOString().slice(0,10)}]`,
-  'background: #107180; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold;'
+  `%c🤖 ACCESS QA Bot v2.5.1-debug.2 - Header Components Restored + Built-in File Upload [${new Date().toISOString().slice(0,10)}]`
 );
 
 const generateSessionId = () => {
