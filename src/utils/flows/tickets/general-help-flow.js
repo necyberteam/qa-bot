@@ -17,6 +17,9 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
+  
+  // Store submission result for cross-environment compatibility
+  let lastSubmissionResult = null;
 
   return {
     // FORM flow - Enhanced General Help Ticket Form Flow
@@ -596,12 +599,14 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
             suggestedKeyword: currentForm.suggestedKeyword || ""
           };
 
-          await submitTicket(formData, 'support', currentForm.uploadedFiles || []);
+          // ✅ Get the actual submission result and store it
+          lastSubmissionResult = await submitTicket(formData, 'support', currentForm.uploadedFiles || []);
         }
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          return "general_help_success";
+          // ✅ Navigate to success/error based on actual result
+          return lastSubmissionResult && lastSubmissionResult.success ? "general_help_success" : "general_help_error";
         } else {
           return "start";
         }
@@ -609,12 +614,29 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     general_help_success: {
       message: () => {
-        return generateSuccessMessage(getSubmissionResult(), 'support ticket');
+        // ✅ Use local result for better cross-environment reliability
+        const result = lastSubmissionResult || getSubmissionResult();
+        return generateSuccessMessage(result, 'support ticket');
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    general_help_error: {
+      message: () => {
+        const result = lastSubmissionResult || getSubmissionResult();
+        return `We apologize, but there was an error submitting your support ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "general_help_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };

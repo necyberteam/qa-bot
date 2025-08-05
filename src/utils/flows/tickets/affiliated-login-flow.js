@@ -17,6 +17,9 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
+  
+  // Store submission result for cross-environment compatibility
+  let lastSubmissionResult = null;
 
   return {
     // PATH: Affiliated/Resource Provider Login Help Path
@@ -202,12 +205,14 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
             userIdAtResource: currentForm.userIdResource || ""
           };
 
-          await submitTicket(formData, 'loginProvider', currentForm.uploadedFiles || []);
+          // ✅ Get the actual submission result and store it
+          lastSubmissionResult = await submitTicket(formData, 'loginProvider', currentForm.uploadedFiles || []);
         }
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          return "affiliated_login_success";
+          // ✅ Navigate to success/error based on actual result
+          return lastSubmissionResult && lastSubmissionResult.success ? "affiliated_login_success" : "affiliated_login_error";
         } else {
           return "start";
         }
@@ -215,12 +220,29 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
     },
     affiliated_login_success: {
       message: () => {
-        return generateSuccessMessage(getSubmissionResult(), 'resource login ticket');
+        // ✅ Use local result for better cross-environment reliability
+        const result = lastSubmissionResult || getSubmissionResult();
+        return generateSuccessMessage(result, 'resource login ticket');
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    affiliated_login_error: {
+      message: () => {
+        const result = lastSubmissionResult || getSubmissionResult();
+        return `We apologize, but there was an error submitting your resource login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "affiliated_login_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };

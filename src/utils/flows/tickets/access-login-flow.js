@@ -17,6 +17,9 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
+  
+  // Store submission result for cross-environment compatibility
+  let lastSubmissionResult = null;
 
   return {
     // PATH: ACCESS Login Help Path
@@ -184,12 +187,14 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
             browser: currentForm.browser || ""
           };
 
-          await submitTicket(formData, 'loginAccess', currentForm.uploadedFiles || []);
+          // ✅ Get the actual submission result and store it
+          lastSubmissionResult = await submitTicket(formData, 'loginAccess', currentForm.uploadedFiles || []);
         }
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          return "access_login_success";
+          // ✅ Navigate to success/error based on actual result
+          return lastSubmissionResult && lastSubmissionResult.success ? "access_login_success" : "access_login_error";
         } else {
           return "start";
         }
@@ -197,12 +202,29 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     access_login_success: {
       message: () => {
-        return generateSuccessMessage(getSubmissionResult(), 'ACCESS login ticket');
+        // ✅ Use local result for better cross-environment reliability
+        const result = lastSubmissionResult || getSubmissionResult();
+        return generateSuccessMessage(result, 'ACCESS login ticket');
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    access_login_error: {
+      message: () => {
+        const result = lastSubmissionResult || getSubmissionResult();
+        return `We apologize, but there was an error submitting your ACCESS login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "access_login_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };

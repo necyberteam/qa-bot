@@ -271,7 +271,8 @@ export const createSecurityFlow = ({
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Security Report") {
-          return "security_success";
+          // ✅ Navigate to success/error based on actual result
+          return submissionResult && submissionResult.success ? "security_success" : "security_error";
         } else {
           return "start";
         }
@@ -287,6 +288,22 @@ export const createSecurityFlow = ({
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    security_error: {
+      message: () => {
+        const currentForm = getCurrentTicketForm() || {};
+        const result = currentForm.submissionResult || submissionResult;
+        return `We apologize, but there was an error submitting your security incident report: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our cybersecurity team directly.`;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "security_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };
