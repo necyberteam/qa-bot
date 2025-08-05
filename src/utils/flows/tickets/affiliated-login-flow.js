@@ -205,8 +205,10 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
             userIdAtResource: currentForm.userIdResource || ""
           };
 
+          console.info('api-response-flow: Submitting affiliated login ticket', { formDataKeys: Object.keys(formData) });
           // ✅ Get the actual submission result and store it
           lastSubmissionResult = await submitTicket(formData, 'loginProvider', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: Affiliated login ticket submission completed', { lastSubmissionResult });
         }
       },
       path: (chatState) => {
@@ -220,9 +222,13 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
     },
     affiliated_login_success: {
       message: () => {
+        console.info('api-response-flow: Entering affiliated_login_success state');
         // ✅ Use local result for better cross-environment reliability
         const result = lastSubmissionResult || getSubmissionResult();
-        return generateSuccessMessage(result, 'resource login ticket');
+        console.info('api-response-flow: Retrieved submission result for affiliated success message', { result });
+        const message = generateSuccessMessage(result, 'resource login ticket');
+        console.info('api-response-flow: Generated affiliated success message', { message });
+        return message;
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
@@ -231,8 +237,12 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
     },
     affiliated_login_error: {
       message: () => {
+        console.info('api-response-flow: Entering affiliated_login_error state');
         const result = lastSubmissionResult || getSubmissionResult();
-        return `We apologize, but there was an error submitting your resource login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Retrieved submission result for affiliated error message', { result });
+        const errorMessage = `We apologize, but there was an error submitting your resource login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Generated affiliated error message', { errorMessage });
+        return errorMessage;
       },
       options: ["Try Again", "Back to Main Menu"],
       chatDisabled: true,

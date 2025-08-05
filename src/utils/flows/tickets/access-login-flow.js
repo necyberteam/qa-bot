@@ -187,8 +187,10 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
             browser: currentForm.browser || ""
           };
 
+          console.info('api-response-flow: Submitting ACCESS login ticket', { formDataKeys: Object.keys(formData) });
           // ✅ Get the actual submission result and store it
           lastSubmissionResult = await submitTicket(formData, 'loginAccess', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: ACCESS login ticket submission completed', { lastSubmissionResult });
         }
       },
       path: (chatState) => {
@@ -202,9 +204,13 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     access_login_success: {
       message: () => {
+        console.info('api-response-flow: Entering access_login_success state');
         // ✅ Use local result for better cross-environment reliability
         const result = lastSubmissionResult || getSubmissionResult();
-        return generateSuccessMessage(result, 'ACCESS login ticket');
+        console.info('api-response-flow: Retrieved submission result for ACCESS success message', { result });
+        const message = generateSuccessMessage(result, 'ACCESS login ticket');
+        console.info('api-response-flow: Generated ACCESS success message', { message });
+        return message;
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
@@ -213,8 +219,12 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     access_login_error: {
       message: () => {
+        console.info('api-response-flow: Entering access_login_error state');
         const result = lastSubmissionResult || getSubmissionResult();
-        return `We apologize, but there was an error submitting your ACCESS login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Retrieved submission result for ACCESS error message', { result });
+        const errorMessage = `We apologize, but there was an error submitting your ACCESS login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Generated ACCESS error message', { errorMessage });
+        return errorMessage;
       },
       options: ["Try Again", "Back to Main Menu"],
       chatDisabled: true,

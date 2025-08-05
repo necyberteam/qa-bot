@@ -89,6 +89,7 @@ export const prepareApiSubmission = async (formData, ticketType = 'support', upl
  * @returns {Promise<Object>} The response from the proxy
  */
 export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
+  console.info('api-response-flow: Starting sendPreparedDataToProxy', { endpointName });
 
   // Use versioned API endpoints
   // These get redirected by netlify.toml in backend repo (e.g. /api/v1/tickets → /.netlify/functions/tickets)
@@ -107,8 +108,10 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
     proxyEndpoint = `${DEFAULT_CONFIG.netlifyBaseUrl}/${endpointName}`;
   }
 
+  console.info('api-response-flow: Proxy endpoint determined', { proxyEndpoint });
 
   try {
+    console.info('api-response-flow: Sending POST request to proxy');
     const response = await fetch(proxyEndpoint, {
       method: 'POST',
       headers: {
@@ -117,11 +120,15 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
       body: JSON.stringify(submissionData)
     });
 
+    console.info('api-response-flow: Received response', { status: response.status, ok: response.ok });
+    
     if (!response.ok) {
+      console.info('api-response-flow: Response not OK, processing error');
       let errorMessage = '';
       try {
         const errorText = await response.text();
         console.error('| ❌ Post data to proxy failed:', response.status, errorText);
+        console.info('api-response-flow: Error text received', { errorText });
         
         // Try to parse as JSON to get a better error message
         try {
@@ -146,6 +153,7 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
         errorMessage = 'Authentication error with the ticket service. Please contact support.';
       }
       
+      console.info('api-response-flow: Returning error response', { errorMessage, status: response.status });
       return {
         success: false,
         status: response.status,
@@ -153,13 +161,17 @@ export const sendPreparedDataToProxy = async (submissionData, endpointName) => {
       };
     }
 
+    console.info('api-response-flow: Response OK, parsing JSON');
     const data = await response.json();
+    console.info('api-response-flow: Successfully parsed response data', { data });
+    console.info('api-response-flow: Returning success response');
     return {
       success: true,
       data
     };
   } catch (error) {
     console.error('| ❌ Post data to proxy exception:', error);
+    console.info('api-response-flow: Caught exception during request', { error: error.message });
     return {
       success: false,
       error: error.message

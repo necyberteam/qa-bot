@@ -579,6 +579,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       chatDisabled: true,
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
+          console.info('api-response-flow: User clicked Submit Ticket');
           const currentForm = getCurrentTicketForm();
           const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
           const formData = {
@@ -599,8 +600,10 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
             suggestedKeyword: currentForm.suggestedKeyword || ""
           };
 
+          console.info('api-response-flow: Submitting ticket with form data', { formDataKeys: Object.keys(formData) });
           // ✅ Get the actual submission result and store it
           lastSubmissionResult = await submitTicket(formData, 'support', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: Ticket submission completed', { lastSubmissionResult });
         }
       },
       path: (chatState) => {
@@ -614,9 +617,13 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     general_help_success: {
       message: () => {
+        console.info('api-response-flow: Entering general_help_success state');
         // ✅ Use local result for better cross-environment reliability
         const result = lastSubmissionResult || getSubmissionResult();
-        return generateSuccessMessage(result, 'support ticket');
+        console.info('api-response-flow: Retrieved submission result for success message', { result });
+        const message = generateSuccessMessage(result, 'support ticket');
+        console.info('api-response-flow: Generated success message', { message });
+        return message;
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
@@ -625,8 +632,12 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     general_help_error: {
       message: () => {
+        console.info('api-response-flow: Entering general_help_error state');
         const result = lastSubmissionResult || getSubmissionResult();
-        return `We apologize, but there was an error submitting your support ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Retrieved submission result for error message', { result });
+        const errorMessage = `We apologize, but there was an error submitting your support ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Generated error message', { errorMessage });
+        return errorMessage;
       },
       options: ["Try Again", "Back to Main Menu"],
       chatDisabled: true,
