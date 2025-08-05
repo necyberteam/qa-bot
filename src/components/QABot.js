@@ -16,6 +16,11 @@ import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
 import { createBotFlow } from '../utils/create-bot-flow';
 import { FormProvider, useFormContext } from '../contexts/FormContext';
 
+// Build signature for deployment verification
+console.info(
+  `%c🤖 ACCESS QA Bot - Function Components Fix Applied [${new Date().toISOString().slice(0,10)}]`,
+  'background: #107180; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold;'
+);
 
 const generateSessionId = () => {
   return `qa_bot_session_${uuidv4()}`;
