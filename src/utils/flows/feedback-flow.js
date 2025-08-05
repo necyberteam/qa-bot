@@ -17,8 +17,8 @@ export const createFeedbackFlow = ({
   setFeedbackForm = () => {},
   userInfo = {}
 }) => {
-  // Create FileUploadComponent as a function for better cross-environment compatibility
-  const fileUploadElement = () => (
+  // Store the FileUploadComponent JSX in a variable for better readability
+  const fileUploadElement = (
     <FileUploadComponent
       onFileUpload={(files) =>
         setFeedbackForm({
