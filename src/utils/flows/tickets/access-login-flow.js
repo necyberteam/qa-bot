@@ -1,5 +1,5 @@
-import { 
-  createSubmissionHandler, 
+import {
+  createSubmissionHandler,
   generateSuccessMessage,
   getFileInfo
 } from './ticket-flow-utils';
@@ -17,7 +17,7 @@ import { validateEmail, validateFileUpload } from '../../validation-utils';
  */
 export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
-  
+
   // Store submission result for cross-environment compatibility
   let lastSubmissionResult = null;
 
@@ -93,13 +93,13 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
           })()
     },
     access_login_upload: {
-      message: "Please upload your screenshot(s).",
+      message: "Please upload your screenshot(s) by clicking the file attachment button in the chat footer.",
       validateFileInput: validateFileUpload,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();
         setTicketForm({
-          ...currentForm, 
+          ...currentForm,
           uploadedFiles: params.files,
           uploadConfirmed: true
         });

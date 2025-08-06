@@ -114,7 +114,7 @@ export const createFeedbackFlow = ({
       }
     },
     feedback_upload_yes: {
-      message: "Please upload a screenshot or file to help us better understand your feedback.",
+      message: "Please upload a screenshot or file to help us better understand your feedback. Click the file attachment button in the chat footer to select files.",
       validateFileInput: validateFileUpload,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality

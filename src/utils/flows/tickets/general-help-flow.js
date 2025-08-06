@@ -1,5 +1,5 @@
-import { 
-  createSubmissionHandler, 
+import {
+  createSubmissionHandler,
   generateSuccessMessage,
   getFileInfo
 } from './ticket-flow-utils';
@@ -17,7 +17,7 @@ import { validateEmail, validateFileUpload } from '../../validation-utils';
  */
 export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
-  
+
   // Store submission result for cross-environment compatibility
   let lastSubmissionResult = null;
 
@@ -81,13 +81,13 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         : "general_help_resource"
     },
     general_help_upload: {
-      message: "Please upload your file(s).",
+      message: "Please upload your file(s) by clicking the file attachment button in the chat footer.",
       validateFileInput: validateFileUpload,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();
         setTicketForm({
-          ...currentForm, 
+          ...currentForm,
           uploadedFiles: params.files,
           uploadConfirmed: true
         });
@@ -545,7 +545,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         // Get current form state from context (always up-to-date)
         const currentForm = getCurrentTicketForm();
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-        
+
         // Use current form state directly since Form Context always has fresh data
         const fileInfo = getFileInfo(currentForm.uploadedFiles);
 

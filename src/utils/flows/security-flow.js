@@ -34,7 +34,7 @@ export const createSecurityFlow = ({
       return `Your security incident report has been submitted successfully.\n\nOur cybersecurity team will review your report and respond accordingly. Thank you for helping keep ACCESS secure.`;
     }
   };
-  
+
   return {
     security_incident: {
       message: "You're reporting a security incident. Please provide a brief summary of the security concern.",
@@ -83,7 +83,7 @@ export const createSecurityFlow = ({
         : "security_contact_info"
     },
     security_upload: {
-      message: "Please upload your files.",
+      message: "Please upload your files by clicking the file attachment button in the chat footer.",
       validateFileInput: validateFileUpload,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality
