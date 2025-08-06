@@ -536,6 +536,7 @@
 /* Tab order for footer elements */
 .rcb-chat-footer-container button {
   order: 1 !important;
+  margin-right: 4px !important;
 }
 
 .rcb-chat-footer-container a[href*="access-qa-tool"] {
@@ -546,6 +547,11 @@
 .rcb-chat-footer-container a[href*="feedback"] {
   order: 3 !important;
   tab-index: 0 !important;
+}
+
+.rcb-attach-button-enabled,
+.rcb-attach-button-disabled {
+  margin-right: 4px !important;
 }
 
 /* High contrast mode support */

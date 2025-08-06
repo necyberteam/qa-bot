@@ -5,7 +5,7 @@ import {
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
-import { validateEmail } from '../../validation-utils';
+import { validateEmail, validateGeneralFiles } from '../../validation-utils';
 
 /**
  * Creates the enhanced general help ticket flow with ProForma field support
@@ -81,7 +81,8 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         : "general_help_resource"
     },
     general_help_upload: {
-      message: "Please upload your file(s). Click the file attachment button in the chat footer to select files.",
+      message: "Please upload your file(s). Click the file attachment button in the chat footer to select files. Supported formats: PDF, PNG, JPG, GIF, DOC, DOCX, TXT, CSV, ZIP (max 25MB per file, 50MB total).",
+      validateFileInput: validateGeneralFiles,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { getCurrentFeedbackForm } from '../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
-import { validateEmail, isValidEmail } from '../validation-utils';
+import { validateEmail, isValidEmail, validateImageFiles } from '../validation-utils';
 
 /**
  * Creates the feedback conversation flow
@@ -114,7 +114,8 @@ export const createFeedbackFlow = ({
       }
     },
     feedback_upload_yes: {
-      message: "Please upload a screenshot or file to help us better understand your feedback. Click the file attachment button in the chat footer to select files.",
+      message: "Please upload a screenshot or file to help us better understand your feedback. Click the file attachment button in the chat footer to select files (PNG or JPG images only, max 10MB).",
+      validateFileInput: validateImageFiles,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality
         setFeedbackForm({
