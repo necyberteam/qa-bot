@@ -1,8 +1,7 @@
-import React from 'react';
-import FileUploadComponent from '../../components/FileUploadComponent';
 import { submitSecurityIncident } from '../api-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
+import { validateFileUpload } from '../validation-utils';
 
 /**
  * Creates the security incident conversation flow
@@ -19,10 +18,10 @@ export const createSecurityFlow = ({
 }) => {
   // Store the most recent ACCESS ID input to handle timing issues
   let mostRecentAccessId = null;
-  
+
   // Store submission result for success message
   let submissionResult = null;
-  
+
   // Custom success message for security incidents
   const generateSecuritySuccessMessage = (result) => {
     if (result && !result.success) {
@@ -35,18 +34,6 @@ export const createSecurityFlow = ({
       return `Your security incident report has been submitted successfully.\n\nOur cybersecurity team will review your report and respond accordingly. Thank you for helping keep ACCESS secure.`;
     }
   };
-  // Store the FileUploadComponent JSX in a variable for better readability
-  const fileUploadElement = (
-    <FileUploadComponent
-      onFileUpload={(files) => {
-        const currentForm = getCurrentTicketForm() || {};
-        setTicketForm({
-          ...currentForm,
-          uploadedFiles: files
-        });
-      }}
-    />
-  );
 
   return {
     security_incident: {
@@ -96,13 +83,16 @@ export const createSecurityFlow = ({
         : "security_contact_info"
     },
     security_upload: {
-      message: "Please upload your files.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => {
+      message: "Please upload your files by clicking the file attachment button in the chat footer.",
+      validateFileInput: validateFileUpload,
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm() || {};
-        setTicketForm({...currentForm, uploadConfirmed: true});
+        setTicketForm({
+          ...currentForm,
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
       },
       path: "security_contact_info"
     },
@@ -118,7 +108,7 @@ export const createSecurityFlow = ({
       options: (chatState) => {
         if (!chatState) return [];
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-        return (formWithUserInfo.name && formWithUserInfo.email && formWithUserInfo.accessId) 
+        return (formWithUserInfo.name && formWithUserInfo.email && formWithUserInfo.accessId)
           ? ["Yes, that's correct", "Let me update it"]
           : [];
       },
@@ -189,7 +179,7 @@ export const createSecurityFlow = ({
         // Get current form state from context
         const currentForm = getCurrentTicketForm() || {};
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-        
+
         // Create a merged form that includes the most recent data
         const finalForm = {
           ...currentForm,
@@ -197,14 +187,14 @@ export const createSecurityFlow = ({
           email: formWithUserInfo.email || currentForm.email,
           accessId: mostRecentAccessId || formWithUserInfo.accessId || currentForm.accessId
         };
-        
+
         let fileInfo = '';
         if (currentForm.uploadedFiles && currentForm.uploadedFiles.length > 0) {
           fileInfo = `\nAttachments: ${currentForm.uploadedFiles.length} file(s) attached`;
         }
 
         const accessIdDisplay = finalForm.accessId || 'Not provided';
-        
+
         return `Here's a summary of your security incident report:\n\n` +
                `Summary: ${finalForm.summary || 'Not provided'}\n` +
                `Priority: ${finalForm.priority || 'Not provided'}\n` +
@@ -220,7 +210,7 @@ export const createSecurityFlow = ({
         if (chatState.userInput === "Submit Security Report") {
           const currentForm = getCurrentTicketForm() || {};
           const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-          
+
           // Create final merged form to handle timing issues
           const finalForm = {
             ...currentForm,
@@ -228,7 +218,7 @@ export const createSecurityFlow = ({
             email: formWithUserInfo.email || currentForm.email,
             accessId: mostRecentAccessId || formWithUserInfo.accessId || currentForm.accessId
           };
-          
+
           // Prepare form data for security incident submission
           const formData = {
             summary: finalForm.summary || "",
@@ -282,7 +272,8 @@ export const createSecurityFlow = ({
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Security Report") {
-          return "security_success";
+          // ✅ Navigate to success/error based on actual result
+          return submissionResult && submissionResult.success ? "security_success" : "security_error";
         } else {
           return "start";
         }
@@ -298,6 +289,22 @@ export const createSecurityFlow = ({
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    security_error: {
+      message: () => {
+        const currentForm = getCurrentTicketForm() || {};
+        const result = currentForm.submissionResult || submissionResult;
+        return `We apologize, but there was an error submitting your security incident report: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our cybersecurity team directly.`;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "security_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };

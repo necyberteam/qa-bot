@@ -1,12 +1,11 @@
-import { 
-  createFileUploadComponent, 
-  createSubmissionHandler, 
+import {
+  createSubmissionHandler,
   generateSuccessMessage,
   getFileInfo
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
-import { validateEmail } from '../../validation-utils';
+import { validateEmail, validateFileUpload } from '../../validation-utils';
 
 /**
  * Creates the affiliated/resource provider login help ticket flow
@@ -18,8 +17,9 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
-  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
 
+  // Store submission result for cross-environment compatibility
+  let lastSubmissionResult = null;
 
   return {
     // PATH: Affiliated/Resource Provider Login Help Path
@@ -43,7 +43,7 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
       message: "Which ACCESS Resource are you trying to access?",
       options: [
         "ACES",
-        "Anvil", 
+        "Anvil",
         "Bridges-2",
         "DARWIN",
         "Delta",
@@ -112,13 +112,16 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
           })()
     },
     affiliated_login_upload: {
-      message: "Please upload your screenshot.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => {
+      message: "Please upload your screenshot(s) by clicking the file attachment button in the chat footer.",
+      validateFileInput: validateFileUpload,
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, uploadConfirmed: true});
+        setTicketForm({
+          ...currentForm,
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
       },
       path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
@@ -203,12 +206,16 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
             userIdAtResource: currentForm.userIdResource || ""
           };
 
-          await submitTicket(formData, 'loginProvider', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: Submitting affiliated login ticket', { formDataKeys: Object.keys(formData) });
+          // ✅ Get the actual submission result and store it
+          lastSubmissionResult = await submitTicket(formData, 'loginProvider', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: Affiliated login ticket submission completed', { lastSubmissionResult });
         }
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          return "affiliated_login_success";
+          // ✅ Navigate to success/error based on actual result
+          return lastSubmissionResult && lastSubmissionResult.success ? "affiliated_login_success" : "affiliated_login_error";
         } else {
           return "start";
         }
@@ -216,12 +223,37 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
     },
     affiliated_login_success: {
       message: () => {
-        return generateSuccessMessage(getSubmissionResult(), 'resource login ticket');
+        console.info('api-response-flow: Entering affiliated_login_success state');
+        // ✅ Use local result for better cross-environment reliability
+        const result = lastSubmissionResult || getSubmissionResult();
+        console.info('api-response-flow: Retrieved submission result for affiliated success message', { result });
+        const message = generateSuccessMessage(result, 'resource login ticket');
+        console.info('api-response-flow: Generated affiliated success message', { message });
+        return message;
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    affiliated_login_error: {
+      message: () => {
+        console.info('api-response-flow: Entering affiliated_login_error state');
+        const result = lastSubmissionResult || getSubmissionResult();
+        console.info('api-response-flow: Retrieved submission result for affiliated error message', { result });
+        const errorMessage = `We apologize, but there was an error submitting your resource login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Generated affiliated error message', { errorMessage });
+        return errorMessage;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "affiliated_login_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };

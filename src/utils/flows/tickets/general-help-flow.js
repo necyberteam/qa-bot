@@ -1,12 +1,11 @@
-import { 
-  createFileUploadComponent, 
-  createSubmissionHandler, 
+import {
+  createSubmissionHandler,
   generateSuccessMessage,
   getFileInfo
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
-import { validateEmail } from '../../validation-utils';
+import { validateEmail, validateFileUpload } from '../../validation-utils';
 
 /**
  * Creates the enhanced general help ticket flow with ProForma field support
@@ -18,8 +17,9 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
-  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
 
+  // Store submission result for cross-environment compatibility
+  let lastSubmissionResult = null;
 
   return {
     // FORM flow - Enhanced General Help Ticket Form Flow
@@ -81,13 +81,16 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         : "general_help_resource"
     },
     general_help_upload: {
-      message: "Please upload your file.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => {
+      message: "Please upload your file(s) by clicking the file attachment button in the chat footer.",
+      validateFileInput: validateFileUpload,
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, uploadConfirmed: true});
+        setTicketForm({
+          ...currentForm,
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
       },
       path: "general_help_resource"
     },
@@ -542,7 +545,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
         // Get current form state from context (always up-to-date)
         const currentForm = getCurrentTicketForm();
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
-        
+
         // Use current form state directly since Form Context always has fresh data
         const fileInfo = getFileInfo(currentForm.uploadedFiles);
 
@@ -577,6 +580,7 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
       chatDisabled: true,
       function: async (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
+          console.info('api-response-flow: User clicked Submit Ticket');
           const currentForm = getCurrentTicketForm();
           const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
           const formData = {
@@ -597,12 +601,16 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
             suggestedKeyword: currentForm.suggestedKeyword || ""
           };
 
-          await submitTicket(formData, 'support', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: Submitting ticket with form data', { formDataKeys: Object.keys(formData) });
+          // ✅ Get the actual submission result and store it
+          lastSubmissionResult = await submitTicket(formData, 'support', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: Ticket submission completed', { lastSubmissionResult });
         }
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          return "general_help_success";
+          // ✅ Navigate to success/error based on actual result
+          return lastSubmissionResult && lastSubmissionResult.success ? "general_help_success" : "general_help_error";
         } else {
           return "start";
         }
@@ -610,12 +618,37 @@ export const createGeneralHelpFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     general_help_success: {
       message: () => {
-        return generateSuccessMessage(getSubmissionResult(), 'support ticket');
+        console.info('api-response-flow: Entering general_help_success state');
+        // ✅ Use local result for better cross-environment reliability
+        const result = lastSubmissionResult || getSubmissionResult();
+        console.info('api-response-flow: Retrieved submission result for success message', { result });
+        const message = generateSuccessMessage(result, 'support ticket');
+        console.info('api-response-flow: Generated success message', { message });
+        return message;
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    general_help_error: {
+      message: () => {
+        console.info('api-response-flow: Entering general_help_error state');
+        const result = lastSubmissionResult || getSubmissionResult();
+        console.info('api-response-flow: Retrieved submission result for error message', { result });
+        const errorMessage = `We apologize, but there was an error submitting your support ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Generated error message', { errorMessage });
+        return errorMessage;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "general_help_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };

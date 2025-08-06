@@ -50,3 +50,73 @@ export const validateEmail = (email) => {
     success: true
   };
 };
+
+/**
+ * File validation utility functions
+ */
+
+/**
+ * Validates uploaded files for all flows
+ * @param {FileList} fileList - The FileList object from file input
+ * @returns {Object} - Validation result with success boolean and optional error message
+ */
+export const validateFileUpload = (fileList) => {
+  if (!fileList || fileList.length === 0) {
+    return {
+      success: false,
+      promptContent: "Please select at least one file to upload.",
+      promptDuration: 3000,
+      promptType: 'error',
+      highlightTextArea: true
+    };
+  }
+
+  const maxFileSize = 25 * 1024 * 1024; // 25MB per file
+  const maxTotalSize = 50 * 1024 * 1024; // 50MB total
+  const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg', '.gif', '.doc', '.docx', '.txt', '.csv', '.zip'];
+  
+  let totalSize = 0;
+
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i];
+    totalSize += file.size;
+    
+    // Check individual file size
+    if (file.size > maxFileSize) {
+      return {
+        success: false,
+        promptContent: `File "${file.name}" is too large.`,
+        promptDuration: 3000,
+        promptType: 'error',
+        highlightTextArea: true
+      };
+    }
+    
+    // Check file extension
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+    
+    if (!hasValidExtension) {
+      return {
+        success: false,
+        promptContent: `File "${file.name}" has an unsupported format.`,
+        promptDuration: 3000,
+        promptType: 'error',
+        highlightTextArea: true
+      };
+    }
+  }
+  
+  // Check total size
+  if (totalSize > maxTotalSize) {
+    return {
+      success: false,
+      promptContent: "Total file size is too large.",
+      promptDuration: 3000,
+      promptType: 'error',
+      highlightTextArea: true
+    };
+  }
+  
+  return { success: true };
+};

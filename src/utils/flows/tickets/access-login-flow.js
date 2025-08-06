@@ -1,12 +1,11 @@
-import { 
-  createFileUploadComponent, 
-  createSubmissionHandler, 
+import {
+  createSubmissionHandler,
   generateSuccessMessage,
   getFileInfo
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
-import { validateEmail } from '../../validation-utils';
+import { validateEmail, validateFileUpload } from '../../validation-utils';
 
 /**
  * Creates the ACCESS login help ticket flow
@@ -18,8 +17,9 @@ import { validateEmail } from '../../validation-utils';
  */
 export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {}, userInfo = {} }) => {
   const { submitTicket, getSubmissionResult } = createSubmissionHandler(setTicketForm);
-  const fileUploadElement = createFileUploadComponent(setTicketForm, ticketForm);
 
+  // Store submission result for cross-environment compatibility
+  let lastSubmissionResult = null;
 
   return {
     // PATH: ACCESS Login Help Path
@@ -93,13 +93,16 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
           })()
     },
     access_login_upload: {
-      message: "Please upload your screenshot.",
-      component: fileUploadElement,
-      options: ["Continue"],
-      chatDisabled: true,
-      function: () => {
+      message: "Please upload your screenshot(s) by clicking the file attachment button in the chat footer.",
+      validateFileInput: validateFileUpload,
+      file: (params) => {
+        // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();
-        setTicketForm({...currentForm, uploadConfirmed: true});
+        setTicketForm({
+          ...currentForm,
+          uploadedFiles: params.files,
+          uploadConfirmed: true
+        });
       },
       path: () => {
         const formWithUserInfo = getCurrentFormWithUserInfo(userInfo);
@@ -185,12 +188,16 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
             browser: currentForm.browser || ""
           };
 
-          await submitTicket(formData, 'loginAccess', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: Submitting ACCESS login ticket', { formDataKeys: Object.keys(formData) });
+          // ✅ Get the actual submission result and store it
+          lastSubmissionResult = await submitTicket(formData, 'loginAccess', currentForm.uploadedFiles || []);
+          console.info('api-response-flow: ACCESS login ticket submission completed', { lastSubmissionResult });
         }
       },
       path: (chatState) => {
         if (chatState.userInput === "Submit Ticket") {
-          return "access_login_success";
+          // ✅ Navigate to success/error based on actual result
+          return lastSubmissionResult && lastSubmissionResult.success ? "access_login_success" : "access_login_error";
         } else {
           return "start";
         }
@@ -198,12 +205,37 @@ export const createAccessLoginFlow = ({ ticketForm = {}, setTicketForm = () => {
     },
     access_login_success: {
       message: () => {
-        return generateSuccessMessage(getSubmissionResult(), 'ACCESS login ticket');
+        console.info('api-response-flow: Entering access_login_success state');
+        // ✅ Use local result for better cross-environment reliability
+        const result = lastSubmissionResult || getSubmissionResult();
+        console.info('api-response-flow: Retrieved submission result for ACCESS success message', { result });
+        const message = generateSuccessMessage(result, 'ACCESS login ticket');
+        console.info('api-response-flow: Generated ACCESS success message', { message });
+        return message;
       },
       options: ["Back to Main Menu"],
       chatDisabled: true,
       renderHtml: ["BOT"],
       path: "start"
+    },
+    access_login_error: {
+      message: () => {
+        console.info('api-response-flow: Entering access_login_error state');
+        const result = lastSubmissionResult || getSubmissionResult();
+        console.info('api-response-flow: Retrieved submission result for ACCESS error message', { result });
+        const errorMessage = `We apologize, but there was an error submitting your ACCESS login ticket: ${result?.error || 'Unknown error'}\n\nPlease try again or contact our support team directly.`;
+        console.info('api-response-flow: Generated ACCESS error message', { errorMessage });
+        return errorMessage;
+      },
+      options: ["Try Again", "Back to Main Menu"],
+      chatDisabled: true,
+      path: (chatState) => {
+        if (chatState.userInput === "Try Again") {
+          return "access_login_confirmation";
+        } else {
+          return "start";
+        }
+      }
     }
   };
 };

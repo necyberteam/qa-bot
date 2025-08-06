@@ -23,11 +23,11 @@ const useChatBotSettings = ({
   loginUrl
 }) => {
   const isBotLoggedIn = isLoggedIn;
-  
+
   // Check if tooltip has been shown in this session
   const hasShownTooltip = sessionStorage.getItem('qa_bot_tooltip_shown');
   const tooltipMode = hasShownTooltip ? 'NEVER' : 'START';
-  
+
   const settings = useMemo(() => {
     return {
       general: {
@@ -94,17 +94,23 @@ const useChatBotSettings = ({
       emoji: {
         disabled: true,
       },
-      fileAttachment: {
-        disabled: true,
-      },
       notification: {
         disabled: true,
       },
       footer: {
         text: (<div key="footer-text"><a href="https://support.access-ci.org/tools/access-qa-tool">About this tool</a>.</div>),
         buttons: [
+          Button.FILE_ATTACHMENT_BUTTON,
+          Button.EMOJI_PICKER_BUTTON,
           <NewChatButton key="new-chat-button" />
         ]
+      },
+      fileAttachment: {
+        disabled: false,
+        multiple: true,
+        accept: ".pdf,.png,.jpg,.jpeg,.gif,.doc,.docx,.txt,.csv,.zip",
+        sendFileName: true,
+        showMediaDisplay: false
       },
       event: {
         rcbToggleChatWindow: true // Enable chat window toggle event
