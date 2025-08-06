@@ -1,4 +1,3 @@
-import React from 'react';
 import { buildWelcomeMessage } from '../config/constants';
 import { createMainMenuFlow } from './flows/main-menu-flow';
 import { createQAFlow } from './flows/qa-flow';

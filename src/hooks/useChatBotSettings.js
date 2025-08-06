@@ -94,9 +94,6 @@ const useChatBotSettings = ({
       emoji: {
         disabled: true,
       },
-      fileAttachment: {
-        disabled: true,
-      },
       notification: {
         disabled: true,
       },

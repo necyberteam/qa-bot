@@ -1,4 +1,3 @@
-import React from 'react';
 import { submitSecurityIncident } from '../api-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
