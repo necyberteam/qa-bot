@@ -5,7 +5,7 @@ import {
 } from './ticket-flow-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../../optional-field-utils';
-import { validateEmail, validateImageFiles } from '../../validation-utils';
+import { validateEmail, validateFileUpload } from '../../validation-utils';
 
 /**
  * Creates the affiliated/resource provider login help ticket flow
@@ -112,8 +112,8 @@ export const createAffiliatedLoginFlow = ({ ticketForm = {}, setTicketForm = () 
           })()
     },
     affiliated_login_upload: {
-      message: "Please upload your screenshot(s). Click the file attachment button in the chat footer to select files (PNG or JPG images only, max 10MB).",
-      validateFileInput: validateImageFiles,
+      message: "Please upload your screenshot(s).",
+      validateFileInput: validateFileUpload,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm();

@@ -2,7 +2,7 @@ import React from 'react';
 import { submitSecurityIncident } from '../api-utils';
 import { getCurrentTicketForm, getCurrentFormWithUserInfo } from '../flow-context-utils';
 import { createOptionalFieldValidator, processOptionalInput } from '../optional-field-utils';
-import { validateGeneralFiles } from '../validation-utils';
+import { validateFileUpload } from '../validation-utils';
 
 /**
  * Creates the security incident conversation flow
@@ -84,8 +84,8 @@ export const createSecurityFlow = ({
         : "security_contact_info"
     },
     security_upload: {
-      message: "Please upload your files. Click the file attachment button in the chat footer to select files. Supported formats: PDF, PNG, JPG, GIF, DOC, DOCX, TXT, CSV, ZIP (max 25MB per file, 50MB total).",
-      validateFileInput: validateGeneralFiles,
+      message: "Please upload your files.",
+      validateFileInput: validateFileUpload,
       file: (params) => {
         // Handle file upload using built-in react-chatbotify file functionality
         const currentForm = getCurrentTicketForm() || {};
