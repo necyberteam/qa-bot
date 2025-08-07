@@ -4,7 +4,6 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGGED_OUT: 'To ask questions, please log in.',
   WELCOME_MESSAGE_LOGIN_TRANSITION: 'Welcome! You are now logged in. What can I help you with?',
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
-  //API_ENDPOINT: 'https://access-ai.ccs.uky.edu/api/query',
   API_ENDPOINT: 'https://access-ai.ccs.uky.edu:543/api/query',
   RATING_ENDPOINT: 'https://access-ai.ccs.uky.edu:545/api/query/rating',
 
@@ -31,6 +30,19 @@ export const DEFAULT_CONFIG = {
     AVATAR_URL: 'https://support.access-ci.org/themes/contrib/asp-theme/images/icons/ACCESS-arrrow.svg',
     TOOLTIP_TEXT: 'Ask me about ACCESS! 😊'
   }
+};
+
+// Runtime functions to get endpoints (handles env vars that may not be available at build time)
+export const getApiEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_API_ENDPOINT) 
+    ? process.env.REACT_APP_API_ENDPOINT 
+    : DEFAULT_CONFIG.API_ENDPOINT;
+};
+
+export const getRatingEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_RATING_ENDPOINT) 
+    ? process.env.REACT_APP_RATING_ENDPOINT 
+    : DEFAULT_CONFIG.RATING_ENDPOINT;
 };
 
 // Helper functions from strings.js

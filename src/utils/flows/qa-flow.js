@@ -1,5 +1,5 @@
 import { handleBotError } from '../error-handler';
-import { DEFAULT_CONFIG } from '../../config/constants';
+import { DEFAULT_CONFIG, getApiEndpoint, getRatingEndpoint } from '../../config/constants';
 
 /**
  * Creates the Q&A conversation flow
@@ -38,7 +38,7 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
             };
 
             try {
-              await fetch(DEFAULT_CONFIG.RATING_ENDPOINT, {
+              await fetch(getRatingEndpoint(), {
                 method: 'POST',
                 headers
               });
@@ -61,7 +61,7 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
               'X-Query-ID': currentQueryId
             };
 
-            const response = await fetch(DEFAULT_CONFIG.API_ENDPOINT, {
+            const response = await fetch(getApiEndpoint(), {
               method: 'POST',
               headers,
               body: JSON.stringify({
