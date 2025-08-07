@@ -55,7 +55,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     accessId
   } = props;
 
-  const finalApiKey = apiKey || ((typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null);
+  const finalApiKey = apiKey || process.env.REACT_APP_API_KEY || null;
 
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
   const sessionIdRef = useRef(getOrCreateSessionId());
