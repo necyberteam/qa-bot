@@ -1,5 +1,5 @@
 import { handleBotError } from '../error-handler';
-import { DEFAULT_CONFIG, getApiEndpoint, getRatingEndpoint } from '../../config/constants';
+import { getApiEndpoint, getRatingEndpoint } from '../../config/constants';
 
 /**
  * Creates the Q&A conversation flow
