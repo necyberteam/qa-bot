@@ -6,6 +6,7 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
   //API_ENDPOINT: 'https://access-ai.ccs.uky.edu/api/query',
   API_ENDPOINT: 'https://access-ai.ccs.uky.edu:543/api/query',
+  RATING_ENDPOINT: 'https://access-ai.ccs.uky.edu:545/api/query/rating',
 
   // Netlify function URL - this should point to the Netlify functions endpoint for ticket submission
   // NOT the Q&A API endpoint

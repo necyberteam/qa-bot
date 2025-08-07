@@ -23,7 +23,6 @@ const useHandleAIQuery = (apiKey, sessionId, setCurrentQueryId) => {
 
     const headers = {
       'Content-Type': 'application/json',
-      'Connection': 'close',
       'X-Origin': 'access',
       'X-API-KEY': apiKey,
       'X-Session-ID': sessionId,
