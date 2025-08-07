@@ -25,8 +25,12 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
 
         // Handle feedback first if it's feedback
         if (userInput === "👍 Helpful" || userInput === "👎 Not helpful") {
+          console.log('Feedback clicked:', userInput);
+          console.log('Check values - apiKey:', !!apiKey, 'sessionId:', !!sessionId, 'feedbackQueryId:', !!feedbackQueryId);
+          
           // Send feedback using the captured query ID
           if (apiKey && sessionId && feedbackQueryId) {
+            console.log('All values present, sending feedback...');
             const isPositive = userInput === "👍 Helpful";
             const headers = {
               'Content-Type': 'application/json',
@@ -37,14 +41,20 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
               'X-Feedback': isPositive ? 1 : 0
             };
 
+            const endpoint = getRatingEndpoint();
+            console.log('Sending to endpoint:', endpoint);
+
             try {
-              await fetch(getRatingEndpoint(), {
+              await fetch(endpoint, {
                 method: 'POST',
                 headers
               });
+              console.log('Feedback sent successfully');
             } catch (error) {
               console.error('Error sending feedback:', error);
             }
+          } else {
+            console.log('Missing required values for feedback');
           }
           return "Thanks for the feedback! Feel free to ask another question.";
         } else {
