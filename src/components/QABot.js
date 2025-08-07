@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
 import useChatBotSettings from '../hooks/useChatBotSettings';
-import useHandleAIQuery from '../hooks/useHandleAIQuery';
 import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import useFocusableSendButton from '../hooks/useFocusableSendButton';
@@ -60,7 +59,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
-  const [currentQueryId, setCurrentQueryId] = useState(null);
   
   // Use Form Context instead of local state
   const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
@@ -72,8 +70,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     }
   }, [isLoggedIn]);
 
-  // Initialize currentQueryId as null - will be set by useHandleAIQuery
-  // when actual queries are processed
 
   // Listen for chat window toggle events from react-chatbotify
   useEffect(() => {
@@ -105,7 +101,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     loginUrl
   });
 
-  const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
   const formContext = useMemo(() => ({ 
     ticketForm: ticketForm || {}, 
@@ -120,9 +115,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     welcomeMessage,
     isBotLoggedIn,
     loginUrl,
-    handleQuery,
     sessionId,
-    currentQueryId,
     ticketForm,
     setTicketForm: updateTicketForm,
     feedbackForm,
@@ -134,7 +127,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
       name: userName || null,
       accessId: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, sessionId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);

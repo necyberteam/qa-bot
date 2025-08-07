@@ -12,10 +12,7 @@ function createBotFlow({
   welcomeMessage,
   isBotLoggedIn,
   loginUrl,
-  handleQuery,
-  hasQueryError,
   sessionId,
-  currentQueryId,
   ticketForm = {},
   setTicketForm = () => {},
   // feedbackForm = {},
@@ -38,9 +35,7 @@ function createBotFlow({
   // Create Q&A flow (requires login)
   const qaFlow = isBotLoggedIn
     ? createQAFlow({
-        fetchAndStreamResponse: handleQuery,
         sessionId,
-        currentQueryId,
         apiKey
       })
     : {
@@ -84,17 +79,7 @@ function createBotFlow({
     ...(qaFlow || {}),
     ...(ticketFlow || {}),
     //...(feedbackFlow || {}), // TODO: add feedback flow back in
-    ...(securityFlow || {}),
-    // Add fallback loop for errors (only if logged in)
-    ...(isBotLoggedIn && {
-      loop: {
-        message: async (params) => {
-          await handleQuery(params);
-        },
-        renderMarkdown: ["BOT"],
-        path: () => hasQueryError ? 'start' : 'loop'
-      }
-    })
+    ...(securityFlow || {})
   };
 
   return flow;
