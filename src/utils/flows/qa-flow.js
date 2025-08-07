@@ -61,7 +61,9 @@ export const createQAFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId
           // Process as a question - fetch response directly
           try {
             // Capture the current query ID for feedback
+            console.log('Processing question, currentQueryId:', currentQueryId);
             feedbackQueryId = currentQueryId;
+            console.log('Set feedbackQueryId to:', feedbackQueryId);
             
             const headers = {
               'Content-Type': 'application/json',
