@@ -4,8 +4,8 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGGED_OUT: 'To ask questions, please log in.',
   WELCOME_MESSAGE_LOGIN_TRANSITION: 'Welcome! You are now logged in. What can I help you with?',
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
-  API_ENDPOINT: 'https://access-ai.ccs.uky.edu/api/query',
-  //API_ENDPOINT: 'https://access-ai.ccs.uky.edu:543/api/query',
+  API_ENDPOINT: 'https://access-ai.ccs.uky.edu:543/api/query',
+  RATING_ENDPOINT: 'https://access-ai.ccs.uky.edu:545/api/query/rating',
 
   // Netlify function URL - this should point to the Netlify functions endpoint for ticket submission
   // NOT the Q&A API endpoint
@@ -32,6 +32,19 @@ export const DEFAULT_CONFIG = {
   }
 };
 
+// Runtime functions to get endpoints (handles env vars that may not be available at build time)
+export const getApiEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_API_ENDPOINT) 
+    ? process.env.REACT_APP_API_ENDPOINT 
+    : DEFAULT_CONFIG.API_ENDPOINT;
+};
+
+export const getRatingEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_RATING_ENDPOINT) 
+    ? process.env.REACT_APP_RATING_ENDPOINT 
+    : DEFAULT_CONFIG.RATING_ENDPOINT;
+};
+
 // Helper functions from strings.js
 export const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
   if (isLoggedIn) {
@@ -44,5 +57,6 @@ export const buildWelcomeMessage = (isLoggedIn, welcomeMessage) => {
 
 export const getApiKey = (providedApiKey) => {
   // Return provided API key if available, otherwise fall back to environment variable
-  return providedApiKey || ((typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null);
+  // Simplified for better Netlify compatibility
+  return providedApiKey || process.env.REACT_APP_API_KEY || null;
 };

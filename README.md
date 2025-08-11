@@ -52,7 +52,6 @@ The bot supports several conversation flows:
 - Built-in feedback system with thumbs up/down options after each response
 - Automatic feedback tracking and analytics
 - Users can provide feedback or continue asking questions immediately
-- Negative feedback offers direct path to support ticket creation
 - Requires user to be logged in
 
 ### 🎫 Support Ticket Flows
@@ -238,7 +237,7 @@ REACT_APP_API_KEY=your-api-key-here
 
 The bot integrates with the ACCESS Q&A API and JSM (Jira Service Management) for ticket creation. Configure your backend endpoints to handle:
 
-- Q&A queries with streaming responses
+- Q&A queries with JSON responses
 - Support ticket creation with ProForma field mapping
 - File upload processing
 - User authentication and session management

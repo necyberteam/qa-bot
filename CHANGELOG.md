@@ -16,13 +16,18 @@
 - **Community Interest Targeting**: Community involvement question now only shown to users who provide contact information
 - **Anonymous Feedback Improvements**: Community interest field hidden from summary for anonymous submissions
 - **Focus Management**: Fixed keyboard focus jumping to previous questions; now properly targets current question only
+- **Q&A Response System**: Replaced unreliable `streamMessage` with direct API calls using `injectMessage` for consistent response display
 
 ### Fixed
+- **Critical Q&A Display Issue**: Fixed problem where Q&A responses stopped displaying after 3-4 questions due to react-chatbotify's `streamMessage` accumulating state
+- **Query ID Generation**: Implemented UUID-based query ID generation directly in QA flow to ensure proper feedback tracking
+- **Response Reliability**: Q&A responses now display consistently regardless of conversation length
 - Resolved form state persistence issues where previous session data would interfere with new submissions
 - Fixed multiple checkbox selection display in feedback summary (was showing only one selection)
 - Corrected timing issues with form context updates using chatState.userInput pattern
 - Fixed anonymous feedback showing previous contact information in summary
 - Improved keyboard accessibility for checkboxes with proper focus management
+- Removed broken fallback loop flow that used deprecated `streamMessage` approach
 
 ## [2.0.0-rc.1] - 2025-05-28
 
