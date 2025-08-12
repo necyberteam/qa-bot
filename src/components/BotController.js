@@ -23,7 +23,7 @@ const BotController = React.forwardRef(({
   const messages = useMessages();
   const chatWindow = useChatWindow();
 
-  const lastOpenRef = useRef(currentOpen);
+  const lastOpenRef = useRef(null); // Start with null to detect initial state
   const fromEventRef = useRef(false);
 
   useLoginStateTransition(isBotLoggedIn);
@@ -31,11 +31,16 @@ const BotController = React.forwardRef(({
   // Sync open state with chat window when it changes (but not when change came from event)
   useEffect(() => {
     if (!embedded && chatWindow && chatWindow.toggleChatWindow) {
+      // Handle initial state and subsequent changes
       if (lastOpenRef.current !== currentOpen && !fromEventRef.current) {
-        if (chatWindow && chatWindow.toggleChatWindow) {
-          chatWindow.toggleChatWindow(currentOpen);
-          lastOpenRef.current = currentOpen;
-        }
+
+        // Use a small delay to ensure chatWindow is fully initialized
+        setTimeout(() => {
+          if (chatWindow && chatWindow.toggleChatWindow) {
+            chatWindow.toggleChatWindow(currentOpen);
+          }
+        }, 0);
+        lastOpenRef.current = currentOpen;
       }
       fromEventRef.current = false;
     }

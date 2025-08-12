@@ -9,9 +9,9 @@ const useKeyboardNavigation = () => {
     // Dedicated checkbox navigation handler
     const handleCheckboxNavigation = (event, elements) => {
       event.preventDefault();
-      
+
       let currentIndex = -1;
-      
+
       // Find currently focused element
       for (let i = 0; i < elements.length; i++) {
         if (elements[i] === document.activeElement || elements[i].contains(document.activeElement)) {
@@ -19,14 +19,14 @@ const useKeyboardNavigation = () => {
           break;
         }
       }
-      
+
       // If no element is focused, start with first one
       if (currentIndex === -1) {
         currentIndex = 0;
       }
-      
+
       let newIndex = currentIndex;
-      
+
       switch (event.key) {
         case 'ArrowDown':
         case 'ArrowRight':
@@ -58,12 +58,12 @@ const useKeyboardNavigation = () => {
           // No action needed for other keys
           return;
       }
-      
+
       // Focus the new element
       elements[newIndex].focus();
       elements[newIndex].setAttribute('tabindex', '0');
       elements[newIndex].classList.add('keyboard-focused');
-      
+
       // Remove tabindex and focus class from other elements
       elements.forEach((element, index) => {
         if (index !== newIndex) {
@@ -92,19 +92,19 @@ const useKeyboardNavigation = () => {
 
       const chatWindow = document.querySelector('.rcb-chat-window');
       if (!chatWindow) return;
-      
+
       // Special handling for checkboxes - but only if they're in the most recent message
       const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
         .filter(el => el.offsetParent !== null);
-      
+
       if (allMessages.length > 0) {
         const lastMessage = allMessages[allMessages.length - 1];
         const checkboxContainer = lastMessage.querySelector('.rcb-checkbox-container');
-        
+
         if (checkboxContainer && checkboxContainer.offsetParent !== null) {
           const checkboxes = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'));
           const nextButton = checkboxContainer.querySelector('.rcb-checkbox-next-button');
-          
+
           if (checkboxes.length > 0) {
             // Include next button in navigable elements
             const allElements = [...checkboxes];
@@ -116,25 +116,25 @@ const useKeyboardNavigation = () => {
           }
         }
       }
-      
+
       // Check if chat window is visible and if there are options available - only in the most recent message
-      
+
       let options = [];
       if (allMessages.length > 0) {
         const lastMessage = allMessages[allMessages.length - 1];
         const optionsContainers = Array.from(lastMessage.querySelectorAll('.rcb-options-container'))
           .filter(el => el.offsetParent !== null);
-        
+
         if (optionsContainers.length > 0) {
           const lastContainer = optionsContainers[optionsContainers.length - 1];
           options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
         }
       }
-      
+
       if (options.length === 0) return;
 
       const currentIndex = options.findIndex(option => option === document.activeElement);
-      
+
       switch (event.key) {
         case 'ArrowDown':
         case 'ArrowRight': {
@@ -146,7 +146,7 @@ const useKeyboardNavigation = () => {
             // Wrap to first option
             nextIndex = 0;
           }
-          
+
           // Make sure the element is focusable
           options[nextIndex].setAttribute('tabindex', '0');
           options.forEach((opt, i) => {
@@ -155,7 +155,7 @@ const useKeyboardNavigation = () => {
               opt.classList.remove('keyboard-focused');
             }
           });
-          
+
           options[nextIndex].classList.add('keyboard-focused');
           options[nextIndex].focus();
           break;
@@ -171,7 +171,7 @@ const useKeyboardNavigation = () => {
             // Wrap to last option
             prevIndex = options.length - 1;
           }
-          
+
           // Make sure the element is focusable
           options[prevIndex].setAttribute('tabindex', '0');
           options.forEach((opt, i) => {
@@ -180,7 +180,7 @@ const useKeyboardNavigation = () => {
               opt.classList.remove('keyboard-focused');
             }
           });
-          
+
           options[prevIndex].classList.add('keyboard-focused');
           options[prevIndex].focus();
           break;
@@ -191,7 +191,7 @@ const useKeyboardNavigation = () => {
           event.preventDefault();
           if (document.activeElement && options.includes(document.activeElement)) {
             const activeElement = document.activeElement;
-            
+
             // Handle checkboxes differently
             if (activeElement.classList.contains('rcb-checkbox-row-container') || activeElement.closest('.rcb-checkbox-row-container')) {
               // For checkboxes, trigger a mousedown event (React ChatBotify standard)
@@ -201,7 +201,7 @@ const useKeyboardNavigation = () => {
                 view: window
               });
               activeElement.dispatchEvent(mouseDownEvent);
-              
+
               // Announce checkbox state
               const labelElement = activeElement.querySelector('.rcb-checkbox-label');
               const selectedText = labelElement ? labelElement.textContent : (activeElement.textContent || 'checkbox');
@@ -216,7 +216,7 @@ const useKeyboardNavigation = () => {
                 view: window
               });
               activeElement.dispatchEvent(mouseDownEvent);
-              
+
               // Announce selection to screen readers
               const selectedText = activeElement.textContent || activeElement.innerText;
               announceToScreenReader(`Selected: ${selectedText}`);
@@ -277,39 +277,43 @@ const useKeyboardNavigation = () => {
     };
 
     // Auto-focus first option when new options appear
-    const handleNewOptions = () => {
-      // Try multiple selectors for the chat window
-      let chatWindow = document.querySelector('.rcb-chat-window');
+    const handleNewOptions = (targetContainer = null) => {
+      let chatWindow = targetContainer;
+
+      // If no specific container provided, try to find one
       if (!chatWindow) {
-        chatWindow = document.querySelector('[class*="rcb-chat"]');
+        chatWindow = document.querySelector('.rcb-chat-window');
+        if (!chatWindow) {
+          chatWindow = document.querySelector('[class*="rcb-chat"]');
+        }
+        if (!chatWindow) {
+          chatWindow = document.querySelector('.qa-bot');
+        }
       }
-      if (!chatWindow) {
-        chatWindow = document.querySelector('.qa-bot');
-      }
-      
+
       if (!chatWindow) return;
-      
+
       // Get all messages to ensure we only focus options in the most recent message
       const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
         .filter(el => el.offsetParent !== null);
-      
+
       if (allMessages.length === 0) return;
-      
+
       const lastMessage = allMessages[allMessages.length - 1];
-      
+
       // Get options containers only from the last message
       const optionsContainers = Array.from(lastMessage.querySelectorAll('.rcb-options-container'))
         .filter(el => el.offsetParent !== null);
-      
+
       let options = [];
       const optionType = 'regular';
-      
+
       // Look for regular options first - but only in the last message
       if (optionsContainers.length > 0) {
         const lastContainer = optionsContainers[optionsContainers.length - 1];
         options = Array.from(lastContainer.querySelectorAll('.rcb-options'));
       }
-      
+
       // If no regular options, look for checkboxes and set them up
       if (options.length === 0) {
         // First try to find checkbox container in last message, but fallback to chatWindow if not found
@@ -317,11 +321,11 @@ const useKeyboardNavigation = () => {
         if (!checkboxContainer && chatWindow) {
           checkboxContainer = chatWindow.querySelector('.rcb-checkbox-container');
         }
-        
+
         if (checkboxContainer && checkboxContainer.offsetParent !== null) {
           const checkboxElements = Array.from(checkboxContainer.querySelectorAll('.rcb-checkbox-row-container'))
             .filter(el => el.offsetParent !== null && el.style.display !== 'none');
-          
+
           if (checkboxElements.length > 0) {
             // Include next button in navigable elements
             const nextButton = checkboxContainer.querySelector('.rcb-checkbox-next-button');
@@ -329,7 +333,7 @@ const useKeyboardNavigation = () => {
             if (nextButton && nextButton.offsetParent !== null) {
               allElements.push(nextButton);
             }
-            
+
             // Set up checkboxes for keyboard navigation
             allElements.forEach((element, index) => {
               element.setAttribute('tabindex', index === 0 ? '0' : '-1');
@@ -339,13 +343,13 @@ const useKeyboardNavigation = () => {
                 element.classList.remove('keyboard-focused');
               }
             });
-            
+
             // Add keyboard navigation hint for checkboxes if there are multiple elements
             if (checkboxElements.length > 1) {
               // Remove any existing hints first
               const existingHints = checkboxContainer.querySelectorAll('.keyboard-nav-hint');
               existingHints.forEach(hint => hint.remove());
-              
+
               // Add new hint
               const hintElement = document.createElement('div');
               hintElement.className = 'keyboard-nav-hint';
@@ -353,19 +357,19 @@ const useKeyboardNavigation = () => {
               hintElement.style.cssText = 'font-size: 12px !important; color: #666 !important; margin-bottom: 8px !important; font-style: italic !important; display: block !important;';
               checkboxContainer.insertBefore(hintElement, checkboxContainer.firstChild);
             }
-            
+
             // Focus first element
             setTimeout(() => {
               if (allElements[0] && allElements[0].offsetParent !== null) {
                 allElements[0].focus();
               }
             }, 150);
-            
+
             return; // Don't process as regular options
           }
         }
       }
-      
+
       if (options.length > 0) {
         // Set tabindex and ARIA attributes for keyboard navigation
         options.forEach((option, index) => {
@@ -390,7 +394,7 @@ const useKeyboardNavigation = () => {
             // Remove any existing hint first
             const existingHints = lastContainer.querySelectorAll('.keyboard-nav-hint');
             existingHints.forEach(hint => hint.remove());
-            
+
             // Add new hint
             const hintElement = document.createElement('div');
             hintElement.className = 'keyboard-nav-hint';
@@ -424,73 +428,83 @@ const useKeyboardNavigation = () => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           const addedNodes = Array.from(mutation.addedNodes);
-          
-          const hasNewOptions = addedNodes.some(node => 
-            node.nodeType === Node.ELEMENT_NODE && 
-            (node.classList?.contains('rcb-options-container') || 
+
+          const hasNewOptions = addedNodes.some(node =>
+            node.nodeType === Node.ELEMENT_NODE &&
+            (node.classList?.contains('rcb-options-container') ||
              node.classList?.contains('rcb-options') ||
              node.querySelector?.('.rcb-options-container') ||
              node.querySelector?.('.rcb-options'))
           );
-          
-          const hasNewCheckboxes = addedNodes.some(node => 
-            node.nodeType === Node.ELEMENT_NODE && 
+
+          const hasNewCheckboxes = addedNodes.some(node =>
+            node.nodeType === Node.ELEMENT_NODE &&
             (node.classList?.contains('rcb-checkbox-container') ||
              node.querySelector?.('.rcb-checkbox-container'))
           );
 
-          
+
           if (hasNewOptions || hasNewCheckboxes) {
-            // Clear tabindex from all existing elements to prevent old ones from being navigable
-            document.querySelectorAll('.rcb-options[tabindex], .rcb-checkbox-row-container[tabindex], .rcb-checkbox-next-button[tabindex]').forEach(el => {
+            // Find which bot container this mutation occurred in
+            let botContainer = mutation.target;
+            while (botContainer && !botContainer.classList?.contains('qa-bot') && !botContainer.classList?.contains('rcb-chat-window')) {
+              botContainer = botContainer.parentElement;
+            }
+
+            // If we found a bot container, scope operations to it; otherwise fallback to global
+            const scopeElement = botContainer || document;
+
+            // Clear tabindex from existing elements within this bot
+            scopeElement.querySelectorAll('.rcb-options[tabindex], .rcb-checkbox-row-container[tabindex], .rcb-checkbox-next-button[tabindex]').forEach(el => {
               el.setAttribute('tabindex', '-1');
               el.classList.remove('keyboard-focused');
             });
-            
-            setTimeout(handleNewOptions, 100);
+
+            // Handle new options for this specific bot
+            setTimeout(() => handleNewOptions(botContainer), 100);
           }
         }
       });
     });
 
-    // Start observing
-    const chatWindow = document.querySelector('.rcb-chat-window');
-    if (chatWindow) {
-      observer.observe(chatWindow, {
-        childList: true,
-        subtree: true
-      });
-    }
+    // Start observing the document body for changes in any bot
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
 
     // Add keyboard event listener to document only
     document.addEventListener('keydown', handleKeyboardNavigation);
 
     // Check for existing options on mount
     handleNewOptions();
-    
+
 
     // Periodic check as backup to catch any missed options and checkboxes
     const periodicCheck = setInterval(() => {
-      const hasVisibleOptions = document.querySelectorAll('.rcb-options-container .rcb-options').length > 0;
-      const hasVisibleCheckboxes = document.querySelectorAll('.rcb-checkbox-row-container').length > 0;
-      
-      if (hasVisibleOptions) {
-        const lastProcessedOptions = document.querySelectorAll('.rcb-options[tabindex]').length;
-        const currentOptions = document.querySelectorAll('.rcb-options').length;
-        
-        if (currentOptions > lastProcessedOptions) {
-          handleNewOptions();
+      // Check each bot container individually
+      document.querySelectorAll('.qa-bot').forEach(botContainer => {
+        const hasVisibleOptions = botContainer.querySelectorAll('.rcb-options-container .rcb-options').length > 0;
+        const hasVisibleCheckboxes = botContainer.querySelectorAll('.rcb-checkbox-row-container').length > 0;
+
+        if (hasVisibleOptions) {
+          const lastProcessedOptions = botContainer.querySelectorAll('.rcb-options[tabindex]').length;
+          const currentOptions = botContainer.querySelectorAll('.rcb-options').length;
+
+          if (currentOptions > lastProcessedOptions) {
+            handleNewOptions(botContainer);
+          }
         }
-      }
-      
-      if (hasVisibleCheckboxes) {
-        const lastProcessedCheckboxes = document.querySelectorAll('.rcb-checkbox-row-container[tabindex]').length;
-        const currentCheckboxes = document.querySelectorAll('.rcb-checkbox-row-container').length;
-        
-        if (currentCheckboxes > lastProcessedCheckboxes) {
-          handleNewOptions();
+
+        if (hasVisibleCheckboxes) {
+          const lastProcessedCheckboxes = botContainer.querySelectorAll('.rcb-checkbox-row-container[tabindex]').length;
+          const currentCheckboxes = botContainer.querySelectorAll('.rcb-checkbox-row-container').length;
+
+          if (currentCheckboxes > lastProcessedCheckboxes) {
+            handleNewOptions(botContainer);
+          }
         }
-      }
+      });
     }, 1000);
 
     // Cleanup

@@ -10,7 +10,7 @@ import { Button } from "react-chatbotify"
  * @param {Object} params - Parameters for generating settings
  * @param {Object} params.themeColors - Theme colors from useThemeColors
  * @param {boolean} params.embedded - Whether the bot is embedded
- * @param {boolean} params.defaultOpen - Default open state (floating mode only)
+ * @param {boolean} params.defaultOpen - Default open state (for uncontrolled components only)
  * @param {boolean} params.isLoggedIn - Whether user is logged in (passed to UserIcon)
  * @param {string} params.loginUrl - URL to navigate to for login
  * @returns {Object} ChatBot settings object
@@ -23,11 +23,11 @@ const useChatBotSettings = ({
   loginUrl
 }) => {
   const isBotLoggedIn = isLoggedIn;
-  
+
   // Check if tooltip has been shown in this session
   const hasShownTooltip = sessionStorage.getItem('qa_bot_tooltip_shown');
   const tooltipMode = hasShownTooltip ? 'NEVER' : 'START';
-  
+
   const settings = useMemo(() => {
     return {
       general: {
@@ -53,7 +53,7 @@ const useChatBotSettings = ({
         ]
       },
       chatWindow: {
-        defaultOpen: embedded ? true : defaultOpen,
+        defaultOpen: embedded ? true : defaultOpen || false,
       },
       chatInput: {
         enabledPlaceholderText: 'Type your question here...',
