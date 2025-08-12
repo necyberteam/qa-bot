@@ -5,6 +5,7 @@ import terser from '@rollup/plugin-terser';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import postcss from 'rollup-plugin-postcss';
 import replace from '@rollup/plugin-replace';
+import json from '@rollup/plugin-json';
 
 import { readFileSync } from 'fs';
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
@@ -29,6 +30,7 @@ export default [
     ],
     plugins: [
       peerDepsExternal(),
+      json(),
       postcss({
         extensions: ['.css'],
         minimize: true,
@@ -63,6 +65,7 @@ export default [
       globals: {}
     },
     plugins: [
+      json(),
       postcss({
         extensions: ['.css'],
         minimize: true,

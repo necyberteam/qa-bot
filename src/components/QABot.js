@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import BotController from './BotController';
 import useThemeColors from '../hooks/useThemeColors';
 import useChatBotSettings from '../hooks/useChatBotSettings';
-import useHandleAIQuery from '../hooks/useHandleAIQuery';
 import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import useFocusableSendButton from '../hooks/useFocusableSendButton';
@@ -15,7 +14,16 @@ import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
 import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
 import { createBotFlow } from '../utils/create-bot-flow';
 import { FormProvider, useFormContext } from '../contexts/FormContext';
+import packageJson from '../../package.json';
 
+// Build signature for deployment verification (only if debug enabled)
+if (localStorage.getItem('QaBotDebug') === 'true') {
+  // eslint-disable-next-line no-console
+  console.info(
+    `%c🤖 ACCESS QA Bot | v${packageJson.version} | react-chatbotify v2.2.0 [${new Date().toISOString().slice(0,10)}]`,
+    'background: #107180; color: white; padding: 8px; border-radius: 3px; font-weight: bold;'
+  );
+}
 
 const generateSessionId = () => {
   return `qa_bot_session_${uuidv4()}`;
@@ -55,12 +63,11 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     accessId
   } = props;
 
-  const finalApiKey = apiKey || ((typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_KEY : null);
+  const finalApiKey = apiKey || process.env.REACT_APP_API_KEY || null;
 
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
-  const [currentQueryId, setCurrentQueryId] = useState(null);
 
   // Use Form Context instead of local state
   const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
@@ -72,9 +79,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     }
   }, [isLoggedIn]);
 
-  // Initialize currentQueryId as null - will be set by useHandleAIQuery
-  // when actual queries are processed
-
   // Listen for chat window toggle events from react-chatbotify
   useEffect(() => {
     if (!embedded && onOpenChange) {
@@ -83,6 +87,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
           botRef.current._markAsUserInteraction();
         }
         const newOpenState = event.data.newState;
+
         onOpenChange(newOpenState);
       };
       window.addEventListener('rcb-toggle-chat-window', handleChatWindowToggle);
@@ -100,12 +105,10 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   const chatBotSettings = useChatBotSettings({
     themeColors,
     embedded,
-    defaultOpen: open,
+    defaultOpen: false, // Always start closed for floating mode, controlled via BotController
     isLoggedIn: isBotLoggedIn,
     loginUrl
   });
-
-  const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId);
 
   const formContext = useMemo(() => ({
     ticketForm: ticketForm || {},
@@ -116,13 +119,14 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     resetFeedbackForm
   }), [ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm]);
 
+  // loads plugins to be passed into chatbot, matching pattern in docs
+  const plugins = [HtmlRenderer(), MarkdownRenderer(), InputValidator()];
+
   const flow = useMemo(() => createBotFlow({
     welcomeMessage,
     isBotLoggedIn,
     loginUrl,
-    handleQuery,
     sessionId,
-    currentQueryId,
     ticketForm,
     setTicketForm: updateTicketForm,
     feedbackForm,
@@ -134,7 +138,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
       name: userName || null,
       accessId: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, sessionId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
@@ -177,7 +181,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
             key={`chatbot-${sessionId}-${isBotLoggedIn}`}
             settings={chatBotSettings}
             flow={flow}
-            plugins={[HtmlRenderer(), MarkdownRenderer(), InputValidator()]}
+            plugins={plugins}
           />
           {/* Live region for screen reader announcements */}
           <div

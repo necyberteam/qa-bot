@@ -1,6 +1,6 @@
 {
   "name": "@snf/access-qa-bot",
-  "version": "2.4.8-debug.0",
+  "version": "2.6.0-debug.3",
   "private": false,
   "homepage": ".",
   "description": "ACCESS Q&A Bot React Component with support ticket creation, feedback collection, and ProForma integration",
@@ -24,7 +24,7 @@
     "@rcb-plugins/html-renderer": "^0.3.1",
     "@rcb-plugins/input-validator": "^0.3.0",
     "@rcb-plugins/markdown-renderer": "^0.3.1",
-    "react-chatbotify": "^2.1.0",
+    "react-chatbotify": "^2.2.0",
     "uuid": "^11.1.0"
   },
   "peerDependencies": {
@@ -45,6 +45,7 @@
     "@eslint/js": "^9.31.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-terser": "^0.4.4",
