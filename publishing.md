@@ -246,3 +246,23 @@ npm install @snf/access-qa-bot
 ```
 
 For more detailed usage instructions and examples, refer to the README.md file.
+
+## Simple Debug Releases Workflow
+
+For quick debug releases during development:
+
+```bash
+# Update version (e.g., 2.6.0-debug.0 to 2.6.0-debug.1)
+npm version 2.6.0-debug.1
+
+# Build the library
+npm run build:lib
+
+# Publish with debug tag
+npm publish --tag debug --access public
+```
+
+This workflow is useful for:
+- Quick iterations during development
+- Testing specific versions in integration environments
+- Publishing debug versions without affecting the main release process
