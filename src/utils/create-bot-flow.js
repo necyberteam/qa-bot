@@ -17,6 +17,7 @@ function createBotFlow({
   handleMetricsQuery,
   hasQueryError,
   sessionId,
+  currentQueryId,
   ticketForm = {},
   setTicketForm = () => {},
   // feedbackForm = {},
