@@ -144,7 +144,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
       name: userName || null,
       accessId: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, handleMetricsQuery, sessionId, currentQueryId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, handleMetricsQuery, sessionId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);
