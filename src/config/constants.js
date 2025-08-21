@@ -6,7 +6,8 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
   API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/api/',
   RATING_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/rating/',
-  METRICS_API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/api/',
+  METRICS_API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/xdmod/chat/api/',
+  METRICS_RATING_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/xdmod/chat/rating/',
   EXAMPLE_METRICS_QUESTIONS_URL: 'https://docs.google.com/document/d/1-0000000000000000000000000000000000000000/edit?usp=sharing',
 
   // Netlify function URL - this should point to the Netlify functions endpoint for ticket submission
@@ -45,6 +46,18 @@ export const getRatingEndpoint = () => {
   return (typeof process !== 'undefined' && process.env?.REACT_APP_RATING_ENDPOINT)
     ? process.env.REACT_APP_RATING_ENDPOINT
     : DEFAULT_CONFIG.RATING_ENDPOINT;
+};
+
+export const getMetricsApiEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_METRICS_API_ENDPOINT)
+    ? process.env.REACT_APP_METRICS_API_ENDPOINT
+    : DEFAULT_CONFIG.METRICS_API_ENDPOINT;
+};
+
+export const getMetricsRatingEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_METRICS_RATING_ENDPOINT)
+    ? process.env.REACT_APP_METRICS_RATING_ENDPOINT
+    : DEFAULT_CONFIG.METRICS_RATING_ENDPOINT;
 };
 
 // Helper functions from strings.js

@@ -1,5 +1,5 @@
 import { handleBotError } from '../error-handler';
-import { DEFAULT_CONFIG } from '../../config/constants';
+import { DEFAULT_CONFIG, getMetricsRatingEndpoint } from '../../config/constants';
 
 /**
  * Creates the metrics conversation flow
@@ -45,7 +45,7 @@ export const createMetricsFlow = ({ fetchAndStreamResponse, sessionId, currentQu
             };
 
             try {
-              await fetch(`${DEFAULT_CONFIG.METRICS_API_ENDPOINT}/rating`, {
+              await fetch(getMetricsRatingEndpoint(), {
                 method: 'POST',
                 headers
               });
