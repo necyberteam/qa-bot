@@ -55,6 +55,11 @@ const useChatBotSettings = ({
       chatWindow: {
         defaultOpen: embedded ? true : defaultOpen || false,
       },
+      device: {
+        desktopEnabled: true,
+        mobileEnabled: true,
+        applyMobileOptimizations: false
+      },
       chatInput: {
         enabledPlaceholderText: 'Type your question here...',
         disabledPlaceholderText: '',
