@@ -293,6 +293,9 @@ const useKeyboardNavigation = () => {
 
       if (!chatWindow) return;
 
+      // Check if this is an embedded bot to prevent auto-scroll
+      const isEmbeddedBot = chatWindow.closest('.embedded-qa-bot') !== null;
+
       // Get all messages to ensure we only focus options in the most recent message
       const allMessages = Array.from(chatWindow.querySelectorAll('.rcb-message-container, .rcb-bot-message-container, .rcb-user-message-container'))
         .filter(el => el.offsetParent !== null);
@@ -358,9 +361,9 @@ const useKeyboardNavigation = () => {
               checkboxContainer.insertBefore(hintElement, checkboxContainer.firstChild);
             }
 
-            // Focus first element
+            // Focus first element (skip for embedded bots to prevent auto-scroll)
             setTimeout(() => {
-              if (allElements[0] && allElements[0].offsetParent !== null) {
+              if (allElements[0] && allElements[0].offsetParent !== null && !isEmbeddedBot) {
                 allElements[0].focus();
               }
             }, 150);
@@ -411,9 +414,9 @@ const useKeyboardNavigation = () => {
           }
         }
 
-        // Focus first option after a short delay to allow rendering
+        // Focus first option after a short delay to allow rendering (skip for embedded bots to prevent auto-scroll)
         setTimeout(() => {
-          if (options[0] && options[0].offsetParent !== null) {
+          if (options[0] && options[0].offsetParent !== null && !isEmbeddedBot) {
             options[0].focus();
             if (options.length > 1) {
               announceToScreenReader(`${options.length} options available. Use arrow keys to navigate.`);
