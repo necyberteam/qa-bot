@@ -1,6 +1,7 @@
 import { handleBotError } from '../error-handler';
 import { getApiEndpoint, getRatingEndpoint } from '../../config/constants';
 import { v4 as uuidv4 } from 'uuid';
+import { getProcessedText } from '../getProcessedText';
 
 /**
  * Creates the Q&A conversation flow
@@ -25,7 +26,7 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
 
         // Handle feedback first if it's feedback
         if (userInput === "👍 Helpful" || userInput === "👎 Not helpful") {
-          
+
           // Send feedback using the captured query ID
           if (apiKey && sessionId && feedbackQueryId) {
             const isPositive = userInput === "👍 Helpful";
@@ -56,7 +57,7 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
             // Generate our own query ID since we're bypassing useHandleAIQuery
             const queryId = uuidv4();
             feedbackQueryId = queryId;
-            
+
             const headers = {
               'Content-Type': 'application/json',
               'X-Origin': 'access',
@@ -72,12 +73,14 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
                 query: userInput
               })
             });
-            
+
             const body = await response.json();
             const text = body.response;
-            
+            const processedText = getProcessedText(text);
+
+
             // Inject the response
-            await chatState.injectMessage(text);
+            await chatState.injectMessage(processedText);
             return null;
           } catch (error) {
             console.error('Error in bot flow:', error);
