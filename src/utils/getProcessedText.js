@@ -9,8 +9,8 @@ export const getProcessedText = (text) => {
   }
 
   // Regex to match URLs that are NOT already in markdown or HTML link format
-  // This looks for URLs that are not preceded by ]( or href=" and not followed by )
-  const urlRegex = /(?<!\]\(|href=["'])https?:\/\/[^\s\[\]()]+(?![)\]])/gi;
+  // This looks for URLs that are not preceded by ]( or href=" or [ and not followed by ) or ]
+  const urlRegex = /(?<!\]\(|href=["']|\[)https?:\/\/[^\s\[\]()]+(?![)\]])/gi;
 
   // Replace bare URLs with markdown links
   const processedText = text.replace(urlRegex, (url) => {
