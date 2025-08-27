@@ -1,6 +1,6 @@
 # @snf/access-qa-bot Publishing Guide
 
-This document outlines the process for publishing the ACCESS Q&A Bot package to npm.
+This document outlines the simplified process for publishing the ACCESS Q&A Bot package to npm.
 
 ## Version Management
 
@@ -39,31 +39,28 @@ git tag -l "v0.3.0"
    npm login
    ```
 
-## Release Process
+## Standard Release Process
 
-Our release process is designed to work with our existing CDN infrastructure and includes release candidate testing for integration with dependent repositories (like access-ci-ui). The process allows for testing integration BEFORE opening a PR to ensure end-to-end functionality.
+This is the main workflow for releasing new versions of the package.
 
-### 1. Feature Development (Including Release Candidate Version)
-
-During feature development:
+### 1. Feature Development
 
 ```bash
 # Create feature branch from main
 git checkout -b feature/my-feature main
 
-# Make changes, commit them
+# Make your changes, commit them
 # ...
 
 # Check existing versions before updating
 git tag -l "v*"
 
-# Update version in package.json with rc suffix (manually edit)
-# Example: "1.1.0-rc.1"
+# Update version in package.json (manually edit)
+# Example: "1.1.0"
 # IMPORTANT: Choose a NEW version that doesn't have an existing git tag
 # This is necessary for our CDN links to work correctly
 
 # Sync package-lock.json with new version
-# NOTE: This ensures package-lock.json matches package.json version
 npm install
 
 # Build the library and app for both npm and CDN delivery
@@ -72,123 +69,85 @@ npm run build
 
 # Commit the version change and builds
 git add .
-git commit -am "Bump version to X.Y.Z-rc.1"
+git commit -am "Bump version to X.Y.Z"
 ```
 
-### 2. Publish Release Candidate from Feature Branch (Before PR)
-
-Publish the release candidate version for integration testing BEFORE opening the PR:
+### 2. Test the Package (Optional)
 
 ```bash
-# From your feature branch (not main yet)
-git checkout npm-release
-git merge feature/my-feature  # Merge your feature branch to npm-release
-# Resolve any conflicts if needed
-
-# Test the package
+# Test the package locally
 npm pack
 tar -tf @snf-access-qa-bot-*.tgz
 
-# Publish release candidate to npm with rc tag
-npm publish --tag rc --access public
-
-# Push changes to npm-release branch
-git push upstream npm-release
-
-# Return to your feature branch
-git checkout feature/my-feature
+# Clean up the test file
+rm @snf-access-qa-bot-*.tgz
 ```
 
-### 3. Integration Testing
-
-Test the release candidate version with dependent repositories:
-
-```bash
-# In access-ci-ui or other consuming repos
-npm install @snf/access-qa-bot@rc
-
-# Test integration thoroughly
-# Document any issues or successful tests
-```
-
-### 4. Open Pull Request
-
-Now that integration testing is complete, open the PR:
+### 3. Open Pull Request
 
 - Create PR from `feature/my-feature` to `main`
-- Include integration test results in PR description
-- Note that RC version has been published and tested
-- Reviewers can be confident the changes work end-to-end
+- Include description of changes
+- Get code review and approval
 
-### 5. Merge to Main
+### 4. Merge to Main
 
-Once PR is approved and merged to main, the feature branch changes are now in main.
+Once PR is approved and merged to main, proceed with the release.
 
-### 6. Promote to Stable Release
-
-After successful PR merge, promote the release candidate to a stable release:
+### 5. Create Release
 
 ```bash
 # Switch to main and pull latest
 git checkout main
 git pull upstream main
 
-# Update version in package.json to remove rc suffix
-# Example: "1.1.0-rc.1" becomes "1.1.0"
-
-# Sync package-lock.json with new version
-# NOTE: This ensures package-lock.json matches package.json version
-npm install
-
-# Build the library and app for both npm and CDN delivery
-npm run build:lib
-npm run build
-
-# Commit the stable version and builds
-git add .
-git commit -am "Release version X.Y.Z"
-
-# Create git tag and GitHub release
+# Create git tag and push it
 git tag -a vX.Y.Z -m "Release version X.Y.Z"  # Match your actual version
 git push upstream vX.Y.Z
 
 # Create GitHub release
 ```
-- Click on the "Releases" tab in the GitHub repository
-- Click "Draft a new release"
-- Select the tag you just created
+
+#### GitHub Release Steps:
+- Go to: https://github.com/necyberteam/qa-bot/releases/new
+- Select the tag you just created (vX.Y.Z)
 - Add a title and description
 - Click "Publish release"
 
+### 6. Publish to npm
+
 ```bash
-# Update npm-release branch with stable version
+# Update npm-release branch with latest main
 git checkout npm-release
 git merge main
+# Resolve any conflicts if needed
 
-# Publish stable version to npm
+# Publish to npm
 npm publish --access public
 
-# Push final changes
+# Push npm-release branch
 git push upstream npm-release
 ```
 
-### 7. Cleanup (Optional)
+## Debug Release Workflow
 
-If desired, you can remove the RC tag from npm after stable release:
+For quick debug releases during development (publishes to npm only, no git tags or GitHub releases):
 
 ```bash
-# Remove the rc tag (optional)
-npm dist-tag rm @snf/access-qa-bot rc
+# From any local branch
+# Update version (e.g., 2.6.0-debug.0 to 2.6.0-debug.1)
+npm version 2.6.0-debug.1
+
+# Build the library
+npm run build:lib
+
+# Publish with debug tag
+npm publish --tag debug --access public
 ```
 
-### Alternative: Direct Release (Skip Release Candidate)
-
-For smaller changes or when integration testing isn't needed:
-
-1. Use stable version number (no rc suffix) from the start
-2. Build the library and app: `npm run build:lib && npm run build`
-3. Follow steps 1-2 above (including the build and commit steps)
-4. Skip to step 5 (Create tag, GitHub release, and publish to npm)
+This workflow is useful for:
+- Quick iterations during development
+- Testing specific versions in integration environments
+- Publishing debug versions without affecting the main release process
 
 ## Maintaining the Release Branch
 
@@ -247,22 +206,12 @@ npm install @snf/access-qa-bot
 
 For more detailed usage instructions and examples, refer to the README.md file.
 
-## Simple Debug Releases Workflow
+## AI Assistant Notes
 
-For quick debug releases during development:
+This workflow is designed to be clear and actionable for AI assistants. Key points:
 
-```bash
-# Update version (e.g., 2.6.0-debug.0 to 2.6.0-debug.1)
-npm version 2.6.0-debug.1
-
-# Build the library
-npm run build:lib
-
-# Publish with debug tag
-npm publish --tag debug --access public
-```
-
-This workflow is useful for:
-- Quick iterations during development
-- Testing specific versions in integration environments
-- Publishing debug versions without affecting the main release process
+- Always check existing git tags before choosing a version number
+- Build commands are: `npm run build:lib && npm run build`
+- The process maintains both npm packages and CDN links
+- Debug releases use the `--tag debug` flag and don't create git tags
+- Clean up temporary files (like .tgz from npm pack) after testing
