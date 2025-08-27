@@ -51,12 +51,43 @@ git checkout -b feature/my-feature main
 
 # Make your changes, commit them
 # ...
+# DO NOT update version numbers yet - this happens after merge
+```
+
+### 2. Test the Package (Optional)
+
+```bash
+# Test the package locally (without version changes)
+npm pack
+tar -tf @snf-access-qa-bot-*.tgz
+
+# Clean up the test file
+rm @snf-access-qa-bot-*.tgz
+```
+
+### 3. Open Pull Request
+
+- Create PR from `feature/my-feature` to `main`
+- Include description of changes
+- Get code review and approval
+- **Note**: PR should NOT include version bumps
+
+### 4. Merge to Main
+
+Once PR is approved and merged to main, proceed with the release.
+
+### 5. Prepare Release (Post-Merge)
+
+```bash
+# Switch to main and pull latest changes (including your merged PR)
+git checkout main
+git pull upstream main
 
 # Check existing versions before updating
 git tag -l "v*"
 
 # Update version in package.json (manually edit)
-# Example: "1.1.0"
+# Example: "2.6.4"
 # IMPORTANT: Choose a NEW version that doesn't have an existing git tag
 # This is necessary for our CDN links to work correctly
 
@@ -70,37 +101,15 @@ npm run build
 # Commit the version change and builds
 git add .
 git commit -am "Bump version to X.Y.Z"
+
+# Push the version bump to main
+git push upstream main
 ```
 
-### 2. Test the Package (Optional)
+### 6. Create Git Tag and GitHub Release
 
 ```bash
-# Test the package locally
-npm pack
-tar -tf @snf-access-qa-bot-*.tgz
-
-# Clean up the test file
-rm @snf-access-qa-bot-*.tgz
-```
-
-### 3. Open Pull Request
-
-- Create PR from `feature/my-feature` to `main`
-- Include description of changes
-- Get code review and approval
-
-### 4. Merge to Main
-
-Once PR is approved and merged to main, proceed with the release.
-
-### 5. Create Release
-
-```bash
-# Switch to main and pull latest
-git checkout main
-git pull upstream main
-
-# Create git tag and push it
+# Create git tag and push it (version should already be committed)
 git tag -a vX.Y.Z -m "Release version X.Y.Z"  # Match your actual version
 git push upstream vX.Y.Z
 
@@ -113,7 +122,7 @@ git push upstream vX.Y.Z
 - Add a title and description
 - Click "Publish release"
 
-### 6. Publish to npm
+### 7. Publish to npm
 
 ```bash
 # Update npm-release branch with latest main
@@ -210,8 +219,17 @@ For more detailed usage instructions and examples, refer to the README.md file.
 
 This workflow is designed to be clear and actionable for AI assistants. Key points:
 
+- **Version bump timing**: Always happens AFTER PR merge, on main branch
+- **Feature PRs**: Should NOT include version bumps - focus on feature changes only
 - Always check existing git tags before choosing a version number
 - Build commands are: `npm run build:lib && npm run build`
 - The process maintains both npm packages and CDN links
 - Debug releases use the `--tag debug` flag and don't create git tags
 - Clean up temporary files (like .tgz from npm pack) after testing
+
+### If Version Bump Gets Missed
+If a PR is merged without version bump (old workflow), simply:
+1. Update version on main after merge
+2. Build and commit 
+3. Proceed with tagging and release
+This is actually the preferred approach.
