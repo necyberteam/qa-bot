@@ -14,10 +14,8 @@ function createBotFlow({
   isBotLoggedIn,
   loginUrl,
   handleQuery,
-  handleMetricsQuery,
   hasQueryError,
   sessionId,
-  currentQueryId,
   ticketForm = {},
   setTicketForm = () => {},
   // feedbackForm = {},
@@ -61,9 +59,7 @@ function createBotFlow({
   // Create metrics flow (requires login)
   const metricsFlow = isBotLoggedIn
     ? createMetricsFlow({
-        fetchAndStreamResponse: handleMetricsQuery,
         sessionId,
-        currentQueryId,
         apiKey
       })
     : {

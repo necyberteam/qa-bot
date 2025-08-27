@@ -1,17 +1,19 @@
 import { handleBotError } from '../error-handler';
-import { DEFAULT_CONFIG, getMetricsRatingEndpoint } from '../../config/constants';
+import { DEFAULT_CONFIG, getMetricsApiEndpoint, getMetricsRatingEndpoint } from '../../config/constants';
+import { v4 as uuidv4 } from 'uuid';
+import { getProcessedText } from '../getProcessedText';
 
 /**
  * Creates the metrics conversation flow
  *
  * @param {Object} params Configuration
- * @param {Function} params.fetchAndStreamResponse Function to fetch and stream responses
  * @param {string} params.sessionId Current session ID
- * @param {string} params.currentQueryId Current query ID
  * @param {string} params.apiKey API key for authentication
  * @returns {Object} Metrics flow configuration
  */
-export const createMetricsFlow = ({ fetchAndStreamResponse, sessionId, currentQueryId, apiKey }) => {
+export const createMetricsFlow = ({ sessionId, apiKey }) => {
+  // Track the query ID for the most recent response that can receive feedback
+  let feedbackQueryId = null;
   return {
     metrics_intro: {
       message: `What is your question about usage and performance metrics? You can see some <a target="_blank" href="${DEFAULT_CONFIG.EXAMPLE_METRICS_QUESTIONS_URL}">examples here</a>.`,
@@ -20,32 +22,27 @@ export const createMetricsFlow = ({ fetchAndStreamResponse, sessionId, currentQu
     },
     metrics_loop: {
       message: async (chatState) => {
-        try {
-          await fetchAndStreamResponse(chatState);
-          return "Was this helpful?";
-        } catch (error) {
-          console.error('Error in metrics flow:', error);
-          return handleBotError(error);
-        }
-      },
-      renderMarkdown: ["BOT"],
-      options: ["👍 Yes", "👎 No"],
-      chatDisabled: false,
-      function: async (chatState) => {
-        if (chatState.userInput === "👍 Yes" || chatState.userInput === "👎 No") {
-          if (apiKey && sessionId) {
-            const isPositive = chatState.userInput === "👍 Yes";
+        const { userInput } = chatState;
+
+        // Handle feedback first if it's feedback
+        if (userInput === "👍 Helpful" || userInput === "👎 Not helpful") {
+
+          // Send feedback using the captured query ID
+          if (apiKey && sessionId && feedbackQueryId) {
+            const isPositive = userInput === "👍 Helpful";
             const headers = {
               'Content-Type': 'application/json',
               'X-Origin': 'metrics',
               'X-API-KEY': apiKey,
               'X-Session-ID': sessionId,
-              'X-Query-ID': currentQueryId,
+              'X-Query-ID': feedbackQueryId,
               'X-Feedback': isPositive ? 1 : 0
             };
 
+            const endpoint = getMetricsRatingEndpoint();
+
             try {
-              await fetch(getMetricsRatingEndpoint(), {
+              await fetch(endpoint, {
                 method: 'POST',
                 headers
               });
@@ -53,36 +50,54 @@ export const createMetricsFlow = ({ fetchAndStreamResponse, sessionId, currentQu
               console.error('Error sending metrics feedback:', error);
             }
           }
+          return "Thanks for the feedback! Feel free to ask another metrics question.";
+        } else {
+          // Process as a question - fetch response directly
+          try {
+            // Generate our own query ID since we're bypassing useHandleAIQuery
+            const queryId = uuidv4();
+            feedbackQueryId = queryId;
+
+            const headers = {
+              'Content-Type': 'application/json',
+              'X-Origin': 'metrics',
+              'X-API-KEY': apiKey,
+              'X-Session-ID': sessionId,
+              'X-Query-ID': queryId
+            };
+
+            const response = await fetch(getMetricsApiEndpoint(), {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                query: userInput
+              })
+            });
+
+            const body = await response.json();
+            const text = body.response;
+            const processedText = getProcessedText(text);
+
+
+            // Inject the response
+            await chatState.injectMessage(processedText);
+            return null;
+          } catch (error) {
+            console.error('Error in metrics flow:', error);
+            return handleBotError(error);
+          }
         }
       },
-      path: (chatState) => {
-        if (chatState.userInput === "👍 Yes") {
-          return "metrics_positive_feedback";
-        } else if (chatState.userInput === "👎 No") {
-          return "metrics_negative_feedback";
+      renderMarkdown: ["BOT"],
+      options: (chatState) => {
+        // Only show feedback options if the input isn't already feedback
+        if (chatState.userInput === "👍 Helpful" || chatState.userInput === "👎 Not helpful") {
+          return []; // No options after feedback is given
         }
-        return "metrics_loop";
-      }
-    },
-    metrics_positive_feedback: {
-      message: "Thank you for your feedback! It helps us improve this tool.",
-      transition: { duration: 1000 },
-      path: "metrics_intro"
-    },
-    metrics_negative_feedback: {
-      message: "Sorry that wasn't useful. Would you like to ask another metrics question?",
-      options: ["Ask another question", "Back to Main Menu"],
-      chatDisabled: true,
-      path: (chatState) => {
-        if (chatState.userInput === "Ask another question") {
-          return "metrics_continue";
-        }
-        return "start";
-      }
-    },
-    metrics_continue: {
-      message: "Ask another metrics question, but remember that each question must stand alone.",
+        return ["👍 Helpful", "👎 Not helpful"];
+      },
+      chatDisabled: false,
       path: "metrics_loop"
-    }
+    },
   };
 };
