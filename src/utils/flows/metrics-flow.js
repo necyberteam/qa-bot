@@ -16,7 +16,7 @@ export const createMetricsFlow = ({ sessionId, apiKey }) => {
   let feedbackQueryId = null;
   return {
     metrics_intro: {
-      message: `What is your question about usage and performance metrics? You can see some <a target="_blank" href="${DEFAULT_CONFIG.EXAMPLE_METRICS_QUESTIONS_URL}">examples here</a>.`,
+      message: `What is your question about usage and performance metrics (XDMoD)? You can see some <a target="_blank" href="${DEFAULT_CONFIG.EXAMPLE_METRICS_QUESTIONS_URL}">examples here</a>.`,
       renderHtml: ["BOT"],
       path: "metrics_loop"
     },

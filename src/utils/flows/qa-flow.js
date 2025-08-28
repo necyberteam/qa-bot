@@ -17,7 +17,7 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
 
   return {
     go_ahead_and_ask: {
-      message: "Please type your question.",
+      message: "Please type your question about ACCESS here.",
       path: "qa_loop"
     },
     qa_loop: {
