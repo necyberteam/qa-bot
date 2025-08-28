@@ -11,7 +11,6 @@ import useUpdateHeader from '../hooks/useUpdateHeader';
 import useRingEffect from '../hooks/useRingEffect';
 import useFocusableSendButton from '../hooks/useFocusableSendButton';
 import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
-import useHandleAIQuery from '../hooks/useHandleAIQuery';
 import { DEFAULT_CONFIG, buildWelcomeMessage } from '../config/constants';
 import { createBotFlow } from '../utils/create-bot-flow';
 import { FormProvider, useFormContext } from '../contexts/FormContext';
@@ -69,7 +68,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
   const [isBotLoggedIn, setIsBotLoggedIn] = useState(isLoggedIn !== undefined ? isLoggedIn : false);
   const sessionIdRef = useRef(getOrCreateSessionId());
   const sessionId = sessionIdRef.current;
-  const [currentQueryId, setCurrentQueryId] = useState(null);
 
   // Use Form Context instead of local state
   const { ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, resetTicketForm, resetFeedbackForm } = useFormContext();
@@ -112,7 +110,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     loginUrl
   });
 
-  const handleQuery = useHandleAIQuery(finalApiKey, sessionId, setCurrentQueryId, 'access');
   const formContext = useMemo(() => ({
     ticketForm: ticketForm || {},
     feedbackForm: feedbackForm || {},
@@ -128,8 +125,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     welcomeMessage,
     isBotLoggedIn,
     loginUrl,
-    handleQuery,
-    hasQueryError: false, // TODO: Remove this parameter - see create-bot-flow.js
     sessionId,
     ticketForm,
     setTicketForm: updateTicketForm,
@@ -142,7 +137,7 @@ const QABotInternal = React.forwardRef((props, botRef) => {
       name: userName || null,
       accessId: accessId || null
     }
-  }), [welcomeMessage, isBotLoggedIn, loginUrl, handleQuery, sessionId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
+  }), [welcomeMessage, isBotLoggedIn, loginUrl, sessionId, ticketForm, feedbackForm, updateTicketForm, updateFeedbackForm, formContext, finalApiKey, userEmail, userName, accessId]);
 
   useUpdateHeader(isBotLoggedIn, containerRef);
   useRingEffect(ringEffect, containerRef);

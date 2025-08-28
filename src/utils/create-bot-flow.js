@@ -13,8 +13,6 @@ function createBotFlow({
   welcomeMessage,
   isBotLoggedIn,
   loginUrl,
-  handleQuery,
-  hasQueryError,
   sessionId,
   ticketForm = {},
   setTicketForm = () => {},
