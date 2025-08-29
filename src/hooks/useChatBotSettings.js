@@ -3,7 +3,7 @@ import { DEFAULT_CONFIG } from '../config/constants';
 import NewChatButton from '../components/NewChatButton';
 import UserIcon from '../components/UserIcon';
 import LoginButton from '../components/LoginButton';
-import { Button } from "react-chatbotify"
+import { Button } from "react-chatbotify";
 
 /**
  * Custom hook to generate ChatBot settings
