@@ -74,7 +74,7 @@ rm @snf-access-qa-bot-*.tgz
 
 ### 4. Merge to Main
 
-Once PR is approved and merged to main, proceed with the release.
+Once PR is approved, merge it to main **on GitHub** (using the GitHub web interface). Then proceed with the release.
 
 ### 5. Prepare Release (Post-Merge)
 
@@ -230,6 +230,6 @@ This workflow is designed to be clear and actionable for AI assistants. Key poin
 ### If Version Bump Gets Missed
 If a PR is merged without version bump (old workflow), simply:
 1. Update version on main after merge
-2. Build and commit 
+2. Build and commit
 3. Proceed with tagging and release
 This is actually the preferred approach.
