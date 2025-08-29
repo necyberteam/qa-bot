@@ -3,6 +3,7 @@ import LoginButton from '../components/LoginButton';
 import { buildWelcomeMessage } from '../config/constants';
 import { createMainMenuFlow } from './flows/main-menu-flow';
 import { createQAFlow } from './flows/qa-flow';
+import { createMetricsFlow } from './flows/metrics-flow';
 import { createTicketFlow } from './flows/ticket-flow';
 // import { createFeedbackFlow } from './flows/feedback-flow';
 import { createSecurityFlow } from './flows/security-flow';
@@ -53,6 +54,27 @@ function createBotFlow({
         }
       };
 
+  // Create metrics flow (requires login)
+  const metricsFlow = isBotLoggedIn
+    ? createMetricsFlow({
+        sessionId,
+        apiKey
+      })
+    : {
+        metrics_intro: {
+          message: "To investigate metrics, you need to log in first.",
+          component: <LoginButton loginUrl={loginUrl} />,
+          options: ["Back to Main Menu"],
+          chatDisabled: true,
+          path: (chatState) => {
+            if (chatState.userInput === "Back to Main Menu") {
+              return "start";
+            }
+            return "metrics_intro";
+          }
+        }
+      };
+
   // Create ticket and feedback flows (available to everyone)
   const ticketFlow = createTicketFlow({
     ticketForm,
@@ -77,6 +99,7 @@ function createBotFlow({
   const flow = {
     ...(mainMenuFlow || {}),
     ...(qaFlow || {}),
+    ...(metricsFlow || {}),
     ...(ticketFlow || {}),
     //...(feedbackFlow || {}), // TODO: add feedback flow back in
     ...(securityFlow || {})
