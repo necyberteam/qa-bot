@@ -50,7 +50,7 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
               console.error('Error sending feedback:', error);
             }
           }
-          return "Thanks for the feedback! Feel free to ask another question.";
+          return "Thanks for the feedback! To continue the conversation about ACCESS, type another question below. To start a new chat, click the New Chat button.";
         } else {
           // Process as a question - fetch response directly
           try {

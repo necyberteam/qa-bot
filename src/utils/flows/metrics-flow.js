@@ -50,7 +50,7 @@ export const createMetricsFlow = ({ sessionId, apiKey }) => {
               console.error('Error sending metrics feedback:', error);
             }
           }
-          return "Thanks for the feedback! Feel free to ask another metrics question.";
+          return "Thanks for the feedback! To continue the conversation about usage and performance metrics (XDMoD), type another question below. To start a new chat, click the New Chat button.";
         } else {
           // Process as a question - fetch response directly
           try {
