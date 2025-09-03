@@ -50,7 +50,7 @@ export const createMetricsFlow = ({ sessionId, apiKey }) => {
               console.error('Error sending metrics feedback:', error);
             }
           }
-          return "Thanks for the feedback! To continue the conversation about usage and performance metrics (XDMoD), type another question below. To start a new chat, click the New Chat button.";
+          return "Thanks for the feedback! Ask another question about usage and performance metrics (XDMoD) or start a new chat.";
         } else {
           // Process as a question - fetch response directly
           try {
@@ -81,6 +81,9 @@ export const createMetricsFlow = ({ sessionId, apiKey }) => {
 
             // Inject the response
             await chatState.injectMessage(processedText);
+
+            // Inject guidance message as second bubble
+            await chatState.injectMessage("Ask another question about usage and performance metrics (XDMoD) or start a new chat.");
             return null;
           } catch (error) {
             console.error('Error in metrics flow:', error);
