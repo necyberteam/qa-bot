@@ -82,8 +82,11 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
             // Inject the response
             await chatState.injectMessage(processedText);
 
-            // Inject guidance message as second bubble
-            await chatState.injectMessage("Ask another question about ACCESS or start a new chat.");
+            // Inject guidance message after a short delay to let options render first
+            setTimeout(async () => {
+              await chatState.injectMessage("Ask another question about ACCESS or start a new chat.");
+            }, 100);
+
             return null;
           } catch (error) {
             console.error('Error in bot flow:', error);

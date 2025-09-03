@@ -82,8 +82,11 @@ export const createMetricsFlow = ({ sessionId, apiKey }) => {
             // Inject the response
             await chatState.injectMessage(processedText);
 
-            // Inject guidance message as second bubble
-            await chatState.injectMessage("Ask another question about usage and performance metrics (XDMoD) or start a new chat.");
+            // Inject guidance message after a short delay to let options render first
+            setTimeout(async () => {
+              await chatState.injectMessage("Ask another question about usage and performance metrics (XDMoD) or start a new chat.");
+            }, 100);
+
             return null;
           } catch (error) {
             console.error('Error in metrics flow:', error);
