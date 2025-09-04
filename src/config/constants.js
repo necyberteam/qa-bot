@@ -6,6 +6,9 @@ export const DEFAULT_CONFIG = {
   WELCOME_MESSAGE_LOGOUT_TRANSITION: 'You have been logged out.',
   API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/api/',
   RATING_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/rating/',
+  METRICS_API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/xdmod/chat/api/',
+  METRICS_RATING_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/xdmod/chat/rating/',
+  METRICS_QUESTIONS_URL: 'https://metrics.access-ci.org/qa_bot_faq',
 
   // Netlify function URL - this should point to the Netlify functions endpoint for ticket submission
   // NOT the Q&A API endpoint
@@ -43,6 +46,18 @@ export const getRatingEndpoint = () => {
   return (typeof process !== 'undefined' && process.env?.REACT_APP_RATING_ENDPOINT)
     ? process.env.REACT_APP_RATING_ENDPOINT
     : DEFAULT_CONFIG.RATING_ENDPOINT;
+};
+
+export const getMetricsApiEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_METRICS_API_ENDPOINT)
+    ? process.env.REACT_APP_METRICS_API_ENDPOINT
+    : DEFAULT_CONFIG.METRICS_API_ENDPOINT;
+};
+
+export const getMetricsRatingEndpoint = () => {
+  return (typeof process !== 'undefined' && process.env?.REACT_APP_METRICS_RATING_ENDPOINT)
+    ? process.env.REACT_APP_METRICS_RATING_ENDPOINT
+    : DEFAULT_CONFIG.METRICS_RATING_ENDPOINT;
 };
 
 // Helper functions from strings.js
