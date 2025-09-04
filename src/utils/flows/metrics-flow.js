@@ -1,26 +1,26 @@
 import { handleBotError } from '../error-handler';
-import { getApiEndpoint, getRatingEndpoint } from '../../config/constants';
+import { DEFAULT_CONFIG, getMetricsApiEndpoint, getMetricsRatingEndpoint } from '../../config/constants';
 import { v4 as uuidv4 } from 'uuid';
 import { getProcessedText } from '../getProcessedText';
 
 /**
- * Creates the Q&A conversation flow
+ * Creates the metrics conversation flow
  *
  * @param {Object} params Configuration
  * @param {string} params.sessionId Current session ID
- * @param {string} params.apiKey API key for requests
- * @returns {Object} Q&A flow configuration
+ * @param {string} params.apiKey API key for authentication
+ * @returns {Object} Metrics flow configuration
  */
-export const createQAFlow = ({ sessionId, apiKey }) => {
+export const createMetricsFlow = ({ sessionId, apiKey }) => {
   // Track the query ID for the most recent response that can receive feedback
   let feedbackQueryId = null;
-
   return {
-    go_ahead_and_ask: {
-      message: "Please type your question about ACCESS below.",
-      path: "qa_loop"
+    metrics_intro: {
+      message: `Please type your question about usage and performance metrics (XDMoD) below. You can see some <a target="_blank" href="${DEFAULT_CONFIG.METRICS_QUESTIONS_URL}">examples here</a>.`,
+      renderHtml: ["BOT"],
+      path: "metrics_loop"
     },
-    qa_loop: {
+    metrics_loop: {
       message: async (chatState) => {
         const { userInput } = chatState;
 
@@ -32,14 +32,14 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
             const isPositive = userInput === "👍 Helpful";
             const headers = {
               'Content-Type': 'application/json',
-              'X-Origin': 'access',
+              'X-Origin': 'metrics',
               'X-API-KEY': apiKey,
               'X-Session-ID': sessionId,
               'X-Query-ID': feedbackQueryId,
               'X-Feedback': isPositive ? 1 : 0
             };
 
-            const endpoint = getRatingEndpoint();
+            const endpoint = getMetricsRatingEndpoint();
 
             try {
               await fetch(endpoint, {
@@ -47,10 +47,10 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
                 headers
               });
             } catch (error) {
-              console.error('Error sending feedback:', error);
+              console.error('Error sending metrics feedback:', error);
             }
           }
-          return "Thanks for the feedback! Ask another question about ACCESS or start a new chat.";
+          return "Thanks for the feedback! Ask another question about usage and performance metrics (XDMoD) or start a new chat.";
         } else {
           // Process as a question - fetch response directly
           try {
@@ -60,13 +60,13 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
 
             const headers = {
               'Content-Type': 'application/json',
-              'X-Origin': 'access',
+              'X-Origin': 'metrics',
               'X-API-KEY': apiKey,
               'X-Session-ID': sessionId,
               'X-Query-ID': queryId
             };
 
-            const response = await fetch(getApiEndpoint(), {
+            const response = await fetch(getMetricsApiEndpoint(), {
               method: 'POST',
               headers,
               body: JSON.stringify({
@@ -84,12 +84,12 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
 
             // Inject guidance message after a short delay to let options render first
             setTimeout(async () => {
-              await chatState.injectMessage("Ask another question about ACCESS or start a new chat.");
+              await chatState.injectMessage("Ask another question about usage and performance metrics (XDMoD) or start a new chat.");
             }, 100);
 
             return null;
           } catch (error) {
-            console.error('Error in bot flow:', error);
+            console.error('Error in metrics flow:', error);
             return handleBotError(error);
           }
         }
@@ -103,7 +103,7 @@ export const createQAFlow = ({ sessionId, apiKey }) => {
         return ["👍 Helpful", "👎 Not helpful"];
       },
       chatDisabled: false,
-      path: "qa_loop"
-    }
+      path: "metrics_loop"
+    },
   };
 };

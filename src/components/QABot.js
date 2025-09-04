@@ -121,7 +121,6 @@ const QABotInternal = React.forwardRef((props, botRef) => {
 
   // loads plugins to be passed into chatbot, matching pattern in docs
   const plugins = [HtmlRenderer(), MarkdownRenderer(), InputValidator()];
-
   const flow = useMemo(() => createBotFlow({
     welcomeMessage,
     isBotLoggedIn,
