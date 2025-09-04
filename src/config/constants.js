@@ -8,7 +8,7 @@ export const DEFAULT_CONFIG = {
   RATING_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/chat/rating/',
   METRICS_API_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/xdmod/chat/api/',
   METRICS_RATING_ENDPOINT: 'https://access-ai-grace1-external.ccs.uky.edu/access/xdmod/chat/rating/',
-  EXAMPLE_METRICS_QUESTIONS_URL: 'https://docs.google.com/document/d/1-0000000000000000000000000000000000000000/edit?usp=sharing',
+  METRICS_QUESTIONS_URL: 'https://metrics.access-ci.org/qa_bot_faq',
 
   // Netlify function URL - this should point to the Netlify functions endpoint for ticket submission
   // NOT the Q&A API endpoint
