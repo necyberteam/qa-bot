@@ -165,41 +165,39 @@ const QABotInternal = React.forwardRef((props, botRef) => {
     <div
       className={`qa-bot ${embedded ? "embedded-qa-bot" : ""}`}
       ref={containerRef}
-      role="region"
-      aria-label="Ask ACCESS tool"
+      role="application"
+      aria-label={embedded ? "Ask ACCESS - Embedded Chat Application" : "Ask ACCESS - Chat Assistant Application"}
     >
       <ChatBotProvider>
-        <main role="main" aria-label="Chat interface">
-          <BotController
-            ref={botRef}
-            embedded={embedded}
-            isBotLoggedIn={isBotLoggedIn}
-            currentOpen={open}
-          />
-          <ChatBot
-            key={`chatbot-${sessionId}-${isBotLoggedIn}`}
-            settings={chatBotSettings}
-            flow={flow}
-            plugins={plugins}
-          />
-          {/* Live region for screen reader announcements */}
-          <div
-            aria-live="polite"
-            aria-label="Bot response updates"
-            className="sr-only"
-            id="bot-live-region"
-          />
+        <BotController
+          ref={botRef}
+          embedded={embedded}
+          isBotLoggedIn={isBotLoggedIn}
+          currentOpen={open}
+        />
+        <ChatBot
+          key={`chatbot-${sessionId}-${isBotLoggedIn}`}
+          settings={chatBotSettings}
+          flow={flow}
+          plugins={plugins}
+        />
+        {/* Live region for screen reader announcements */}
+        <div
+          aria-live="polite"
+          role="status"
+          className="sr-only"
+          id="bot-live-region"
+        />
 
-          {/* Accessibility help text */}
-          <div id="chat-input-help" className="sr-only">
-            Type your message and press Enter to send. Use arrow keys to navigate through response options. Press Enter or Space to select an option.
-          </div>
+        {/* Accessibility help text */}
+        <div id="chat-input-help" className="sr-only">
+          Type your message and press Enter to send. Use arrow keys to navigate through response options. Press Enter or Space to select an option.
+        </div>
 
-          {/* Keyboard navigation instructions */}
-          <div id="keyboard-help" className="sr-only">
-            Available keyboard shortcuts: Arrow keys to navigate options, Enter or Space to select, Tab to move between interactive elements, Escape to close dialogs.
-          </div>
-        </main>
+        {/* Keyboard navigation instructions */}
+        <div id="keyboard-help" className="sr-only">
+          Available keyboard shortcuts: Arrow keys to navigate options, Enter or Space to select, Tab to move between interactive elements, Escape to close dialogs.
+        </div>
       </ChatBotProvider>
     </div>
   );
